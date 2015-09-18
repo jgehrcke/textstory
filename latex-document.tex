@@ -1,0 +1,98 @@
+\documentclass[paper=a5,fontsize=11pt,DIV=10]{scrreprt}
+\usepackage{fontspec}
+\usepackage{libertine}
+\usepackage{microtype}
+\usepackage[ngerman]{babel}
+\usepackage[german=guillemets]{csquotes}
+\usepackage{changepage}
+\usepackage{hyperref}
+\usepackage[absolute,overlay]{textpos}
+
+
+\newfontfamily\licensefont{Cabin}
+
+%\pagestyle{scrheadings}
+\usepackage{scrlayer-scrpage}
+\cfoot{\thepage}
+
+%\changepage{text height}{text width}{even-side margin}
+%{odd-side margin}{column sep.}
+%{topmargin}{headheight}{headsep}{footskip}
+%\changepage{+2cm}{-1cm}{+0cm}{+0.5cm}{}{}{}{}{-1cm}
+
+\hypersetup{
+    %pdftoolbar=false,
+    %pdfmenubar=false,
+    pdftitle={Kommt und holt sie},
+    pdfauthor={Josa Wode},
+    pdfsubject={Geschichte},
+    %pdfcreator={Josa Wode},
+    pdfproducer={Hilfe von Prof. Dr. Dr. hc. Heinrich Holzhammer},
+    pdfkeywords={geschichte, alte, josa, wode},
+    colorlinks=true,
+    urlcolor=blue
+}
+
+\begin{document}
+
+\vspace*{3.6cm}
+
+\begin{textblock*}{4.6cm}(9.1cm,0.7cm) % {block width} (coords)
+\includegraphics[width=4.6cm,trim={0 74 0 0},clip]{img/restauranttester_web.jpg}
+\end{textblock*}
+\noindent
+{\Huge \textbf{\sffamily Kommt und holt sie}}
+
+\noindent
+{\textit{Eine Geschichte von Josa Wode}}
+
+\vspace{1.1cm}
+\noindent
+\input{latex-body}
+\clearpage
+\urlstyle{rm}
+
+{\licensefont\small
+\noindent
+Except where otherwise noted, this work is licensed under
+
+\noindent
+\url{http://creativecommons.org/licenses/by-nc-sa/3.0}
+
+\vspace{0.5cm}
+\noindent
+
+Dieses Werk ist unter einer Creative Commons Lizenz vom Typ Namensnennung -
+Nicht-kommerziell - Weitergabe unter gleichen Bedingungen 3.0 Unported
+zugänglich. Um eine Kopie dieser Lizenz einzusehen, konsultieren Sie
+\url{http://creativecommons.org/licenses/by-nc-sa/3.0/} oder wenden Sie sich
+brieflich an Creative Commons, Postfach 1866, Mountain View, California, 94042,
+USA.
+
+Das Werk bzw. der Inhalt darf vervielfältigt, verbreitet und öffentlich
+zugänglich gemacht werden und es können Abwandlungen und Bearbeitungen des
+Werkes bzw. des Inhalts angefertigt werden, solange die folgenden Bedingungen
+eingehalten werden:
+
+\begin{enumerate}
+\item Namensnennung: Es müssen angemessene Urheber- und Rechteangaben gemacht, ein
+   Link zur Lizenz beigefügt und angegeben werden, ob Änderungen vorgenommen
+   wurden. Diese Angaben dürfen in jeder angemessenen Art und Weise gemacht
+   werden, allerdings nicht so, dass der Eindruck entsteht, der Lizenzgeber
+   unterstütze gerade Sie oder Ihre Nutzung besonders.
+
+\item  Nicht kommerziell: Das Material darf nicht für kommerzielle Zwecke genutzt
+   werden.
+
+\item  Weitergabe unter gleichen Bedingungen: Wird das Material verändert oder
+   anderweitig direkt darauf aufgebaut, dürfen die abgeleiteten Beiträge nur
+   unter derselben Lizenz wie das Original verbreitet werden.
+\end{enumerate}
+
+\noindent
+Der vollständige Lizenzvertrag ist unter folgender URL zu finden:
+
+\noindent
+\url{http://creativecommons.org/licenses/by-nc-sa/3.0/deed.de}
+}
+\end{document}
