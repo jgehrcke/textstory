@@ -71,11 +71,10 @@ class Filter(object):
 
 class FilterDots(Filter):
     def to_html(self, s):
-        return s
+        return s.replace("...", "&hellip;")
 
     def to_latex(self, s):
-        new = s.replace("...", r"\dots ")
-        return new.replace("…", r"\dots ")
+        return s.replace("...", r"\dots ")
 
 
 class FilterQuotes(Filter):
