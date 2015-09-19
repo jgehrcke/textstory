@@ -4,7 +4,10 @@
 
 from __future__ import unicode_literals
 import re
+import string
 import logging
+
+
 logging.basicConfig(
     format='%(asctime)s:%(msecs)05.1f  %(levelname)s: %(message)s',
     datefmt='%H:%M:%S')
@@ -39,6 +42,23 @@ def main():
         f.write(outputlatex.encode("utf-8"))
     log.info("Wrote UTF-8-encoded LaTeX source file: %s.", OUTFILE_LATEX)
 
+    # Push original contents through HTML filters (same order, order matters).
+    outputhtml = inputtext
+    for f in filters:
+        log.info("Process with %s", f)
+        outputhtml = f.to_html(outputhtml)
+        log.info("Done.")
+
+    log.info("Read HTML template file: %s.", HTML_TEMPLATE)
+    with open(HTML_TEMPLATE, "rb") as f:
+        htmltemplate = string.Template(f.read().decode("utf-8").strip())
+
+    log.info("Perform HTML template substitution")
+    htmldoc = htmltemplate.substitute(html_content=outputhtml)
+
+    with open(OUTFILE_HTML, "wb") as f:
+        f.write(htmldoc.encode("utf-8"))
+    log.info("Wrote UTF-8-encoded HTML document: %s.", OUTFILE_HTML)
 
 
 class Filter(object):
