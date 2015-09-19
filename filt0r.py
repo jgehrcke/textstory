@@ -25,9 +25,9 @@ def main():
     with open(INFILE, "rb") as f:
         inputtext = f.read().decode("utf-8").strip()
     filters = [
-        FilterSectionsParagraphs(),
+        FilterHyphens(),
+        FilterSectionsParagraphs(), # introduces HTML-minuses, must run after FilterHyphens
         FilterFootnotes(),
-        FilterSpacedHyphens(),
         FilterQuotes(),
         FilterDots(),
     ]
@@ -136,15 +136,19 @@ class FilterSectionsParagraphs(Filter):
         return self._convert(s, sectionsep, paragraphsep)
 
 
-class FilterSpacedHyphens(Filter):
+class FilterHyphens(Filter):
     def to_html(self, s):
-        return s
+        new = s.replace(" -- ", " &mdash; ")
+        # One of Josa's quite special cases!
+        new = new.replace(" --,", " &mdash;, ")
+        # All minuses that are left over should be interpreted as n dashes:
+        #new = new.replace("-", "&ndash;")
+        return new
 
     def to_latex(self, s):
-        new = s.replace(" - ", " --- ")
-        new = new.replace(" – ",  " --- ")
+        new = s.replace(" -- ", " --- ")
         # One of Josa's quite special cases!
-        new = new.replace(" –,", " ---,")
+        new = new.replace(" --,", " ---,")
         return new
 
 
