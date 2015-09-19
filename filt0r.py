@@ -115,30 +115,26 @@ class FilterQuotes(Filter):
 
 class FilterSectionsParagraphs(Filter):
 
-    _first_html_invocation = False
+    def _convert(self, s, secsep, parsep):
+        _tmp_sectionspacer = "$NEWSECTION$"
+        # First remember and shim places with two LF (section separator).
+        new = s.replace("\n\n", _tmp_sectionspacer)
+        # Replace single LF with paragraph separator.
+        new = new.replace("\n", parsep)
+        # Replace original two-LFs with markup for new section.
+        new = new.replace(_tmp_sectionspacer, secsep)
+        return new
 
     def to_html(self, s):
-        temp_section_spacer = "$NEWSECTION$"
-        section_separator = "</p>\n</section>\n\n\n<section>\n<p>"
-        paragraph_separator = '</p>\n\n<p class="indent">"'
-        # First remember and shim places with two LF (section separator).
-        new = s.replace("\n\n", temp_section_spacer)
-        # Replace single LF (real paragraph) with paragraph separator
-        new = new.replace("\n", paragraph_separator)
-        # Replace original two-LF places with markup for new section.
-        new = new.replace(temp_section_spacer, section_separator)
+        sectionsep = "</p>\n</section>\n\n\n<section>\n<p>"
+        paragraphsep = '</p>\n\n<p class="indent">"'
+        new = self._convert(s, sectionsep, paragraphsep)
         return "<section>\n<p>%s</p>\n</section>" % (new, )
 
     def to_latex(self, s):
-        two_lf_temp = "$NEWSECTION$"
-        vspace = "\n\n\\vspace{0.5cm}\\noindent\n"
-        # First remember and shim places with two LF.
-        new = s.replace("\n\n", two_lf_temp)
-        # Replace single LF by two LF (real paragraph)
-        new = new.replace("\n", "\n\n")
-        # Replace original two-LF places with markup for new section.
-        new = new.replace(two_lf_temp, vspace)
-        return new
+        sectionsep = "\n\n\\vspace{0.5cm}\\noindent\n"
+        paragraphsep = "\n\n"
+        return self._convert(s, sectionsep, paragraphsep)
 
 
 class FilterSpacedHyphens(Filter):
