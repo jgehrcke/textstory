@@ -79,7 +79,22 @@ class FilterDots(Filter):
 
 class FilterQuotes(Filter):
     def to_html(self, s):
-        return s
+        def replacefunc(matchobj):
+            # Extract quote content.
+            quote = matchobj.group(1)
+            # Implement paragraphs with vspace and w/o indentation.
+            quote = quote.replace(
+                '<p class=$DQ$indent$DQ$>', "<p><br />")
+            # Implement LaTeX command.
+            result = "»%s«" % (quote, )
+            return result
+
+        pattern = '"(.*?)"'
+        new, n = re.subn(pattern, replacefunc, s, flags=re.DOTALL)
+        log.info("Made %s quotation replacements.", n)
+        # Restore HTML doublequotes:
+        new = new.replace("$DQ$", '"')
+        return new
 
     def to_latex(self, s):
         def replacefunc(matchobj):
@@ -106,7 +121,7 @@ class FilterQuotes(Filter):
         # non-overlapping occurrence of pattern. The function takes a single match
         # object argument, and returns the replacement string."
         # Make the search non-greedy, and search across newlines.
-        pattern = "„(.*?)“"
+        pattern = '"(.*?)"'
         new, n = re.subn(pattern, replacefunc, s, flags=re.DOTALL)
         log.info("Made %s quotation replacements.", n)
         return new
@@ -126,9 +141,11 @@ class FilterSectionsParagraphs(Filter):
 
     def to_html(self, s):
         sectionsep = "</p>\n</section>\n\n\n<section>\n<p>"
-        paragraphsep = '</p>\n\n<p class="indent">"'
+        # Temporarily shim HTML double quotes.
+        paragraphsep = '</p>\n\n<p class=$DQ$indent$DQ$>'
         new = self._convert(s, sectionsep, paragraphsep)
-        return "<section>\n<p>%s</p>\n</section>" % (new, )
+        new = "<section>\n<p>%s</p>\n</section>" % (new, )
+        return new
 
     def to_latex(self, s):
         sectionsep = "\n\n\\vspace{0.5cm}\\noindent\n"
@@ -164,6 +181,8 @@ class FilterFootnotes(Filter):
             '<label for="sn-tufte-handout" class="margin-toggle sidenote-number">'
             '</label><input type="checkbox" id="sn-tufte-handout" class="margin-toggle"/>.'
             '<span class="sidenote">\\1</span>')
+        # Temporarily shim HTML double quotes.
+        repl = repl.replace('"', "$DQ$")
         return self._convert(s, repl)
 
     def to_latex(self, s):
