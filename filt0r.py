@@ -71,7 +71,7 @@ class Filter(object):
 
 class FilterDots(Filter):
     def to_html(self, s):
-        pass
+        return s
 
     def to_latex(self, s):
         new = s.replace("...", r"\dots ")
@@ -80,7 +80,7 @@ class FilterDots(Filter):
 
 class FilterQuotes(Filter):
     def to_html(self, s):
-        pass
+        return s
 
     def to_latex(self, s):
         def replacefunc(matchobj):
@@ -114,11 +114,23 @@ class FilterQuotes(Filter):
 
 
 class FilterSectionsParagraphs(Filter):
+
+    _first_html_invocation = False
+
     def to_html(self, s):
-        pass
+        temp_section_spacer = "$NEWSECTION$"
+        section_separator = "</p>\n</section>\n\n\n<section>\n<p>"
+        paragraph_separator = '</p>\n\n<p class="indent">"'
+        # First remember and shim places with two LF (section separator).
+        new = s.replace("\n\n", temp_section_spacer)
+        # Replace single LF (real paragraph) with paragraph separator
+        new = new.replace("\n", paragraph_separator)
+        # Replace original two-LF places with markup for new section.
+        new = new.replace(temp_section_spacer, section_separator)
+        return "<section>\n<p>%s</p>\n</section>" % (new, )
 
     def to_latex(self, s):
-        two_lf_temp = "$2LF$"
+        two_lf_temp = "$NEWSECTION$"
         vspace = "\n\n\\vspace{0.5cm}\\noindent\n"
         # First remember and shim places with two LF.
         new = s.replace("\n\n", two_lf_temp)
@@ -131,7 +143,7 @@ class FilterSectionsParagraphs(Filter):
 
 class FilterSpacedHyphens(Filter):
     def to_html(self, s):
-        pass
+        return s
 
     def to_latex(self, s):
         new = s.replace(" - ", " --- ")
@@ -143,7 +155,7 @@ class FilterSpacedHyphens(Filter):
 
 class FilterFootnotes(Filter):
     def to_html(self, s):
-        pass
+        return s
 
     def to_latex(self, s):
         pattern = "{(.*?)}"
