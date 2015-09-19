@@ -1,0 +1,20 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    Jan-Philip Gehrcke -- Developer -- @gehrcke
+    Josa Wode -- Developer, Story writer -- 
+
+# THANKS
+
+    <name>
+
+# TECHNOLOGY COLOPHON
+
+    CSS3, HTML5
+    HTML5 Boilerplate
+    Tufte CSS
+    Normalize.css
+    LaTeX, TeXLive
+
