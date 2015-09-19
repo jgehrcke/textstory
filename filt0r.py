@@ -20,7 +20,7 @@ HTML_TEMPLATE = "html/index.tpl.html"
 
 def main():
     with open(INFILE, "rb") as f:
-        contents = f.read().decode("utf-8").strip()
+        inputtext = f.read().decode("utf-8").strip()
     filters = [
         FilterFootnotes(),
         FilterSpacedHyphens(),
@@ -28,13 +28,17 @@ def main():
         FilterQuotes(),
         FilterDots(),
     ]
+
+    # Push original contents through all LaTeX filters (order matters).
+    outputlatex = inputtext
     for f in filters:
         log.info("Process with %s", f)
-        contents = f.to_latex(contents)
+        outputlatex = f.to_latex(outputlatex)
         log.info("Done.")
     with open(OUTFILE_LATEX, "wb") as f:
-        f.write(contents.encode("utf-8"))
-    log.info("Wrote LaTeX outfile %s.", OUTFILE_LATEX)
+        f.write(outputlatex.encode("utf-8"))
+    log.info("Wrote UTF-8-encoded LaTeX source file: %s.", OUTFILE_LATEX)
+
 
 
 class Filter(object):
