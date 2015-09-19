@@ -25,9 +25,9 @@ def main():
     with open(INFILE, "rb") as f:
         inputtext = f.read().decode("utf-8").strip()
     filters = [
+        FilterSectionsParagraphs(),
         FilterFootnotes(),
         FilterSpacedHyphens(),
-        FilterSectionsParagraphs(),
         FilterQuotes(),
         FilterDots(),
     ]
@@ -150,15 +150,21 @@ class FilterSpacedHyphens(Filter):
 
 
 class FilterFootnotes(Filter):
-    def to_html(self, s):
-        return s
-
-    def to_latex(self, s):
-        pattern = "{(.*?)}"
-        repl = r"\\footnote{\1}"
-        new, n = re.subn(pattern, repl, s, flags=re.DOTALL)
+    def _convert(self, s, replacement):
+        pattern = "\[(.*?)\]"
+        new, n = re.subn(pattern, replacement, s, flags=re.DOTALL)
         log.info("Made %s footnote replacements.", n)
         return new
+
+    def to_html(self, s):
+        repl = (
+            '<label for="sn-tufte-handout" class="margin-toggle sidenote-number">'
+            '</label><input type="checkbox" id="sn-tufte-handout" class="margin-toggle"/>.'
+            '<span class="sidenote">\\1</span>')
+        return self._convert(s, repl)
+
+    def to_latex(self, s):
+        return self._convert(s, r"\\footnote{\1}")
 
 
 if __name__ == "__main__":
