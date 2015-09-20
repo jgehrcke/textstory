@@ -30,7 +30,7 @@ $ python filt0r.py doc.txt
 
 
 ## 2) LaTeX build
-Wurde mit TeXLive 2014's `lualatex` getestet. Im `latex`-Verzeichnis muss `latex-document.tex` per `lualatex` kompiliert werden. `build.bat` dient als Helferlein für Windows:
+Im `latex`-Verzeichnis dieses Projekts muss `latex-document.tex` per `lualatex` kompiliert werden. `build.bat` dient als Helferlein für Windows:
 ```
 $ build.bat
 [...]
@@ -38,10 +38,14 @@ Output written on latex-document.pdf (35 pages, 115586 bytes).
 Transcript written on latex-document.log.
 ```
 
-## 3) Dateiformat Dokumentenquelle
+Der Kompiliervorgang wurde mit TeXLive 2014's `lualatex` getestet.
+
+
+## 3) Dateiformat der Dokumentenquelle
 Erwartet wird eine Text-Datei in UTF-8-Kodierung mit einfachen Linefeed-Zeichen (UNIX-Format).
 
-## 4) Markup-Format
+
+## 4) Markupformat der Dokumentenquelle
 ### Anführungszeichen
 Markup: Einfache Double-Quote-Paare.
 
