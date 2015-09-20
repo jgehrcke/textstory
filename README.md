@@ -20,8 +20,14 @@ Die Konversion zu HTML & LaTeX wird mit `filt0r.py` durchgeführt. `filt0r.py` w
 ```
 $ python filt0r.py doc.txt
 [...]
+15:13:17:977.0  INFO: Wrote UTF-8-encoded LaTeX source file: latex/latex-body.tex.
+[...]
 15:13:17:987.0  INFO: Wrote UTF-8-encoded HTML document: html/index.html.
 ```
+
+`filt0r.py` sollte im Stammverzeichnis dieses Projekts ausgeführt werden. Es schreibt die Dateien `latex/latex-body.tex` und `html/index.html` relativ zum current working directory.
+
+
 
 ## 2) LaTeX build
 Wurde mit TeXLive 2014's `lualatex` getestet. Im `latex`-Verzeichnis muss `latex-document.tex` per `lualatex` kompiliert werden. `build.bat` dient als Helferlein für Windows:
