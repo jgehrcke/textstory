@@ -3,6 +3,7 @@ Ein Projekt zur Konversion eines Dokuments, geschrieben in einem simplen Markup-
 Credits:
 
 * [Python](https://www.python.org/)
+* [TeX Live](https://www.tug.org/texlive/)
 * [LaTeX / LuaTeX](http://www.luatex.org/)
 * [KOMA-Script](https://www.ctan.org/pkg/koma-script?lang=en)
 * [Microtype](https://www.ctan.org/pkg/microtype?lang=en)
@@ -38,7 +39,7 @@ Output written on latex-document.pdf (35 pages, 115586 bytes).
 Transcript written on latex-document.log.
 ```
 
-Der Kompiliervorgang wurde mit TeXLive 2014's `lualatex` getestet.
+Der Kompiliervorgang wurde mit TeX Live 2014's `lualatex` getestet.
 
 
 ## 3) Dateiformat der Dokumentenquelle
