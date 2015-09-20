@@ -4,6 +4,8 @@
 
 from __future__ import unicode_literals
 import re
+import os
+import sys
 import string
 import logging
 
@@ -15,14 +17,18 @@ log = logging.getLogger()
 log.setLevel(logging.INFO)
 
 
-INFILE = "doc.txt"
 OUTFILE_LATEX = "latex/latex-body.tex"
 OUTFILE_HTML = "html/index.html"
 HTML_TEMPLATE = "html/index.tpl.html"
 
 
 def main():
-    with open(INFILE, "rb") as f:
+    if len(sys.argv) < 2:
+        sys.exit("First argument must be path to document source.")
+    infile_path = sys.argv[1]
+    if not os.path.isfile(infile_path):
+        sys.exit("File not found: %s" % infile_path)
+    with open(infile_path, "rb") as f:
         inputtext = f.read().decode("utf-8").strip()
     filters = [
         FilterHyphens(),
