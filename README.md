@@ -43,7 +43,7 @@ Der Kompiliervorgang wurde mit TeX Live 2014's `lualatex` getestet.
 
 
 ## 3) Dateiformat der Dokumentenquelle
-Erwartet wird eine Text-Datei in UTF-8-Kodierung mit einfachen Linefeed-Zeichen (UNIX-Format).
+Erwartet wird eine Text-Datei in UTF-8-Kodierung im "UNIX-Format", also mit einem Linefeed(LF)-Zeichen pro Zeilenumbruch.
 
 
 ## 4) Markupformat der Dokumentenquelle
