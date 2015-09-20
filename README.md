@@ -47,19 +47,25 @@ Erwartet wird eine Text-Datei in UTF-8-Kodierung mit einfachen Linefeed-Zeichen 
 
 
 ## 4) Markupformat der Dokumentenquelle
+### Absatztrennung
+Markup: Ein LF-Zeichen (`\n`)
+
+### Sektionstrennung
+Markup: Zwei LF-Zeichen (`\n\n`)
+
 ### Anführungszeichen
 Markup: Einfache Double-Quote-Paare.
 
 Beispiel: `Er sagte: "Oh, Kacke!"`
 
-Wird mit französischen Anführungszeichen ersetzt.
+In der Ausgabe werden französische Anführungszeichen gesetzt.
 
 Refs:
 
 * https://de.wikipedia.org/wiki/Guillemets
 
 
-### Einfache Bindestriche
+### Bindestriche
 Markup: Einfaches Minus.
 
 Beispiel: `Damen- und Herrentoilette`
@@ -76,8 +82,8 @@ Markup: Doppelminus.
 
 Beispiel: `erstes Wort -- zweites Wort -- drittes Wort`
 
-HTML-Code: wird übersetzt zu em-dash (`&mdash;`).
-LaTeX-Code: wird übersetzt zu `---`.
+HTML: wird übersetzt zu em-dash (`&mdash;`).
+LaTeX: wird übersetzt zu `---`.
 
 Refs:
 
@@ -89,20 +95,12 @@ Markup: Drei normale Punkte.
 
 Beispiel: `Das ist... ähm... doof.`
 
-HTML-Code: wird übersetzt zu `&hellip;`.
-LaTeX-Code: wird übersetzt zu `\dots`.
+HTML: wird übersetzt zu `&hellip;`.
+LaTeX: wird übersetzt zu `\dots`.
 
 Refs:
 
 * https://en.wikipedia.org/wiki/Ellipsis
-
-
-### Absatztrennung
-Markup: Ein LF-Zeichen (`\n`)
-
-
-### Sektionstrennung
-Markup: Zwei LF-Zeichen (`\n\n`)
 
 
 ### Fußnoten
