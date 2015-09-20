@@ -25,7 +25,7 @@ html, body {
 body {
     padding-left: 20px;
     width: auto;
-    max-width: 900px;
+    max-width: 1000px;
 }
 
 p {
@@ -44,6 +44,22 @@ img.titleimage {
     width: 200px;
     top: 15px;
     left: 450px;
+}
+
+/* Relative width, so that footnote displays properly. */
+@media (max-width: 1050px) {
+    p {
+        max-width: none;
+        width: 60%;
+    }
+}
+
+/* At 900 px screen width, the footnotes (sidenotes) wrap into the text. */
+@media (max-width: 900px) {
+    p {
+        max-width: 620px;
+        width: auto;
+    }
 }
 
 @media (max-width: 760px) {
