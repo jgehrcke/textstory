@@ -1,3 +1,20 @@
+Ein Projekt zur Konversion eines Dokuments, geschrieben in einem simplen Markup-Format, zu HTML- und LaTeX-Dokumenten  -- optimiert für Lesbarkeit, mit besten typographischen Absichten.
+
+Credits:
+
+* [Python](https://www.python.org/)
+* [LaTeX / LuaTeX](http://www.luatex.org/)
+* [KOMA-Script](https://www.ctan.org/pkg/koma-script?lang=en)
+* [Microtype](https://www.ctan.org/pkg/microtype?lang=en)
+* [Libertine](https://en.wikipedia.org/wiki/Linux_Libertine)
+* [csquotes](https://www.ctan.org/pkg/csquotes?lang=en)
+* [Tufte CSS](https://github.com/daveliepmann/tufte-css)
+* [normalize.css](https://github.com/necolas/normalize.css)
+* [HTML5 Boilerplate](https://html5boilerplate.com/)
+* [Bembo](https://de.wikipedia.org/wiki/Bembo)
+
+
+# Dokumentation
 ## 1) Konversion der Dokumentenquelle zu HTML & LaTeX
 Die Konversion zu HTML & LaTeX wird mit `filt0r.py` durchgeführt. `filt0r.py` wurde mit Python 2.7 und 3.4 getestet. Erwartet wird ein Argument: der Pfad zur Dokumentenquelle. Beispiel:
 ```
@@ -16,7 +33,7 @@ Transcript written on latex-document.log.
 ```
 
 ## 3) Dateiformat Dokumentenquelle
-Erwartet wird eine Text-Datei in UTF-8-Kodierung mit einfachen Linefeed-Zeichen (UNIX format).
+Erwartet wird eine Text-Datei in UTF-8-Kodierung mit einfachen Linefeed-Zeichen (UNIX-Format).
 
 ## 4) Markup-Format
 ### Anführungszeichen
