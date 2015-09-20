@@ -80,7 +80,7 @@ table.booktabs { width: auto;
 
 .booktabs th.nocmid { border-bottom: none; }
 
-.booktabs tbody tr:first-child td { padding-top: 0.65ex; } /* add space between thead row and tbody */ 
+.booktabs tbody tr:first-child td { padding-top: 0.65ex; } /* add space between thead row and tbody */
 
 .booktabs td { padding-left: 0.5em;
                padding-right: 0.5em;
@@ -176,7 +176,7 @@ img { max-width: 100%; }
                                            vertical-align: baseline;
                                            color: #f00000; }
 
-.sidenote-number:after { content: counter(sidenote-counter); 
+.sidenote-number:after { content: counter(sidenote-counter);
                          font-size: 0.9rem;
                          top: -0.5rem;
                          left: 0.1rem; }
@@ -224,9 +224,9 @@ label.sidenote-number { display: inline; }
 
 label.margin-toggle:not(.sidenote-number) { display: none; }
 
-@media (max-width: 760px) { label.margin-toggle:not(.sidenote-number) { display: inline; }
+@media (max-width: 900px) { label.margin-toggle:not(.sidenote-number) { display: inline; }
                             .sidenote, .marginnote { display: none; }
-                            .margin-toggle:checked + .sidenote, 
+                            .margin-toggle:checked + .sidenote,
                             .margin-toggle:checked + .marginnote { display: block;
                                                                    float: left;
                                                                    left: 1rem;
@@ -236,7 +236,7 @@ label.margin-toggle:not(.sidenote-number) { display: none; }
                                                                    vertical-align: baseline;
                                                                    position: relative; }
                             label { cursor: pointer; }
-                            pre.code { width: 90%; 
+                            pre.code { width: 90%;
                                        padding: 0; }
                             .table-caption { display: block;
                                              float: right;
