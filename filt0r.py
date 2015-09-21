@@ -77,7 +77,7 @@ class Filter(object):
 
 class FilterDots(Filter):
     def to_html(self, s):
-        return s.replace("...", "&hellip;")
+        return s.replace("...", "&hellip; ")
 
     def to_latex(self, s):
         return s.replace("...", r"\dots ")
@@ -86,19 +86,16 @@ class FilterDots(Filter):
 class FilterQuotes(Filter):
     def to_html(self, s):
         def replacefunc(matchobj):
-            # Extract quote content.
             quote = matchobj.group(1)
-            # Implement paragraphs with vspace and w/o indentation.
-            quote = quote.replace(
-                '<p class=$DQ$indent$DQ$>', "<p><br />")
-            # Implement LaTeX command.
+            # Implement paragraphs with vertical space and w/o indentation.
+            quote = quote.replace('<p class=$DQ$indent$DQ$>', "<p><br />")
             result = "»%s«" % (quote, )
             return result
 
         pattern = '"(.*?)"'
         new, n = re.subn(pattern, replacefunc, s, flags=re.DOTALL)
         log.info("Made %s quotation replacements.", n)
-        # Restore HTML doublequotes:
+        # Restore HTML doublequotes.
         new = new.replace("$DQ$", '"')
         return new
 
@@ -107,12 +104,7 @@ class FilterQuotes(Filter):
             """
             Paragraphs within quotations should not be indented.
             In this func, also filter the quote *contents* to implement
-            this criterion. Like this:
-
-            quote = quote.replace("\n\n", "\n\\noindent\n")
-            result = "\\enquote{%s}" % quote
-
-            This filter should be invoked late.
+            this criterion.
             """
             # Extract quote content.
             quote = matchobj.group(1)
@@ -124,8 +116,8 @@ class FilterQuotes(Filter):
             return result
 
         # From re.subn docs. "If repl is a function, it is called for every
-        # non-overlapping occurrence of pattern. The function takes a single match
-        # object argument, and returns the replacement string."
+        # non-overlapping occurrence of pattern. The function takes a single
+        # match object argument, and returns the replacement string."
         # Make the search non-greedy, and search across newlines.
         pattern = '"(.*?)"'
         new, n = re.subn(pattern, replacefunc, s, flags=re.DOTALL)
@@ -164,8 +156,6 @@ class FilterHyphens(Filter):
         new = s.replace(" -- ", " &mdash; ")
         # One of Josa's quite special cases!
         new = new.replace(" --,", " &mdash;, ")
-        # All minuses that are left over should be interpreted as n dashes:
-        #new = new.replace("-", "&ndash;")
         return new
 
     def to_latex(self, s):
