@@ -1,6 +1,10 @@
 \documentclass[paper=a5,fontsize=11pt,DIV=10]{scrreprt}
+
 \usepackage{fontspec}
-\usepackage{libertine}
+
+\usepackage{gentium}
+\usepackage{fontenc}
+\setmainfont{GentiumPlus}
 \usepackage{microtype}
 \usepackage[ngerman]{babel}
 \usepackage[german=guillemets]{csquotes}
@@ -8,17 +12,15 @@
 \usepackage{hyperref}
 \usepackage[absolute,overlay]{textpos}
 
-
 \newfontfamily\licensefont{Cabin}
 
-%\pagestyle{scrheadings}
+\pagestyle{scrheadings}
 \usepackage{scrlayer-scrpage}
-\cfoot{\thepage}
 
 %\changepage{text height}{text width}{even-side margin}
 %{odd-side margin}{column sep.}
 %{topmargin}{headheight}{headsep}{footskip}
-%\changepage{+2cm}{-1cm}{+0cm}{+0.5cm}{}{}{}{}{-1cm}
+\changepage{+2cm}{}{}{}{}{}{}{}{-1cm}
 
 \hypersetup{
     %pdftoolbar=false,
@@ -30,18 +32,27 @@
     pdfproducer={Hilfe von Prof. Dr. Dr. hc. Heinrich Holzhammer},
     pdfkeywords={geschichte, alte, josa, wode},
     colorlinks=true,
-    urlcolor=blue
+    urlcolor=blue,
+    linkcolor=black
 }
+
+\clearscrheadfoot
+\ihead{Josa Wode}
+\ohead{Kommt und holt sie}
+\chead{\includegraphics[width=0.4cm]{img/tilde.png} \normalfont{\thepage} \includegraphics[width=0.4cm]{img/tilde.png}}
 
 \begin{document}
 
-\vspace*{3.6cm}
+\thispagestyle{empty}
 
-\begin{textblock*}{4.5cm}(9.2cm,0.5cm) % {block width} (coords)
-\includegraphics[width=4.5cm]{title.png}
-\end{textblock*}
+%%\vspace*{3.6cm}
+
+%%\begin{textblock*}{4.5cm}(9.2cm,0.5cm) % {block width} (coords)
+%%\includegraphics[width=4.5cm]{title.png}
+%%\end{textblock*}
+
 \noindent
-{\Huge \textbf{\sffamily Kommt und holt sie}}
+{\Huge \textbf{Kommt und holt sie}}
 
 \noindent
 {\textit{Eine Geschichte von Josa Wode}}
@@ -53,22 +64,43 @@
 \urlstyle{rm}
 
 {\licensefont\small
-\noindent
-Except where otherwise noted, this work is licensed under
 
 \noindent
-\url{http://creativecommons.org/licenses/by-nc-sa/3.0}
+\begin{minipage}[c]{0.15\textwidth}
+		\includegraphics[width=0.9\textwidth]{img/cc-large.png}
+\end{minipage}
+\begin{minipage}[c]{0.15\textwidth}
+		\includegraphics[width=0.9\textwidth]{img/by-large.png}
+\end{minipage}
+\begin{minipage}[c]{0.15\textwidth}
+		\includegraphics[width=0.9\textwidth]{img/nc-eu-large.png}
+\end{minipage}
+\begin{minipage}[c]{0.15\textwidth}
+		\includegraphics[width=0.9\textwidth]{img/sa-large.png}
+\end{minipage}
+\begin{minipage}[tr]{0.4\textwidth}
+	\hfill \today
+\end{minipage}
 
 \vspace{0.5cm}
-\noindent
 
+\noindent
+Except where otherwise noted, this work is licensed under
+	
+\noindent
+\urlstyle{same}\url{http://creativecommons.org/licenses/by-nc-sa/3.0}
+
+\vspace{0.5cm}
+
+\noindent
 Dieses Werk ist unter einer Creative Commons Lizenz vom Typ Namensnennung -
 Nicht-kommerziell - Weitergabe unter gleichen Bedingungen 3.0 Unported
 zugänglich. Um eine Kopie dieser Lizenz einzusehen, konsultieren Sie
-\url{http://creativecommons.org/licenses/by-nc-sa/3.0/} oder wenden Sie sich
+\urlstyle{same}\url{http://creativecommons.org/licenses/by-nc-sa/3.0/} oder wenden Sie sich
 brieflich an Creative Commons, Postfach 1866, Mountain View, California, 94042,
 USA.
 
+\noindent
 Das Werk bzw. der Inhalt darf vervielfältigt, verbreitet und öffentlich
 zugänglich gemacht werden und es können Abwandlungen und Bearbeitungen des
 Werkes bzw. des Inhalts angefertigt werden, solange die folgenden Bedingungen
@@ -93,6 +125,6 @@ eingehalten werden:
 Der vollständige Lizenzvertrag ist unter folgender URL zu finden:
 
 \noindent
-\url{http://creativecommons.org/licenses/by-nc-sa/3.0/deed.de}
+\urlstyle{same}\url{http://creativecommons.org/licenses/by-nc-sa/3.0/deed.de}
 }
 \end{document}
