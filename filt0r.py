@@ -88,7 +88,7 @@ class FilterQuotes(Filter):
         def replacefunc(matchobj):
             quote = matchobj.group(1)
             # Implement paragraphs with vertical space and w/o indentation.
-            quote = quote.replace('<p class=$DQ$indent$DQ$>', "<p><br />")
+            quote = quote.replace('<p class=$DQ$indent$DQ$>', "<p>")
             result = "»%s«" % (quote, )
             return result
 
@@ -110,7 +110,7 @@ class FilterQuotes(Filter):
             quote = matchobj.group(1)
             # Implement paragraphs with vspace and w/o indentation.
             quote = quote.replace(
-                "\n\n", "\n\n\\vspace{\\baselineskip}\\noindent\n")
+                "\n\n", "\n\n\\noindent\n")
             # Implement LaTeX command.
             result = "\\enquote{%s}" % quote
             return result
@@ -153,16 +153,18 @@ class FilterSectionsParagraphs(Filter):
 
 class FilterHyphens(Filter):
     def to_html(self, s):
-        new = s.replace(" -- ", " &mdash; ")
+        new = s.replace(" -- ", " &ndash; ")
         # One of Josa's quite special cases!
-        new = new.replace(" --,", " &mdash;, ")
+        new = new.replace(" --,", " &ndash;, ")
         return new
 
     def to_latex(self, s):
-        new = s.replace(" -- ", " --- ")
-        # One of Josa's quite special cases!
-        new = new.replace(" --,", " ---,")
-        return new
+		# new = s.replace(" -- ", " --- ")
+		# # One of Josa's quite special cases!
+		# new = new.replace(" --,", " ---,")
+		# return new
+		# actually nothing to do:
+        return s
 
 
 class FilterFootnotes(Filter):
@@ -175,7 +177,7 @@ class FilterFootnotes(Filter):
     def to_html(self, s):
         repl = (
             '<label for="sn-tufte-handout" class="margin-toggle sidenote-number">'
-            '</label><input type="checkbox" id="sn-tufte-handout" class="margin-toggle"/>.'
+            '</label><input type="checkbox" id="sn-tufte-handout" class="margin-toggle"/>'
             '<span class="sidenote">\\1</span>')
         # Temporarily shim HTML double quotes.
         repl = repl.replace('"', "$DQ$")

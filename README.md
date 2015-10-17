@@ -82,8 +82,8 @@ Markup: Doppelminus.
 
 Beispiel: `erstes Wort -- zweites Wort -- drittes Wort`
 
-HTML: wird übersetzt zu em-dash (`&mdash;`).
-LaTeX: wird übersetzt zu `---`.
+HTML: wird übersetzt zu en-dash (`&ndash;`).
+LaTeX: wird übersetzt zu `--`.
 
 Refs:
 
