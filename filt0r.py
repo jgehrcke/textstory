@@ -159,20 +159,30 @@ class FilterHyphens(Filter):
         return new
 
     def to_latex(self, s):
-		# new = s.replace(" -- ", " --- ")
-		# # One of Josa's quite special cases!
-		# new = new.replace(" --,", " ---,")
-		# return new
-		# actually nothing to do:
+        # new = s.replace(" -- ", " --- ")
+        # # One of Josa's quite special cases!
+        # new = new.replace(" --,", " ---,")
+        # return new
+        # actually nothing to do:
         return s
 
 
 class FilterFootnotes(Filter):
+
     def _convert(self, s, replacement):
         pattern = "\[(.*?)\]"
         new, n = re.subn(pattern, replacement, s, flags=re.DOTALL)
         log.info("Made %s footnote replacements.", n)
         return new
+
+    def _repair_footnote_ids(self, s):
+        id = 'sn-tufte-handout'
+        index = 1
+        while True:
+            s, n = re.subn(id + '(?!\d)', (id + str(index)), s, 2)
+            index += 1
+            if n < 2: break
+        return s
 
     def to_html(self, s):
         repl = (
@@ -181,7 +191,7 @@ class FilterFootnotes(Filter):
             '<span class="sidenote">\\1</span>')
         # Temporarily shim HTML double quotes.
         repl = repl.replace('"', "$DQ$")
-        return self._convert(s, repl)
+        return self._repair_footnote_ids(self._convert(s, repl))
 
     def to_latex(self, s):
         return self._convert(s, r"\\footnote{\1}")
