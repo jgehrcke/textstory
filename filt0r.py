@@ -97,7 +97,7 @@ class FilterHeadlines(Filter):
         def replacefunc(matchobj):
             text = matchobj.group(1)
             log.info(matchobj)
-            result = "\\vspace{0.5cm}\\noindent\n{\\LARGE %s}" % text
+            result = "\n{\\vspace{0.5cm}\\noindent\\LARGE %s}" % text
             return result
 
         pattern = '^##\s*(.*?)$'
