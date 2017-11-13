@@ -35,6 +35,8 @@ def main():
         FilterSectionsParagraphs(), # introduces HTML-minuses, must run after FilterHyphens
         FilterFootnotes(),
         FilterQuotes(),
+		FilterBold(), # has to be done before FilterItalics
+		FilterItalics(),
         FilterDots(),
     ]
 
@@ -124,6 +126,61 @@ class FilterQuotes(Filter):
         log.info("Made %s quotation replacements.", n)
         return new
 
+# Text surrounded by double underscores or double asterisks will be shown bold
+class FilterBold(Filter):
+    def to_html(self, s):
+        def replacefunc(matchobj):
+            text = matchobj.group(1)
+            result = "<strong>%s</strong>" % (text, )
+            return result
+
+        pattern = '__(.*?)__'
+        new, n = re.subn(pattern, replacefunc, s, flags=re.DOTALL)
+        pattern = '\*\*(.*?)\*\*'
+        new, m = re.subn(pattern, replacefunc, new, flags=re.DOTALL)
+        log.info("Made %s bold replacements.", n+m)
+        return new
+
+    def to_latex(self, s):
+        def replacefunc(matchobj):
+            text = matchobj.group(1)
+            result = "\\textbf{%s}" % text
+            return result
+
+        pattern = '__(.*?)__'
+        new, n = re.subn(pattern, replacefunc, s, flags=re.DOTALL)
+        pattern = '\*\*(.*?)\*\*'
+        new, m = re.subn(pattern, replacefunc, new, flags=re.DOTALL)
+        log.info("Made %s bold replacements.", n+m)
+        return new
+		
+# Text surrounded by underscores or asterisks will be shown in italics
+class FilterItalics(Filter):
+    def to_html(self, s):
+        def replacefunc(matchobj):
+            text = matchobj.group(1)
+            result = "<em>%s</em>" % (text, )
+            return result
+
+        pattern = '_(.*?)_'
+        new, n = re.subn(pattern, replacefunc, s, flags=re.DOTALL)
+        pattern = '\*(.*?)\*'
+        new, m = re.subn(pattern, replacefunc, new, flags=re.DOTALL)
+        log.info("Made %s italic replacements.", n+m)
+        return new
+
+    def to_latex(self, s):
+        def replacefunc(matchobj):
+            text = matchobj.group(1)
+            result = "\\textit{%s}" % text
+            return result
+
+        pattern = '_(.*?)_'
+        new, n = re.subn(pattern, replacefunc, s, flags=re.DOTALL)
+        pattern = '\*(.*?)\*'
+        new, m = re.subn(pattern, replacefunc, new, flags=re.DOTALL)
+        log.info("Made %s italic replacements.", n+m)
+        return new
 
 class FilterSectionsParagraphs(Filter):
 

@@ -89,6 +89,27 @@ Refs:
 
 * http://jakubmarian.com/hyphen-minus-en-dash-and-em-dash-difference-and-usage-in-english/
 
+### Kursiv
+Markup: Mit Unterstrichen (_) oder Asterisken (*) umgeben.
+
+Beispiel: `Hier ist _etwas_ kursiv geschrieben. Hier *noch etwas*.`
+
+Der markierte Textabschnitt wird kursiv dargestellt.
+
+Refs:
+
+* https://en.wikipedia.org/wiki/Italic_type
+
+### Fett
+Markup: Mit doppelten Unterstrichen (__) oder doppelten Asterisken (**) umgeben.
+
+Beispiel: `Hier ist __etwas__ fett gedruckt. Hier **noch etwas**.`
+
+Der markierte Textabschnitt wird fett dargestellt.
+
+Refs:
+
+* https://en.wikipedia.org/wiki/Emphasis_(typography)
 
 ### Auslassungspunkte
 Markup: Drei normale Punkte.
