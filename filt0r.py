@@ -33,6 +33,7 @@ def main():
     filters = [
         FilterHyphens(),
         FilterSectionsParagraphs(), # introduces HTML-minuses, must run after FilterHyphens
+		FilterHeadlines(),
         FilterFootnotes(),
         FilterQuotes(),
 		FilterBold(), # has to be done before FilterItalics
@@ -76,6 +77,33 @@ class Filter(object):
     def __str__(self):
         return self.__class__.__name__
 
+# Lines beginning with ## will be formatted as headlines
+class FilterHeadlines(Filter):
+    def to_html(self, s):
+        def replacefunc(matchobj):
+            text = matchobj.group(1)
+            log.info(matchobj)
+            #text = text.replace('<p class=$DQ$indent$DQ$>', "")
+            #text = text.replace('</p>', "")
+            result = "<h2>%s</h2>" % (text, )
+            return result
+
+        pattern = '^<p.*>##\s*(.*?)</p>$'
+        new, n = re.subn(pattern, replacefunc, s, flags=re.MULTILINE)
+        log.info("Made %s headline replacements.", n)
+        return new
+
+    def to_latex(self, s):
+        def replacefunc(matchobj):
+            text = matchobj.group(1)
+            log.info(matchobj)
+            result = "\\vspace{0.5cm}\\noindent\n{\\LARGE %s}" % text
+            return result
+
+        pattern = '^##\s*(.*?)$'
+        new, n = re.subn(pattern, replacefunc, s, flags=re.MULTILINE)
+        log.info("Made %s headline replacements.", n)
+        return new
 
 class FilterDots(Filter):
     def to_html(self, s):

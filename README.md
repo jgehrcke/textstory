@@ -53,6 +53,13 @@ Markup: Ein LF-Zeichen (`\n`)
 ### Sektionstrennung
 Markup: Zwei LF-Zeichen (`\n\n`)
 
+### Überschriften
+Markup: Doppelraute am Zeilenanfang
+
+Beispiel: `## Kapitel 1`
+
+Eine derart markierte Zeile wird als Überschrift interpretiert.
+
 ### Anführungszeichen
 Markup: Einfache Double-Quote-Paare.
 
