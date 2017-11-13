@@ -82,9 +82,6 @@ class FilterHeadlines(Filter):
     def to_html(self, s):
         def replacefunc(matchobj):
             text = matchobj.group(1)
-            log.info(matchobj)
-            #text = text.replace('<p class=$DQ$indent$DQ$>', "")
-            #text = text.replace('</p>', "")
             result = "<h2>%s</h2>" % (text, )
             return result
 
@@ -96,7 +93,6 @@ class FilterHeadlines(Filter):
     def to_latex(self, s):
         def replacefunc(matchobj):
             text = matchobj.group(1)
-            log.info(matchobj)
             result = "\n{\\vspace{0.5cm}\\noindent\\LARGE %s}" % text
             return result
 
