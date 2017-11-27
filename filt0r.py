@@ -31,6 +31,7 @@ def main():
     with open(infile_path, "rb") as f:
         inputtext = f.read().decode("utf-8").strip()
     filters = [
+        FilterMaskEscapedCharacters(), # needs to be done first
         FilterHyphens(),
         FilterSectionsParagraphs(), # introduces HTML-minuses, must run after FilterHyphens
 		FilterHeadlines(),
@@ -39,6 +40,7 @@ def main():
 		FilterBold(), # has to be done before FilterItalics
 		FilterItalics(),
         FilterDots(),
+        FilterRestoreEscapedCharacters(), # needs to be done last
     ]
 
     # Push original contents through all LaTeX filters (order matters).
@@ -231,6 +233,92 @@ class FilterSectionsParagraphs(Filter):
         paragraphsep = "\n\n"
         return self._convert(s, sectionsep, paragraphsep)
 
+#structure for defining how to escape and restore special characters
+class EscapeRoute(object):
+    def __init__(self, original, temporary, html, latex):
+        self.original = original
+        self.temporary = temporary
+        self.html = html
+        self.latex = latex
+"""
+list of all allowed EscapeRoutes (\ needs to be escaped in python too, so theres a lot of \)
+
+HTML:
+& becomes &amp; (does not need to be escaped in original document)
+< becomes &lt; (does not need to be escaped in original document)
+> becomes &gt; (does not need to be escaped in original document)
+
+LATEX:
+& becomes \& (does not need to be escaped in original document)
+% becomes \% (does not need to be escaped in original document)
+$ becomes \$
+# becomes \#
+_ becomes \_
+{ becomes \{
+} becomes \}
+~ becomes \textasciitilde (does not need to be escaped in original document)
+^ becomes \textasciicircum (does not need to be escaped in original document)
+\ becomes \textbackslash
+
+TEXTSTORY MARKUP:
+\   backslash
+*   asterisk
+_   underscore
+{}  curly braces
+[]  square brackets
+#   hash mark
+"   doublequote
+!   exclamation mark (only needs to be escaped when followed by '[')
+--  double minus
+
+"""
+escapeRoutes = [
+    EscapeRoute('\\\\', '$escapeChar$', '\\', '\\textbackslash{}'),
+    EscapeRoute('&', '$amp$', '&amp;', '\\&'),
+    EscapeRoute('<', '$lt$', '&lt;', '<'),
+    EscapeRoute('>', '$gt$', '&gt;', '>'),
+    EscapeRoute('%', '$percent$', '%', '\\% '),
+    EscapeRoute('\\$', '$dollar$', '$', '\\$ '),
+    EscapeRoute('\\#', '$hash$', '#', '\\# '),
+    EscapeRoute('\\_', '$underscore$', '_', '\\_ '),
+    EscapeRoute('\\{', '$curlyBracketOpen$', '{', '\\{ '),
+    EscapeRoute('\\}', '$curlyBracketClose$', '}', '\\} '),
+    EscapeRoute('\\[', '$squareBracketOpen$', '[', '['),
+    EscapeRoute('\\]', '$squareBracketClose$', ']', ']'),
+    EscapeRoute('~', '$tilde$', '~', '\\textasciitilde{}'),
+    EscapeRoute('^', '$circumflex$', '^', '\\textasciicircum{}'),
+    EscapeRoute('\\*', '$asterisk$', '*', '*'),
+    EscapeRoute('\\--', '$hyphen$', '--', '\\verb|--|'),
+    EscapeRoute('\\"', '$doubleQuote$', '&quot;', '"{}'),
+    EscapeRoute('\\!', '$exclamation$', '!', '!'),
+    #EscapeRoute('\\', '', '', ''),
+]
+
+class FilterMaskEscapedCharacters(Filter):
+    def _convert(self, s):
+        new = s
+        for i in escapeRoutes:
+            new = new.replace(i.original, i.temporary)
+        return new
+           
+    def to_html(self, s):
+        return self._convert(s)
+    
+    def to_latex(self, s):
+        return self._convert(s)
+
+class FilterRestoreEscapedCharacters(Filter):
+    def to_html(self, s):
+        new = s
+        for i in escapeRoutes:
+            new = new.replace(i.temporary, i.html)
+        return new
+    
+    def to_latex(self, s):
+        new = s
+        for i in escapeRoutes:
+            new = new.replace(i.temporary, i.latex)
+        return new
 
 class FilterHyphens(Filter):
     def to_html(self, s):

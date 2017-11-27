@@ -13,6 +13,7 @@ Credits:
 * [normalize.css](https://github.com/necolas/normalize.css)
 * [HTML5 Boilerplate](https://html5boilerplate.com/)
 * [Bembo](https://de.wikipedia.org/wiki/Bembo)
+* [Markdown](https://daringfireball.net/projects/markdown/syntax)
 
 
 # Dokumentation
@@ -47,11 +48,15 @@ Erwartet wird eine Text-Datei in UTF-8-Kodierung im "UNIX-Format", also mit eine
 
 
 ## 4) Markupformat der Dokumentenquelle
+
+
 ### Absatztrennung
 Markup: Ein LF-Zeichen (`\n`)
 
+
 ### Sektionstrennung
 Markup: Zwei LF-Zeichen (`\n\n`)
+
 
 ### Überschriften
 Markup: Doppelraute am Zeilenanfang
@@ -59,6 +64,7 @@ Markup: Doppelraute am Zeilenanfang
 Beispiel: `## Kapitel 1`
 
 Eine derart markierte Zeile wird als Überschrift interpretiert.
+
 
 ### Anführungszeichen
 Markup: Einfache Double-Quote-Paare.
@@ -69,7 +75,7 @@ In der Ausgabe werden französische Anführungszeichen gesetzt.
 
 Refs:
 
-* https://de.wikipedia.org/wiki/Guillemets
+* <https://de.wikipedia.org/wiki/Guillemets>
 
 
 ### Bindestriche
@@ -81,7 +87,7 @@ Wird unverändert in den HTML- und LaTeX-Code übertragen.
 
 Refs:
 
-* http://jakubmarian.com/hyphen-minus-en-dash-and-em-dash-difference-and-usage-in-english/
+* <http://jakubmarian.com/hyphen-minus-en-dash-and-em-dash-difference-and-usage-in-english/>
 
 
 ### Gedankenstriche
@@ -94,7 +100,8 @@ LaTeX: wird übersetzt zu `--`.
 
 Refs:
 
-* http://jakubmarian.com/hyphen-minus-en-dash-and-em-dash-difference-and-usage-in-english/
+* <http://jakubmarian.com/hyphen-minus-en-dash-and-em-dash-difference-and-usage-in-english/>
+
 
 ### Kursiv
 Markup: Mit Unterstrichen (_) oder Asterisken (*) umgeben.
@@ -105,7 +112,8 @@ Der markierte Textabschnitt wird kursiv dargestellt.
 
 Refs:
 
-* https://en.wikipedia.org/wiki/Italic_type
+* <https://en.wikipedia.org/wiki/Italic_type>
+
 
 ### Fett
 Markup: Mit doppelten Unterstrichen (__) oder doppelten Asterisken (**) umgeben.
@@ -116,7 +124,8 @@ Der markierte Textabschnitt wird fett dargestellt.
 
 Refs:
 
-* https://en.wikipedia.org/wiki/Emphasis_(typography)
+* <https://en.wikipedia.org/wiki/Emphasis_(typography)>
+
 
 ### Auslassungspunkte
 Markup: Drei normale Punkte.
@@ -128,7 +137,7 @@ LaTeX: wird übersetzt zu `\dots`.
 
 Refs:
 
-* https://en.wikipedia.org/wiki/Ellipsis
+* <https://en.wikipedia.org/wiki/Ellipsis>
 
 
 ### Fußnoten
@@ -136,3 +145,35 @@ Markup: Eckige Klammern.
 
 Beispiel: `Das ist das WortNachDemDieFußNoteKommt[Die Fußnote].`
 
+
+### Maskierung von Sonderzeichen
+Markup: Backslash gefolgt vom Sonderzeichen ('`\Sonderzeichen`')
+
+In HTML, LaTeX und dem hier verwendeten Markup sind bestimmte Symbole als Teil der Syntax reserviert. Sie müssen maskiert werden, um als das bloße Symbol interpretiert zu werden und als solches im generierten Text aufzutauchen.
+
+Folgende Zeichen sind zu maskieren ('`\`' voranstellen):  
+`\`   Backslash -- das Maskierungszeichen selbst  
+`*`   Asterisk  
+`_`   Unterstrich  
+`{}`  Geschweifte Klammern  
+`[]`  Eckige Klammern  
+`#`   Raute  
+`"`   Anführungszeichen / Double-Quote  
+`!`   Ausrufezeichen (nur nötig, wenn '[' folgt)  
+`--`  Doppel-Minus
+`$`   Dollar  
+
+Folgende Zeichen können normal verwendet werden und werden automatisch in HTML- bzw. LaTeX-Schreibweise übertragen:  
+`&`   wird in HTML zu '`&amp;`', in LaTeX zu '`\&`'  
+`<`   wird in HTML zu `&lt;`  
+`>`   wird in HTML zu `&gt;`  
+`%`   wird in LaTeX zu `\%`  
+`~`   wird in LaTeX zu `\\textasciitilde`  
+`^`   wird in LaTeX zu `\\textasciicircum`  
+
+Beispiel: `Ich verwende spitze <voll spitze> und eckige Klammern \[weil es so schön ist\].`
+
+Refs:
+
+* <https://www.w3.org/International/questions/qa-escapes#use>
+* <https://www.namsu.de/Extra/strukturen/Sonderzeichen.html>
