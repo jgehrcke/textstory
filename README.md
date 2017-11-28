@@ -212,7 +212,7 @@ Folgende Zeichen sind zu maskieren ('`\`' voranstellen):
 `#`   Raute  
 `"`   Anführungszeichen / Double-Quote  
 `!`   Ausrufezeichen (nur nötig, wenn '[' folgt)  
-`--`  Doppel-Minus
+`--`  Doppel-Minus  
 `$`   Dollar  
 
 Folgende Zeichen können normal verwendet werden und werden automatisch in HTML- bzw. LaTeX-Schreibweise übertragen:  
@@ -223,7 +223,7 @@ Folgende Zeichen können normal verwendet werden und werden automatisch in HTML-
 `~`   wird in LaTeX zu `\\textasciitilde`  
 `^`   wird in LaTeX zu `\\textasciicircum`  
 
-Beispiel: `Ich verwende spitze <voll spitze> und eckige Klammern \[weil es so schön ist\].`
+Beispiel: `Spitze <voll spitze> und eckige Klammern \[weil es so schön ist\].`
 
 Refs:
 

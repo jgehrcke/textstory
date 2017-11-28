@@ -38,7 +38,7 @@ def main():
         setupFilePath = sys.argv[2]
     if not os.path.isfile(setupFilePath):
         sys.exit("File not found: %s" % setupFilePath)        
-    # Read setup file
+    log.info("Read setup file: %s.", setupFilePath)
     with open(setupFilePath, "rb") as f:
         setupData = f.read().decode("utf-8").strip()
         setup = toml.loads(setupData)
