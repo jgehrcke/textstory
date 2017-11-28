@@ -35,6 +35,7 @@ def main():
         FilterHyphens(),
         FilterSectionsParagraphs(), # introduces HTML-minuses, must run after FilterHyphens
 		FilterHeadlines(),
+        FilterImages(), # has to be done before FilterFootnotes
         FilterFootnotes(),
         FilterQuotes(),
 		FilterBold(), # has to be done before FilterItalics
@@ -208,6 +209,50 @@ class FilterItalics(Filter):
         log.info("Made %s italic replacements.", n+m)
         return new
 
+class FilterImages(Filter):
+    #![Alt text](/path/to/img.jpg "optional title")
+    pattern = '!\[(.*)\]\(([^")]*)(\s"(.*)")?\)'
+    
+    def to_html(self, s):
+        def replacefunc(matchobj):
+            altText = matchobj.group(1)
+            path = matchobj.group(2)
+            title = matchobj.group(4)
+            result = '<figure class=$DQ$textimage$DQ$>\n'
+            result += '<img src=$DQ$%s$DQ$ alt=$DQ$%s$DQ$ ' % (path, altText, )
+            #if title != None:
+            #    result += 'title=$DQ$%s$DQ$ ' %(title, )
+            result += ' />\n'
+            if title != None:
+                result += '<figcaption>%s</figcaption>\n' % (title, )
+            result += '</figure>'
+            return result
+
+        new, n = re.subn('^<p.*>' + self.pattern + '</p>$', replacefunc, s, flags=re.MULTILINE)
+        log.info("Made %s image replacements.", n)
+        return new
+
+    def to_latex(self, s):
+        def replacefunc(matchobj):
+            altText = matchobj.group(1)
+            path = matchobj.group(2)
+            title = matchobj.group(4)
+            result = '\\begin{figure}$squareBracketOpen$!ht$squareBracketClose$\n'
+            result += '\\centering\n'
+            maxHeight = '1.0\\textheight'
+            caption = ''
+            if title != None:
+                maxHeight = '0.9\\textheight'
+                caption = '\\caption$asterisk${%s}\n' %(title, )
+            result += '\\includegraphics$squareBracketOpen$max height=' + maxHeight + ',max width=1.0\\textwidth$squareBracketClose${%s}\n' % (path, )
+            result += caption
+            result += '\\end{figure}'
+            return result
+            
+        new, n = re.subn(self.pattern, replacefunc, s)
+        log.info("Made %s image replacements.", n)
+        return new
+
 class FilterSectionsParagraphs(Filter):
 
     def _convert(self, s, secsep, parsep):
@@ -337,7 +382,6 @@ class FilterHyphens(Filter):
 
 
 class FilterFootnotes(Filter):
-
     def _convert(self, s, replacement):
         pattern = "\[(.*?)\]"
         new, n = re.subn(pattern, replacement, s, flags=re.DOTALL)

@@ -146,6 +146,13 @@ Markup: Eckige Klammern.
 Beispiel: `Das ist das WortNachDemDieFußNoteKommt[Die Fußnote].`
 
 
+### Bilder
+Markup: \!\[altText\]\(bildPfad "optionaler Titel"\)
+
+Auf diese Weise können Bilder integriert werden, die am angegebenen Pfad liegen. Der optionale Titel wird zu einer Bildunterschrift. Der altText dient im HTML als Alternative, falls das Bild nicht dargestellt wird, und für Screen Reader. Im LaTeX wird diese Angabe (derzeit) ignoriert.
+
+Beispiel: `![Alt text](/path/to/img.jpg "optional title")`
+
 ### Maskierung von Sonderzeichen
 Markup: Backslash gefolgt vom Sonderzeichen ('`\Sonderzeichen`')
 
