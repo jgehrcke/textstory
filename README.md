@@ -14,9 +14,20 @@ Credits:
 * [HTML5 Boilerplate](https://html5boilerplate.com/)
 * [Bembo](https://de.wikipedia.org/wiki/Bembo)
 * [Markdown](https://daringfireball.net/projects/markdown/syntax)
-
+* [TOML](https://github.com/toml-lang/toml)
 
 # Dokumentation
+
+## 0) Anforderungen / Installation
+Natürlich muss [Python](https://www.python.org/) installiert sein.
+
+`filt0r.py` hat zudem folgende Voraussetzungen
+
+* [Python TOML](https://pypi.python.org/pypi/toml)
+
+Vor der ersten Ausführung sind diese zu installieren:  
+`pip install -r requirements.txt`
+
 ## 1) Konversion der Dokumentenquelle zu HTML & LaTeX
 Die Konversion zu HTML & LaTeX wird mit `filt0r.py` durchgeführt. `filt0r.py` wurde mit Python 2.7 und 3.4 getestet. Erwartet wird ein Argument: der Pfad zur Dokumentenquelle. Beispiel:
 ```
@@ -27,11 +38,45 @@ $ python filt0r.py doc.txt
 15:13:17:987.0  INFO: Wrote UTF-8-encoded HTML document: html/index.html.
 ```
 
-`filt0r.py` sollte im Stammverzeichnis dieses Projekts ausgeführt werden. Es schreibt die Dateien `latex/latex-body.tex` und `html/index.html` relativ zum current working directory.
+Optionales Argument: der Pfad zur Setupdatei (s.u.), falls abweichend von `setup.toml`. Beispiel:  
+`python filt0r.py doc.txt toml.toml`
 
+`filt0r.py` sollte im Stammverzeichnis dieses Projekts ausgeführt werden. Es schreibt die Dateien `latex/latex-document.tex`, `latex/latex-body.tex` und `html/index.html` relativ zum current working directory.
 
+## 2) Setup
 
-## 2) LaTeX build
+In einer Setupdatei in TOML-Notation (default: `setup.toml`) werden allgemeine Einstellungen und Angaben zum zu generierenden Dokument gemacht. Dies sind Angaben wie Titel, Autor und verschiedene PDF- und HTML-Metadaten. Die meisten dieser Angaben sind zwingend erforderlich. Nicht erforderliche Angaben sind durch Kommentare als solche markiert.
+
+Beispiel einer vollständigen Setupdatei:
+```
+[general]
+title = "Kommt und holt sie"
+subtitle = ""
+author = "Josa Wode"
+language = "de" #de, en, ...
+
+[latex]
+printAuthorOnTitle = "false" #true, false #Legt fest, ob die Titelseite mit dem Namen des Autors bzw. der Autorin beginnt
+#title = "" #Auskommentieren, falls identisch mit 'general.title'
+subtitle = "Eine Geschichte von Josa Wode" #Auskommentieren, falls identisch mit 'general.subtitle'
+pdfsubject = "Geschichte"
+pdfkeywords = "geschichte, alte, josa, wode"
+hascolorlinks = "true"
+urlcolor = "blue"
+linkcolor = "black"
+    
+[html]
+#title = "" #Auskommentieren, falls identisch mit 'general.title'
+#subtitle = "" #Auskommentieren, falls identisch mit 'general.subtitle'
+headertitle = "Kommt und holt sie | eine Geschichte von Josa Wode"
+url = "http://writing.fotoelectrics.de/documents/come-get-her/de/html/" #meta property og:url
+metadescription = "Eine kurze Geschichte von Josa Wode - Es könnte ein Märchen sein, wenn es sich benehmen würde. (Lizenz: Creative Commons BY-NC-SA 3.0)"    #meta description und meta property og:description
+locale = "de_DE" #de_DE, en_GB, ... #meta property og:locale
+sitename = "writing.fotoelectrics" #meta property og:site_name
+#previewimage = "" #meta property og:image #Auskommentieren, falls kein image tag erwünscht ist
+```
+
+## 3) LaTeX build
 Im `latex`-Verzeichnis dieses Projekts muss `latex-document.tex` per `lualatex` kompiliert werden. `build.bat` dient als Helferlein für Windows:
 ```
 $ build.bat
@@ -43,11 +88,11 @@ Transcript written on latex-document.log.
 Der Kompiliervorgang wurde mit TeX Live 2014's `lualatex` getestet.
 
 
-## 3) Dateiformat der Dokumentenquelle
+## 4) Dateiformat der Dokumentenquelle
 Erwartet wird eine Text-Datei in UTF-8-Kodierung im "UNIX-Format", also mit einem Linefeed(LF)-Zeichen pro Zeilenumbruch.
 
 
-## 4) Markupformat der Dokumentenquelle
+## 5) Markupformat der Dokumentenquelle
 
 
 ### Absatztrennung

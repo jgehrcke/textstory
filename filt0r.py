@@ -8,6 +8,7 @@ import os
 import sys
 import string
 import logging
+import toml
 
 
 logging.basicConfig(
@@ -16,11 +17,12 @@ logging.basicConfig(
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
-
-OUTFILE_LATEX = "latex/latex-body.tex"
+SETUP_FILE = "setup.toml"
+OUTFILE_LATEX_BODY = "latex/latex-body.tex"
+OUTFILE_LATEX_DOC = "latex/latex-document.tex"
 OUTFILE_HTML = "html/index.html"
+LATEX_TEMPLATE = "latex/latex-document.tpl.tex"
 HTML_TEMPLATE = "html/index.tpl.html"
-
 
 def main():
     if len(sys.argv) < 2:
@@ -30,16 +32,65 @@ def main():
         sys.exit("File not found: %s" % infile_path)
     with open(infile_path, "rb") as f:
         inputtext = f.read().decode("utf-8").strip()
+    
+    setupFilePath = SETUP_FILE
+    if len(sys.argv) > 2:
+        setupFilePath = sys.argv[2]
+    if not os.path.isfile(setupFilePath):
+        sys.exit("File not found: %s" % setupFilePath)        
+    # Read setup file
+    with open(setupFilePath, "rb") as f:
+        setupData = f.read().decode("utf-8").strip()
+        setup = toml.loads(setupData)
+        
+    #setup general substitutions
+    title = setup['general']['title']
+    subtitle = setup['general']['subtitle']
+    author = setup['general']['author']
+    language = setup['general']['language']
+    
+    log.info("Read LATEX template file: %s.", LATEX_TEMPLATE)
+    with open(LATEX_TEMPLATE, "rb") as f:
+        latextemplate = string.Template(f.read().decode("utf-8").strip())
+        
+    #setup latex substitutions
+    if setup['latex']['printAuthorOnTitle'] == 'true':
+        latexAuthor = "\\noindent\n%s\n\n\\vspace{0.3cm}\n" % author
+    else:
+        latexAuthor = ""
+    if 'title' in setup['latex']:
+        latexTitle = setup['latex']['title']
+    else:
+        latexTitle = title
+    if 'subtitle' in setup['latex']:
+        latexSubtitle = setup['latex']['subtitle']
+    else:
+        latexSubtitle = subtitle
+    if latexSubtitle != "":
+        latexSubtitle = '\n\\vspace{0.1cm}\n\n\\noindent\n\\textit{%s}\n' % latexSubtitle
+
+    pdfSubject = setup['latex']['pdfsubject']
+    pdfKeywords = setup['latex']['pdfkeywords']
+    hasColorLinks = setup['latex']['hascolorlinks']
+    urlColor = setup['latex']['urlcolor']
+    linkColor = setup['latex']['linkcolor']
+    #substitute latex
+    latexdoc = latextemplate.substitute(title=latexTitle, subtitle=latexSubtitle, author=latexAuthor, i_head=author, o_head=latexTitle, pdf_title=latexTitle, pdf_author=author, pdf_subject=pdfSubject, pdf_keywords=pdfKeywords, has_color_links=hasColorLinks, url_color=urlColor, link_color=linkColor)
+
+    with open(OUTFILE_LATEX_DOC, "wb") as f:
+        f.write(latexdoc.encode("utf-8"))
+    log.info("Wrote UTF-8-encoded LATEX document: %s.", OUTFILE_LATEX_DOC)
+
     filters = [
         FilterMaskEscapedCharacters(), # needs to be done first
         FilterHyphens(),
         FilterSectionsParagraphs(), # introduces HTML-minuses, must run after FilterHyphens
-		FilterHeadlines(),
+        FilterHeadlines(),
         FilterImages(), # has to be done before FilterFootnotes
         FilterFootnotes(),
         FilterQuotes(),
-		FilterBold(), # has to be done before FilterItalics
-		FilterItalics(),
+        FilterBold(), # has to be done before FilterItalics
+        FilterItalics(),
         FilterDots(),
         FilterRestoreEscapedCharacters(), # needs to be done last
     ]
@@ -50,9 +101,9 @@ def main():
         log.info("Process with %s", f)
         outputlatex = f.to_latex(outputlatex)
         log.info("Done.")
-    with open(OUTFILE_LATEX, "wb") as f:
+    with open(OUTFILE_LATEX_BODY, "wb") as f:
         f.write(outputlatex.encode("utf-8"))
-    log.info("Wrote UTF-8-encoded LaTeX source file: %s.", OUTFILE_LATEX)
+    log.info("Wrote UTF-8-encoded LaTeX source file: %s.", OUTFILE_LATEX_BODY)
 
     # Push original contents through HTML filters (same order, order matters).
     outputhtml = inputtext
@@ -66,7 +117,31 @@ def main():
         htmltemplate = string.Template(f.read().decode("utf-8").strip())
 
     log.info("Perform HTML template substitution")
-    htmldoc = htmltemplate.substitute(html_content=outputhtml)
+    #setup html substitutions
+    lang = language
+    locale = setup['html']['locale']
+    if 'title' in setup['html']:
+        htmlTitle = setup['html']['title']
+    else:
+        htmlTitle = title
+    if 'subtitle' in setup['html']:
+        htmlSubtitle = setup['html']['subtitle']
+    else:
+        htmlSubtitle = subtitle
+    if htmlSubtitle == "":
+        subtitleTag = ""
+    else:
+        subtitleTag = '<p class="subtitle">%s</p>\n' % htmlSubtitle
+    headerTitle = setup['html']['headertitle']
+    metaDescription = setup['html']['metadescription']
+    url = setup['html']['url']
+    siteName = setup['html']['sitename']
+    if 'previewimage' in setup['html']:
+        ogImageTag = '<meta property="og:image" content="%s" />' % setup['html']['previewimage']
+    else:
+        ogImageTag = ""
+    #substitute html
+    htmldoc = htmltemplate.substitute(html_content=outputhtml, lang=lang, locale=locale, header_title=headerTitle, title=htmlTitle, subtitle_tag=subtitleTag, author=author, meta_description=metaDescription, url=url, site_name=siteName, og_image_tag=ogImageTag)
 
     with open(OUTFILE_HTML, "wb") as f:
         f.write(htmldoc.encode("utf-8"))

@@ -27,20 +27,20 @@
 \hypersetup{
     %pdftoolbar=false,
     %pdfmenubar=false,
-    pdftitle={Kommt und holt sie},
-    pdfauthor={Josa Wode},
-    pdfsubject={Geschichte},
+    pdftitle={$pdf_title},
+    pdfauthor={$pdf_author},
+    pdfsubject={$pdf_subject},
     %pdfcreator={Josa Wode},
-    pdfproducer={Hilfe von Prof. Dr. Dr. hc. Heinrich Holzhammer},
-    pdfkeywords={geschichte, alte, josa, wode},
-    colorlinks=true,
-    urlcolor=blue,
-    linkcolor=black
+    pdfproducer={textstory-to-beautiful-latex-html},
+    pdfkeywords={$pdf_keywords},
+    colorlinks=$has_color_links,
+    urlcolor=$url_color,
+    linkcolor=$link_color
 }
 
 \clearscrheadfoot
-\ihead{Josa Wode}
-\ohead{Kommt und holt sie}
+\ihead{$i_head}
+\ohead{$o_head}
 \chead{\includegraphics[width=0.4cm]{img/tilde.png} \normalfont{\thepage} \includegraphics[width=0.4cm]{img/tilde.png}}
 
 \begin{document}
@@ -53,12 +53,10 @@
 %%\includegraphics[width=4.5cm]{title.png}
 %%\end{textblock*}
 
+$author
 \noindent
-{\Huge \textbf{Kommt und holt sie}}
-
-\noindent
-{\textit{Eine Geschichte von Josa Wode}}
-
+{\Huge \textbf{$title}}
+$subtitle
 \vspace{1.1cm}
 \noindent
 \input{latex-body}

@@ -1,0 +1,25 @@
+[general]
+title = "Kommt und holt sie"
+subtitle = ""
+author = "Josa Wode"
+language = "de" #de, en, ...
+
+[latex]
+printAuthorOnTitle = "false" #true, false #determines if title page begins with author name
+#title = "" #comment out if same as general.title
+subtitle = "Eine Geschichte von Josa Wode" #comment out if same as general.subtitle
+pdfsubject = "Geschichte"
+pdfkeywords = "geschichte, alte, josa, wode"
+hascolorlinks = "true"
+urlcolor = "blue"
+linkcolor = "black"
+    
+[html]
+#title = "" #comment out if same as general.title
+#subtitle = "" #comment out if same as general.subtitle
+headertitle = "Kommt und holt sie | eine Geschichte von Josa Wode"
+url = "http://writing.fotoelectrics.de/documents/come-get-her/de/html/" #meta property og:url
+metadescription = "Eine kurze Geschichte von Josa Wode - Es könnte ein Märchen sein, wenn es sich benehmen würde. (Lizenz: Creative Commons BY-NC-SA 3.0)"    #meta description and meta property og:description
+locale = "de_DE" #de_DE, en_GB, ... #meta property og:locale
+sitename = "writing.fotoelectrics" #meta property og:site_name
+#previewimage = "" #meta property og:image #comment out for no image tag
