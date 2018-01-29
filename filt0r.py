@@ -54,6 +54,20 @@ def main():
         latextemplate = string.Template(f.read().decode("utf-8").strip())
         
     #setup latex substitutions
+    if 'pageFormat' in setup['latex']:
+        latexPageFormat = "page=%s," % setup['latex']['pageFormat']
+        latexPageSize = ""
+    elif 'pageWidth' in setup['latex'] and 'pageHeight' in setup['latex']:
+        latexPageFormat = ""
+        latexPageSize = "paperwidth=%smm, paperheight=%smm" % (setup['latex']['pageWidth'], setup['latex']['pageHeight'], )
+    else:
+        #default
+        latexPageFormat = "page=a5,"
+        latexPageSize = ""
+    if 'fontSize' in setup['latex']:
+        latexFontSize = "fontsize=%spt," % setup['latex']['fontSize']
+    else:
+        latexFontSize = "fontsize=11pt,"
     if setup['latex']['printAuthorOnTitle'] == 'true':
         latexAuthor = "\\noindent\n%s\n\n\\vspace{0.3cm}\n" % author
     else:
@@ -75,14 +89,15 @@ def main():
     urlColor = setup['latex']['urlcolor']
     linkColor = setup['latex']['linkcolor']
     #substitute latex
-    latexdoc = latextemplate.substitute(title=latexTitle, subtitle=latexSubtitle, author=latexAuthor, i_head=author, o_head=latexTitle, pdf_title=latexTitle, pdf_author=author, pdf_subject=pdfSubject, pdf_keywords=pdfKeywords, has_color_links=hasColorLinks, url_color=urlColor, link_color=linkColor)
+    latexdoc = latextemplate.substitute(page_format=latexPageFormat, page_size=latexPageSize, font_size=latexFontSize, title=latexTitle, subtitle=latexSubtitle, author=latexAuthor, i_head=author, o_head=latexTitle, pdf_title=latexTitle, pdf_author=author, pdf_subject=pdfSubject, pdf_keywords=pdfKeywords, has_color_links=hasColorLinks, url_color=urlColor, link_color=linkColor)
 
     with open(OUTFILE_LATEX_DOC, "wb") as f:
         f.write(latexdoc.encode("utf-8"))
     log.info("Wrote UTF-8-encoded LATEX document: %s.", OUTFILE_LATEX_DOC)
 
     filters = [
-        FilterMaskEscapedCharacters(), # needs to be done first
+        FilterConvertLineEndings(),  # needs to be done first
+        FilterMaskEscapedCharacters(), # needs to be done second
         FilterHyphens(),
         FilterSectionsParagraphs(), # introduces HTML-minuses, must run after FilterHyphens
         FilterHeadlines(),
@@ -328,6 +343,19 @@ class FilterImages(Filter):
         log.info("Made %s image replacements.", n)
         return new
 
+class FilterConvertLineEndings(Filter):
+    
+    def _convert(self, s):
+        new = s.replace("\r\n", "\n") # Windows
+        new = new.replace("\r", "\n") # Mac
+        return new
+
+    def to_html(self, s):
+        return self._convert(s)
+
+    def to_latex(self, s):
+        return self._convert(s)
+
 class FilterSectionsParagraphs(Filter):
 
     def _convert(self, s, secsep, parsep):
@@ -442,16 +470,11 @@ class FilterRestoreEscapedCharacters(Filter):
 
 class FilterHyphens(Filter):
     def to_html(self, s):
-        new = s.replace(" -- ", " &ndash; ")
-        # One of Josa's quite special cases!
-        new = new.replace(" --,", " &ndash;, ")
+        new = s.replace("---", "&mdash;")
+        new = new.replace("--", "&ndash;")
         return new
 
     def to_latex(self, s):
-        # new = s.replace(" -- ", " --- ")
-        # # One of Josa's quite special cases!
-        # new = new.replace(" --,", " ---,")
-        # return new
         # actually nothing to do:
         return s
 

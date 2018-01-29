@@ -56,6 +56,10 @@ author = "Josa Wode"
 language = "de" #de, en, ...
 
 [latex]
+pageFormat = "a5" # a0 - a6, b0 - b6 # define page size
+#pageWidth = "210" # in mm # only when not using pageFormat
+#pageHeight = "297" # in mm # only when not using pageFormat
+fontSize = "11" # e.g. 11 12.5 # in pt
 printAuthorOnTitle = "false" #true, false #Legt fest, ob die Titelseite mit dem Namen des Autors bzw. der Autorin beginnt
 #title = "" #Auskommentieren, falls identisch mit 'general.title'
 subtitle = "Eine Geschichte von Josa Wode" #Auskommentieren, falls identisch mit 'general.subtitle'
@@ -135,13 +139,26 @@ Refs:
 * <http://jakubmarian.com/hyphen-minus-en-dash-and-em-dash-difference-and-usage-in-english/>
 
 
-### Gedankenstriche
+### Gedankenstriche (en-dash)
 Markup: Doppelminus.
 
-Beispiel: `erstes Wort -- zweites Wort -- drittes Wort`
+Beispiel: `Glitzer, Filz, Garn und Knöpfe -- seine Küche sah aus als wäre ein Clown in ihr explodiert.`
 
 HTML: wird übersetzt zu en-dash (`&ndash;`).
 LaTeX: wird übersetzt zu `--`.
+
+Refs:
+
+* <http://jakubmarian.com/hyphen-minus-en-dash-and-em-dash-difference-and-usage-in-english/>
+
+
+### Gedankenstriche (em-dash)
+Markup: Dreifaches Minus.
+
+Beispiel: `Glitter, felt, yarn, and buttons---his kitchen looked as if a clown had exploded.`
+
+HTML: wird übersetzt zu em-dash (`&mdash;`).
+LaTeX: wird übersetzt zu `---`.
 
 Refs:
 
