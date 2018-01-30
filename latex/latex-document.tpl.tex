@@ -1,6 +1,8 @@
-\documentclass[$page_format $font_size DIV=10]{scrbook} %%{scrreprt}
+\documentclass[$font_size]{$document_type}
 
-\usepackage[$page_size]{geometry}
+\usepackage{calc}
+$geometry
+\geometry{textheight=0.82\paperheight}
 
 \usepackage{fontspec}
 
@@ -20,11 +22,6 @@
 
 \pagestyle{scrheadings}
 \usepackage{scrlayer-scrpage}
-
-%\changepage{text height}{text width}{even-side margin}
-%{odd-side margin}{column sep.}
-%{topmargin}{headheight}{headsep}{footskip}
-\changepage{+2cm}{}{}{}{}{}{}{}{-1cm}
 
 \hypersetup{
     %pdftoolbar=false,

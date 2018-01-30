@@ -54,16 +54,24 @@ def main():
         latextemplate = string.Template(f.read().decode("utf-8").strip())
         
     #setup latex substitutions
+    if 'bookPrint' in setup['latex'] and setup['latex']['bookPrint'].lower() == "true":
+        latexDocumentType = "scrbook"
+        #TODO add bookPreliminaries
+        #TODO add bookAppendix
+        #TODO make overall pages divisible through 4 (add empty pages)
+    else:
+        latexDocumentType = "scrreprt"
+    latexGeometry = "\\usepackage["
     if 'pageFormat' in setup['latex']:
-        latexPageFormat = "page=%s," % setup['latex']['pageFormat']
-        latexPageSize = ""
+        latexGeometry += "%spaper" % setup['latex']['pageFormat']
     elif 'pageWidth' in setup['latex'] and 'pageHeight' in setup['latex']:
-        latexPageFormat = ""
-        latexPageSize = "paperwidth=%smm, paperheight=%smm" % (setup['latex']['pageWidth'], setup['latex']['pageHeight'], )
+        latexGeometry += "paperwidth=%s, paperheight=%s" % (setup['latex']['pageWidth'], setup['latex']['pageHeight'], )
     else:
         #default
-        latexPageFormat = "page=a5,"
-        latexPageSize = ""
+        latexGeometry += "a5paper"
+    if 'bindingOffset' in setup['latex']:
+        latexGeometry += ", bindingoffset=%s" % setup['latex']['bindingOffset']
+    latexGeometry += ", heightrounded, vmarginratio=1:1]{geometry}"
     if 'fontSize' in setup['latex']:
         latexFontSize = "fontsize=%spt," % setup['latex']['fontSize']
     else:
@@ -82,14 +90,14 @@ def main():
         latexSubtitle = subtitle
     if latexSubtitle != "":
         latexSubtitle = '\n\\vspace{0.1cm}\n\n\\noindent\n\\textit{%s}\n' % latexSubtitle
-
+    
     pdfSubject = setup['latex']['pdfsubject']
     pdfKeywords = setup['latex']['pdfkeywords']
     hasColorLinks = setup['latex']['hascolorlinks']
     urlColor = setup['latex']['urlcolor']
     linkColor = setup['latex']['linkcolor']
     #substitute latex
-    latexdoc = latextemplate.substitute(page_format=latexPageFormat, page_size=latexPageSize, font_size=latexFontSize, title=latexTitle, subtitle=latexSubtitle, author=latexAuthor, i_head=author, o_head=latexTitle, pdf_title=latexTitle, pdf_author=author, pdf_subject=pdfSubject, pdf_keywords=pdfKeywords, has_color_links=hasColorLinks, url_color=urlColor, link_color=linkColor)
+    latexdoc = latextemplate.substitute(document_type=latexDocumentType, geometry=latexGeometry, font_size=latexFontSize, title=latexTitle, subtitle=latexSubtitle, author=latexAuthor, i_head=author, o_head=latexTitle, pdf_title=latexTitle, pdf_author=author, pdf_subject=pdfSubject, pdf_keywords=pdfKeywords, has_color_links=hasColorLinks, url_color=urlColor, link_color=linkColor)
 
     with open(OUTFILE_LATEX_DOC, "wb") as f:
         f.write(latexdoc.encode("utf-8"))
