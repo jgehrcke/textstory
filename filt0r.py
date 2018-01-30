@@ -23,6 +23,10 @@ OUTFILE_LATEX_DOC = "latex/latex-document.tex"
 OUTFILE_HTML = "html/index.html"
 LATEX_TEMPLATE = "latex/latex-document.tpl.tex"
 HTML_TEMPLATE = "html/index.tpl.html"
+PRELIMINARIES_PATH = "latex/bookPreliminaries"
+PRELIMINARIES_LATEX_PATH = "bookPreliminaries/"
+APPENDIX_PATH = "latex/bookAppendix"
+APPENDIX_LATEX_PATH = "bookAppendix/"
 
 def main():
     if len(sys.argv) < 2:
@@ -54,11 +58,20 @@ def main():
         latextemplate = string.Template(f.read().decode("utf-8").strip())
         
     #setup latex substitutions
+    preliminaries = ""
+    appendix = ""
     if 'bookPrint' in setup['latex'] and setup['latex']['bookPrint'].lower() == "true":
         latexDocumentType = "scrbook"
-        #TODO add bookPreliminaries
-        #TODO add bookAppendix
-        #TODO make overall pages divisible through 4 (add empty pages)
+        #adding preliminary pages     
+        for root, dirs, files in os.walk(PRELIMINARIES_PATH):
+            for name in files:
+                log.info("adding preliminary page " + name)
+                preliminaries += "\\input{" + PRELIMINARIES_LATEX_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
+        #adding appendix pages
+        for root, dirs, files in os.walk(APPENDIX_PATH):
+            for name in files:
+                log.info("adding appendix page " + name)
+                appendix += "\\input{" + APPENDIX_LATEX_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
     else:
         latexDocumentType = "scrreprt"
     latexGeometry = "\\usepackage["
@@ -90,14 +103,14 @@ def main():
         latexSubtitle = subtitle
     if latexSubtitle != "":
         latexSubtitle = '\n\\vspace{0.1cm}\n\n\\noindent\n\\textit{%s}\n' % latexSubtitle
-    
     pdfSubject = setup['latex']['pdfsubject']
     pdfKeywords = setup['latex']['pdfkeywords']
     hasColorLinks = setup['latex']['hascolorlinks']
     urlColor = setup['latex']['urlcolor']
-    linkColor = setup['latex']['linkcolor']
+    linkColor = setup['latex']['linkcolor']    
+    
     #substitute latex
-    latexdoc = latextemplate.substitute(document_type=latexDocumentType, geometry=latexGeometry, font_size=latexFontSize, title=latexTitle, subtitle=latexSubtitle, author=latexAuthor, i_head=author, o_head=latexTitle, pdf_title=latexTitle, pdf_author=author, pdf_subject=pdfSubject, pdf_keywords=pdfKeywords, has_color_links=hasColorLinks, url_color=urlColor, link_color=linkColor)
+    latexdoc = latextemplate.substitute(document_type=latexDocumentType, geometry=latexGeometry, font_size=latexFontSize, title=latexTitle, subtitle=latexSubtitle, author=latexAuthor, i_head=author, o_head=latexTitle, pdf_title=latexTitle, pdf_author=author, pdf_subject=pdfSubject, pdf_keywords=pdfKeywords, has_color_links=hasColorLinks, url_color=urlColor, link_color=linkColor, preliminaries=preliminaries, appendix=appendix)
 
     with open(OUTFILE_LATEX_DOC, "wb") as f:
         f.write(latexdoc.encode("utf-8"))

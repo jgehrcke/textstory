@@ -56,9 +56,11 @@ author = "Josa Wode"
 language = "de" #de, en, ...
 
 [latex]
+bookPrint = "true" #true, false #Dokument wird für den Druck als Buch erstellt, es können Seiten zu Titelei und Anhang hinzugefügt werden (Verzeichnisse: latex/bookPreliminaries und latex/bookAppendix)
 pageFormat = "a5" # a0 - a6, b0 - b6 # define page size
 #pageWidth = "210" # in mm # only when not using pageFormat
 #pageHeight = "297" # in mm # only when not using pageFormat
+bindingOffset = "15mm" #Seitenanteil der in der Bindung verschwindet
 fontSize = "11" # e.g. 11 12.5 # in pt
 printAuthorOnTitle = "false" #true, false #Legt fest, ob die Titelseite mit dem Namen des Autors bzw. der Autorin beginnt
 #title = "" #Auskommentieren, falls identisch mit 'general.title'
