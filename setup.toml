@@ -18,7 +18,7 @@ printAuthorOnTitle = "false" #true, false #determines if title page begins with 
 #halfTitle = "" #half title for book printing #comment out if same as title
 pdfsubject = "Geschichte"
 pdfkeywords = "geschichte, alte, josa, wode"
-hascolorlinks = "true"
+hascolorlinks = "false"
 urlcolor = "blue"
 linkcolor = "black"
     
