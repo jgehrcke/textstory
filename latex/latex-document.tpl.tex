@@ -20,8 +20,16 @@ $geometry
 
 \newfontfamily\licensefont{Cabin}
 
-\pagestyle{scrheadings}
+%\pagestyle{scrheadings}
 \usepackage{scrlayer-scrpage}
+
+\newcommand{\storytitle}{$title}
+\newcommand{\storysubtitle}{$subtitle}
+\newcommand{\storyhalftitle}{$half_title}
+\newcommand{\storyauthor}{$author}
+\newcommand{\isbn}{$isbn}
+
+\newcommand{\printtitle}{$print_title}
 
 \hypersetup{
     %pdftoolbar=false,
@@ -46,19 +54,8 @@ $geometry
 
 $preliminaries
 
-\thispagestyle{empty}
+$first_page_setup
 
-%%\vspace*{3.6cm}
-
-%%\begin{textblock*}{4.5cm}(9.2cm,0.5cm) % {block width} (coords)
-%%\includegraphics[width=4.5cm]{title.png}
-%%\end{textblock*}
-
-$author
-\noindent
-{\Huge \textbf{$title}}
-$subtitle
-\vspace{1.1cm}
 \noindent
 \input{latex-body}
 \clearpage

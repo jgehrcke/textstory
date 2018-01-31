@@ -1,11 +1,12 @@
 [general]
-title = "Kommt und holt sie"
-subtitle = ""
+title = "Leben, Träumen und Sterben"
+subtitle = "kurze Geschichten rund ums Jahr"
 author = "Josa Wode"
 language = "de" #de, en, ...
 
 [latex]
 bookPrint = "true" #true, false #create document for book printing, allow preliminaries and appendix (directories: latex/bookPreliminaries and latex/bookAppendix)
+isbn = "xxx-x-xxxx-xxxx-x"
 pageFormat = "a5" #a0 - a6, b0 - b6 #define page size
 #pageWidth = "210mm" #only when not using pageFormat
 #pageHeight = "297mm" #only when not using pageFormat
@@ -13,7 +14,8 @@ bindingOffset = "15mm" #part of the page that is lost in binding
 fontSize = "10" #e.g. 11 12.5 #in pt
 printAuthorOnTitle = "false" #true, false #determines if title page begins with author name
 #title = "" #comment out if same as general.title
-subtitle = "Eine Geschichte von Josa Wode" #comment out if same as general.subtitle
+#subtitle = "Eine Geschichte von Josa Wode" #comment out if same as general.subtitle
+#halfTitle = "" #half title for book printing #comment out if same as title
 pdfsubject = "Geschichte"
 pdfkeywords = "geschichte, alte, josa, wode"
 hascolorlinks = "true"

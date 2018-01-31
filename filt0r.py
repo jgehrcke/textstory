@@ -62,6 +62,7 @@ def main():
     appendix = ""
     if 'bookPrint' in setup['latex'] and setup['latex']['bookPrint'].lower() == "true":
         latexDocumentType = "scrbook"
+        latexFirstPageSetup = ""
         #adding preliminary pages     
         for root, dirs, files in os.walk(PRELIMINARIES_PATH):
             for name in files:
@@ -74,7 +75,12 @@ def main():
                 appendix += "\\input{" + APPENDIX_LATEX_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
     else:
         latexDocumentType = "scrreprt"
+        latexFirstPageSetup = "\\thispagestyle{empty}\n\n\\printtitle\n"
     latexGeometry = "\\usepackage["
+    if 'isbn' in setup['latex']:
+        isbn = setup['latex']['isbn']
+    else:
+        isbn = ""
     if 'pageFormat' in setup['latex']:
         latexGeometry += "%spaper" % setup['latex']['pageFormat']
     elif 'pageWidth' in setup['latex'] and 'pageHeight' in setup['latex']:
@@ -89,10 +95,6 @@ def main():
         latexFontSize = "fontsize=%spt," % setup['latex']['fontSize']
     else:
         latexFontSize = "fontsize=11pt,"
-    if setup['latex']['printAuthorOnTitle'] == 'true':
-        latexAuthor = "\\noindent\n%s\n\n\\vspace{0.3cm}\n" % author
-    else:
-        latexAuthor = ""
     if 'title' in setup['latex']:
         latexTitle = setup['latex']['title']
     else:
@@ -101,8 +103,19 @@ def main():
         latexSubtitle = setup['latex']['subtitle']
     else:
         latexSubtitle = subtitle
+    printTitle = "\\begin{center}\n"
+    if setup['latex']['printAuthorOnTitle'] == 'true':
+        printTitle += "{\\large \\storyauthor}\n\n\\vspace{0.6cm}\n"   
+    printTitle += "{\\huge \\storytitle}\n"
     if latexSubtitle != "":
-        latexSubtitle = '\n\\vspace{0.1cm}\n\n\\noindent\n\\textit{%s}\n' % latexSubtitle
+        printTitle += "\n\\vspace{0.3cm}\n{\\large \\storysubtitle}\n"
+        #latexSubtitle = '\n\\vspace{0.1cm}\n\n\\noindent\n\\textit{%s}\n' % latexSubtitle
+    printTitle += "\\end{center}\n"
+
+    latexHalfTitle = latexTitle
+    if 'halfTitle' in setup['latex']:
+        latexHalfTitle = setup['latex']['halfTitle']
+
     pdfSubject = setup['latex']['pdfsubject']
     pdfKeywords = setup['latex']['pdfkeywords']
     hasColorLinks = setup['latex']['hascolorlinks']
@@ -110,7 +123,7 @@ def main():
     linkColor = setup['latex']['linkcolor']    
     
     #substitute latex
-    latexdoc = latextemplate.substitute(document_type=latexDocumentType, geometry=latexGeometry, font_size=latexFontSize, title=latexTitle, subtitle=latexSubtitle, author=latexAuthor, i_head=author, o_head=latexTitle, pdf_title=latexTitle, pdf_author=author, pdf_subject=pdfSubject, pdf_keywords=pdfKeywords, has_color_links=hasColorLinks, url_color=urlColor, link_color=linkColor, preliminaries=preliminaries, appendix=appendix)
+    latexdoc = latextemplate.substitute(isbn=isbn, document_type=latexDocumentType, geometry=latexGeometry, font_size=latexFontSize, title=latexTitle, subtitle=latexSubtitle, half_title=latexHalfTitle, print_title=printTitle, author=author, first_page_setup=latexFirstPageSetup, i_head=author, o_head=latexTitle, pdf_title=latexTitle, pdf_author=author, pdf_subject=pdfSubject, pdf_keywords=pdfKeywords, has_color_links=hasColorLinks, url_color=urlColor, link_color=linkColor, preliminaries=preliminaries, appendix=appendix)
 
     with open(OUTFILE_LATEX_DOC, "wb") as f:
         f.write(latexdoc.encode("utf-8"))
