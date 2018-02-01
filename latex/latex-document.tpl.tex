@@ -23,6 +23,8 @@ $geometry
 
 \usepackage{scrlayer-scrpage}
 
+%% some handy commands
+
 \newcommand{\storytitle}{$title}
 \newcommand{\storysubtitle}{$subtitle}
 \newcommand{\storyhalftitle}{$half_title}
@@ -30,6 +32,8 @@ $geometry
 \newcommand{\isbn}{$isbn}
 
 \newcommand{\printtitle}{$print_title}
+
+%% hypersetup
 
 \hypersetup{
     %pdftoolbar=false,
@@ -45,10 +49,14 @@ $geometry
     linkcolor=$link_color
 }
 
+%% header and footer
+
 \clearscrheadfoot
 \ihead{$i_head}
 \ohead{$o_head}
 \chead{\includegraphics[width=0.4cm]{img/tilde.png} \normalfont{\thepage} \includegraphics[width=0.4cm]{img/tilde.png}}
+
+%% document
 
 \begin{document}
 

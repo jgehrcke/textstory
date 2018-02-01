@@ -6,6 +6,7 @@ language = "de" #de, en, ...
 
 [latex]
 bookPrint = "true" #true, false #create document for book printing, allow preliminaries and appendix (directories: latex/bookPreliminaries and latex/bookAppendix)
+tableOfContents = "true" #true, false
 isbn = "xxx-x-xxxx-xxxx-x"
 pageFormat = "a5" #a0 - a6, b0 - b6 #define page size
 #pageWidth = "210mm" #only when not using pageFormat

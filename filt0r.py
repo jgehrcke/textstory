@@ -28,6 +28,8 @@ PRELIMINARIES_LATEX_PATH = "bookPreliminaries/"
 APPENDIX_PATH = "latex/bookAppendix"
 APPENDIX_LATEX_PATH = "bookAppendix/"
 
+latexChapters = []
+
 def main():
     if len(sys.argv) < 2:
         sys.exit("First argument must be path to document source.")
@@ -36,6 +38,31 @@ def main():
         sys.exit("File not found: %s" % infile_path)
     with open(infile_path, "rb") as f:
         inputtext = f.read().decode("utf-8").strip()
+    
+    filters = [
+        FilterConvertLineEndings(),  # needs to be done first
+        FilterMaskEscapedCharacters(), # needs to be done second
+        FilterHyphens(),
+        FilterSectionsParagraphs(), # introduces HTML-minuses, must run after FilterHyphens
+        FilterHeadlines(),
+        FilterImages(), # has to be done before FilterFootnotes
+        FilterFootnotes(),
+        FilterQuotes(),
+        FilterBold(), # has to be done before FilterItalics
+        FilterItalics(),
+        FilterDots(),
+        FilterRestoreEscapedCharacters(), # needs to be done last
+    ]
+
+    # Push original contents through all LaTeX filters (order matters).
+    outputlatex = inputtext
+    for f in filters:
+        log.info("Process with %s", f)
+        outputlatex = f.to_latex(outputlatex)
+        log.info("Done.")
+    with open(OUTFILE_LATEX_BODY, "wb") as f:
+        f.write(outputlatex.encode("utf-8"))
+    log.info("Wrote UTF-8-encoded LaTeX source file: %s.", OUTFILE_LATEX_BODY)
     
     setupFilePath = SETUP_FILE
     if len(sys.argv) > 2:
@@ -60,9 +87,19 @@ def main():
     #setup latex substitutions
     preliminaries = ""
     appendix = ""
+    if 'tableOfContents' in setup['latex'] and setup['latex']['tableOfContents'].lower() == "true":
+        #latexFirstPageSetup = "\\tableofcontents\n"
+        latexFirstPageSetup = "{\\large"
+        for chapter in latexChapters:
+            latexFirstPageSetup += "{\\noindent "
+            latexFirstPageSetup += chapter['name'] + " \\pageref{" + chapter['id'] + "}"
+            latexFirstPageSetup += "}\n\n"
+        latexFirstPageSetup += "}\n"
+    else:
+        latexFirstPageSetup = ""
     if 'bookPrint' in setup['latex'] and setup['latex']['bookPrint'].lower() == "true":
         latexDocumentType = "scrbook"
-        latexFirstPageSetup = ""
+        
         #adding preliminary pages     
         for root, dirs, files in os.walk(PRELIMINARIES_PATH):
             for name in files:
@@ -75,7 +112,7 @@ def main():
                 appendix += "\\input{" + APPENDIX_LATEX_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
     else:
         latexDocumentType = "scrreprt"
-        latexFirstPageSetup = "\\thispagestyle{empty}\n\n\\printtitle\n"
+        latexFirstPageSetup = "\\thispagestyle{empty}\n\n\\printtitle\n" + latexFirstPageSetup
     latexGeometry = "\\usepackage["
     if 'isbn' in setup['latex']:
         isbn = setup['latex']['isbn']
@@ -128,31 +165,6 @@ def main():
     with open(OUTFILE_LATEX_DOC, "wb") as f:
         f.write(latexdoc.encode("utf-8"))
     log.info("Wrote UTF-8-encoded LATEX document: %s.", OUTFILE_LATEX_DOC)
-
-    filters = [
-        FilterConvertLineEndings(),  # needs to be done first
-        FilterMaskEscapedCharacters(), # needs to be done second
-        FilterHyphens(),
-        FilterSectionsParagraphs(), # introduces HTML-minuses, must run after FilterHyphens
-        FilterHeadlines(),
-        FilterImages(), # has to be done before FilterFootnotes
-        FilterFootnotes(),
-        FilterQuotes(),
-        FilterBold(), # has to be done before FilterItalics
-        FilterItalics(),
-        FilterDots(),
-        FilterRestoreEscapedCharacters(), # needs to be done last
-    ]
-
-    # Push original contents through all LaTeX filters (order matters).
-    outputlatex = inputtext
-    for f in filters:
-        log.info("Process with %s", f)
-        outputlatex = f.to_latex(outputlatex)
-        log.info("Done.")
-    with open(OUTFILE_LATEX_BODY, "wb") as f:
-        f.write(outputlatex.encode("utf-8"))
-    log.info("Wrote UTF-8-encoded LaTeX source file: %s.", OUTFILE_LATEX_BODY)
 
     # Push original contents through HTML filters (same order, order matters).
     outputhtml = inputtext
@@ -220,7 +232,9 @@ class FilterHeadlines(Filter):
     def to_latex(self, s):
         def replacefunc(matchobj):
             text = matchobj.group(1)
-            result = "\n{\\vspace{0.5cm}\\noindent\\LARGE %s}" % text
+            labelText = str(len(latexChapters)) + text
+            latexChapters.append({'id':labelText, 'name':text})
+            result = "\n{\\label{%s}\\vspace{0.5cm}\\noindent\\LARGE %s}" % (labelText, text, )
             return result
 
         pattern = '^##\s*(.*?)$'

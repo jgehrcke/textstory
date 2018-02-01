@@ -83,7 +83,7 @@ sitename = "writing.fotoelectrics" #meta property og:site_name
 ```
 
 ## 3) LaTeX build
-Im `latex`-Verzeichnis dieses Projekts muss `latex-document.tex` per `lualatex` kompiliert werden. `build.bat` dient als Helferlein für Windows:
+Im `latex`-Verzeichnis dieses Projekts muss `latex-document.tex` per `lualatex` kompiliert werden (für das Erstellen des Inhaltsverzeichnisses ist dies zweimal durchzuführen). `build.bat` dient als Helferlein für Windows:
 ```
 $ build.bat
 [...]
@@ -114,7 +114,7 @@ Markup: Doppelraute am Zeilenanfang
 
 Beispiel: `## Kapitel 1`
 
-Eine derart markierte Zeile wird als Überschrift interpretiert.
+Eine derart markierte Zeile wird als Überschrift (und Kapitelanfang) interpretiert.
 
 
 ### Anführungszeichen
