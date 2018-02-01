@@ -28,8 +28,9 @@ PRELIMINARIES_LATEX_PATH = "bookPreliminaries/"
 APPENDIX_PATH = "latex/bookAppendix"
 APPENDIX_LATEX_PATH = "bookAppendix/"
 
+latexChapterPagebreak = False
 latexChapters = []
-
+        
 def main():
     if len(sys.argv) < 2:
         sys.exit("First argument must be path to document source.")
@@ -39,6 +40,21 @@ def main():
     with open(infile_path, "rb") as f:
         inputtext = f.read().decode("utf-8").strip()
     
+    setupFilePath = SETUP_FILE
+    if len(sys.argv) > 2:
+        setupFilePath = sys.argv[2]
+    if not os.path.isfile(setupFilePath):
+        sys.exit("File not found: %s" % setupFilePath)        
+    log.info("Read setup file: %s.", setupFilePath)
+    with open(setupFilePath, "rb") as f:
+        setupData = f.read().decode("utf-8").strip()
+        setup = toml.loads(setupData)
+
+    #this needs to be set before LaTeX body is 
+    if 'chapterPagebreak' in setup['latex'] and setup['latex']['chapterPagebreak'].lower() == "true":
+        global latexChapterPagebreak 
+        latexChapterPagebreak = True
+
     filters = [
         FilterConvertLineEndings(),  # needs to be done first
         FilterMaskEscapedCharacters(), # needs to be done second
@@ -53,7 +69,7 @@ def main():
         FilterDots(),
         FilterRestoreEscapedCharacters(), # needs to be done last
     ]
-
+        
     # Push original contents through all LaTeX filters (order matters).
     outputlatex = inputtext
     for f in filters:
@@ -63,16 +79,6 @@ def main():
     with open(OUTFILE_LATEX_BODY, "wb") as f:
         f.write(outputlatex.encode("utf-8"))
     log.info("Wrote UTF-8-encoded LaTeX source file: %s.", OUTFILE_LATEX_BODY)
-    
-    setupFilePath = SETUP_FILE
-    if len(sys.argv) > 2:
-        setupFilePath = sys.argv[2]
-    if not os.path.isfile(setupFilePath):
-        sys.exit("File not found: %s" % setupFilePath)        
-    log.info("Read setup file: %s.", setupFilePath)
-    with open(setupFilePath, "rb") as f:
-        setupData = f.read().decode("utf-8").strip()
-        setup = toml.loads(setupData)
         
     #setup general substitutions
     title = setup['general']['title']
@@ -88,13 +94,19 @@ def main():
     preliminaries = ""
     appendix = ""
     if 'tableOfContents' in setup['latex'] and setup['latex']['tableOfContents'].lower() == "true":
-        #latexFirstPageSetup = "\\tableofcontents\n"
-        latexFirstPageSetup = "{\\large"
+        latexFirstPageSetup = "\\thispagestyle{empty}\n\n{\\large\n"
+        if 'contentsTitle' in setup['latex'] and setup['latex']['contentsTitle'] != "":
+            latexContentsTitle = setup['latex']['contentsTitle']
+            latexFirstPageSetup += "\n{\\vspace{0.5cm}\\noindent\\LARGE %s}\n\n" % latexContentsTitle
+        latexFirstPageSetup += "\\vspace{0.5cm}\\noindent\\begin{tabular}{lr}\n"
         for chapter in latexChapters:
-            latexFirstPageSetup += "{\\noindent "
-            latexFirstPageSetup += chapter['name'] + " \\pageref{" + chapter['id'] + "}"
-            latexFirstPageSetup += "}\n\n"
-        latexFirstPageSetup += "}\n"
+            latexFirstPageSetup += chapter['name'] + " & \\pageref{" + chapter['id'] + "} \\\\\n"
+        latexFirstPageSetup += "\\end{tabular}\n"
+        latexFirstPageSetup += "}\n\n" 
+        if latexChapterPagebreak or 'tableOfContentsPagebreak' in setup['latex'] and setup['latex']['tableOfContentsPagebreak'].lower() == "true":
+            latexFirstPageSetup += "\clearpage\n\n"
+        else:
+            latexFirstPageSetup += "\\vspace{0.5cm}\n\n"
     else:
         latexFirstPageSetup = ""
     if 'bookPrint' in setup['latex'] and setup['latex']['bookPrint'].lower() == "true":
@@ -232,9 +244,12 @@ class FilterHeadlines(Filter):
     def to_latex(self, s):
         def replacefunc(matchobj):
             text = matchobj.group(1)
-            labelText = str(len(latexChapters)) + text
+            chaptersCount = len(latexChapters)
+            labelText = str(chaptersCount) + text
             latexChapters.append({'id':labelText, 'name':text})
             result = "\n{\\label{%s}\\vspace{0.5cm}\\noindent\\LARGE %s}" % (labelText, text, )
+            if latexChapterPagebreak and chaptersCount > 0:
+                result = "\\clearpage\n\n" + result
             return result
 
         pattern = '^##\s*(.*?)$'
