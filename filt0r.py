@@ -411,7 +411,7 @@ class FilterBold(Filter):
     def to_latex(self, s):
         def replacefunc(matchobj):
             text = matchobj.group(1)
-            result = "\\textbf{%s}" % text
+            result = "{\\boldfont\\textbf{%s}}" % text
             return result
 
         pattern = '__(.*?)__'
