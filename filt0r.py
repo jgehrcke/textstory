@@ -36,8 +36,11 @@ def main():
         sys.exit("First argument must be path to document source.")
     infilePath = sys.argv[1]
     inputMarkup = DocumentReader(infilePath).getString()
-
-    setupData = DocumentReader(SETUP_FILE).getString()
+    
+    setupFilePath = SETUP_FILE
+    if len(sys.argv) > 2:
+        setupFilePath = sys.argv[2]
+    setupData = DocumentReader(setupFilePath).getString()
     setup = toml.loads(setupData)
 
     #this needs to be set before LaTeX body is 
@@ -166,48 +169,72 @@ def main():
         f.write(latexDoc.encode("utf-8"))
     log.info("Wrote UTF-8-encoded LATEX document: %s.", OUTFILE_LATEX_DOC)
 
-    # Push original contents through HTML filters (same order, order matters).
-    outputHtml = inputMarkup
-    for f in filters:
-        log.info("Process with %s", f)
-        outputHtml = f.to_html(outputHtml)
-        log.info("Done.")
+    setup = Setup(setupFilePath)
+    htmlGenerator = HtmlGenerator(setup, inputMarkup, filters, HTML_TEMPLATE, OUTFILE_HTML)
+    htmlGenerator.createOutputFile()
 
-    log.info("Read HTML template file: %s.", HTML_TEMPLATE)
-    with open(HTML_TEMPLATE, "rb") as f:
-        htmltemplate = string.Template(f.read().decode("utf-8").strip())
+class Setup(object):
+    def __init__(self, setupFilePath):
+        setupFileString = DocumentReader(setupFilePath).getString()
+        self.setupToml = toml.loads(setupFileString)
+        self.general = GeneralSetupData(self.setupToml)
+        self.html = HtmlSetupData(self.setupToml, self.general)
+    
+class GeneralSetupData(object):
+    def __init__(self, setupToml):
+        self.title = setupToml['general']['title']
+        self.subtitle = setupToml['general']['subtitle']
+        self.author = setupToml['general']['author']
+        self.language = setupToml['general']['language']   
 
-    log.info("Perform HTML template substitution")
-    #setup html substitutions
-    lang = language
-    locale = setup['html']['locale']
-    if 'title' in setup['html']:
-        htmlTitle = setup['html']['title']
-    else:
-        htmlTitle = title
-    if 'subtitle' in setup['html']:
-        htmlSubtitle = setup['html']['subtitle']
-    else:
-        htmlSubtitle = subtitle
-    if htmlSubtitle == "":
-        subtitleTag = ""
-    else:
-        subtitleTag = '<p class="subtitle">%s</p>\n' % htmlSubtitle
-    headerTitle = setup['html']['headertitle']
-    metaDescription = setup['html']['metadescription']
-    url = setup['html']['url']
-    siteName = setup['html']['sitename']
-    if 'previewimage' in setup['html']:
-        ogImageTag = '<meta property="og:image" content="%s" />' % setup['html']['previewimage']
-    else:
-        ogImageTag = ""
-    #substitute html
-    htmldoc = htmltemplate.substitute(html_content=outputHtml, lang=lang, locale=locale, header_title=headerTitle, title=htmlTitle, subtitle_tag=subtitleTag, author=author, meta_description=metaDescription, url=url, site_name=siteName, og_image_tag=ogImageTag)
+class HtmlSetupData(object):        
+    def __init__(self, setupToml, general):
+        self.locale = setupToml['html']['locale']
+        if 'title' in setupToml['html']:
+            self.title = setupToml['html']['title']
+        else:
+            self.title = general.title
+        if 'subtitle' in setupToml['html']:
+            self.subtitle = setupToml['html']['subtitle']
+        else:
+            self.subtitle = general.subtitle
+        if self.subtitle == "":
+            self.subtitleTag = ""
+        else:
+            self.subtitleTag = '<p class="subtitle">%s</p>\n' % self.subtitle
+        self.headerTitle = setupToml['html']['headertitle']
+        self.metaDescription = setupToml['html']['metadescription']
+        self.url = setupToml['html']['url']
+        self.siteName = setupToml['html']['sitename']
+        if 'previewimage' in setupToml['html']:
+            self.ogImageTag = '<meta property="og:image" content="%s" />' % setupToml['html']['previewimage']
+        else:
+            self.ogImageTag = ""
+    
+class HtmlGenerator(object):
+    def __init__(self, setup, inputMarkup, filters, templateFilePath, outputFilePath):
+        self.templateFilePath = templateFilePath
+        self.outputFilePath = outputFilePath
+        self.applyFilters(filters, inputMarkup)
+        self.substitute(setup)
 
-    with open(OUTFILE_HTML, "wb") as f:
-        f.write(htmldoc.encode("utf-8"))
-    log.info("Wrote UTF-8-encoded HTML document: %s.", OUTFILE_HTML)
+    def applyFilters(self, filters, inputMarkup):
+        # Push original contents through HTML filters (same order, order matters).
+        self.outputHtml = inputMarkup
+        for f in filters:
+            log.info("Process with %s", f)
+            self.outputHtml = f.to_html(self.outputHtml)
+            log.info("Done.")   
 
+    def substitute(self, setup):
+        log.info("Performing HTML template substitution")
+        htmlTemplate = string.Template(DocumentReader(self.templateFilePath).getString())
+        self.htmlDoc = htmlTemplate.substitute(html_content=self.outputHtml, lang=setup.general.language, locale=setup.html.locale, header_title=setup.html.headerTitle, title=setup.html.title, subtitle_tag=setup.html.subtitleTag, author=setup.general.author, meta_description=setup.html.metaDescription, url=setup.html.url, site_name=setup.html.siteName, og_image_tag=setup.html.ogImageTag)    
+        
+    def createOutputFile(self):
+        with open(self.outputFilePath, "wb") as f:
+            f.write(self.htmlDoc.encode("utf-8"))
+        log.info("Wrote UTF-8-encoded HTML document: %s.", self.outputFilePath)    
     
 class DocumentReader(object):
     def __init__(self, documentPath):
