@@ -28,7 +28,6 @@ PRELIMINARIES_LATEX_PATH = "bookPreliminaries/"
 APPENDIX_PATH = "latex/bookAppendix"
 APPENDIX_LATEX_PATH = "bookAppendix/"
 
-latexChapterPagebreak = False
 latexChapters = []
         
 def main():
@@ -37,22 +36,18 @@ def main():
     infilePath = sys.argv[1]
     inputMarkup = DocumentReader(infilePath).getString()
     
+    #Setup
     setupFilePath = SETUP_FILE
     if len(sys.argv) > 2:
         setupFilePath = sys.argv[2]
     setup = Setup(setupFilePath)
-
-    #this needs to be set before LaTeX body is created
-    if setup.latex.chapterPagebreak: #'chapterPagebreak' in setup['latex'] and setup['latex']['chapterPagebreak'].lower() == "true":
-        global latexChapterPagebreak 
-        latexChapterPagebreak = True
 
     filters = [
         FilterConvertLineEndings(),  # needs to be done first
         FilterMaskEscapedCharacters(), # needs to be done second
         FilterHyphens(),
         FilterSectionsParagraphs(), # introduces HTML-minuses, must run after FilterHyphens
-        FilterHeadlines(),
+        FilterHeadlines(setup.latex.chapterPagebreak),
         FilterImages(), # has to be done before FilterFootnotes
         FilterFootnotes(),
         FilterQuotes(),
@@ -61,46 +56,14 @@ def main():
         FilterDots(),
         FilterRestoreEscapedCharacters(), # needs to be done last
     ]
-        
-    # Push original contents through all LaTeX filters (order matters).
-    outputLatex = inputMarkup
-    for f in filters:
-        log.info("Process with %s", f)
-        outputLatex = f.to_latex(outputLatex)
-        log.info("Done.")
-    with open(OUTFILE_LATEX_BODY, "wb") as f:
-        f.write(outputLatex.encode("utf-8"))
-    log.info("Wrote UTF-8-encoded LaTeX source file: %s.", OUTFILE_LATEX_BODY)   
-       
-    #setup latex substitutions
-    latexFirstPageSetup = ""
-    if setup.latex.tableOfContents:
-        latexFirstPageSetup = "\\thispagestyle{empty}\n\n{\\large\n"
-        if setup.latex.latexContentsTitle:
-            latexFirstPageSetup += "\n{\\vspace{0.5cm}\\noindent\\LARGE %s}\n\n" % setup.latex.latexContentsTitle
-        latexFirstPageSetup += "\\vspace{0.5cm}\\noindent\\begin{tabular}{lr}\n"
-        for chapter in latexChapters:
-            latexFirstPageSetup += chapter['name'] + " & \\pageref{" + chapter['id'] + "} \\\\\n"
-        latexFirstPageSetup += "\\end{tabular}\n"
-        latexFirstPageSetup += "}\n\n" 
-        if setup.latex.chapterPagebreak or setup.latex.tableOfContentsPagebreak:
-            latexFirstPageSetup += "\clearpage\n\n"
-        else:
-            latexFirstPageSetup += "\\vspace{0.5cm}\n\n"
-    if not setup.latex.bookPrint:
-        latexFirstPageSetup = "\\thispagestyle{empty}\n\n\\printtitle\n" + latexFirstPageSetup
-     
     
-    #substitute latex
-    latexTemplate = string.Template(DocumentReader(LATEX_TEMPLATE).getString())
-    latexDoc = latexTemplate.substitute(isbn=setup.latex.isbn, document_type=setup.latex.latexDocumentType, geometry=setup.latex.latexGeometry, font_size=setup.latex.latexFontSize, title=setup.latex.latexTitle, subtitle=setup.latex.latexSubtitle, half_title=setup.latex.latexHalfTitle, print_title=setup.latex.printTitle, author=setup.general.author, first_page_setup=latexFirstPageSetup, i_head=setup.general.author, o_head=setup.latex.latexTitle, pdf_title=setup.latex.latexTitle, pdf_author=setup.general.author, pdf_subject=setup.latex.pdfSubject, pdf_keywords=setup.latex.pdfKeywords, has_color_links=setup.latex.hasColorLinks, url_color=setup.latex.urlColor, link_color=setup.latex.linkColor, preliminaries=setup.latex.preliminaries, appendix=setup.latex.appendix)
+    #Create LaTeX
+    latexGenerator = LatexGenerator(setup, inputMarkup, filters, LATEX_TEMPLATE, OUTFILE_LATEX_DOC, OUTFILE_LATEX_BODY)
+    latexGenerator.createOutput()
 
-    with open(OUTFILE_LATEX_DOC, "wb") as f:
-        f.write(latexDoc.encode("utf-8"))
-    log.info("Wrote UTF-8-encoded LATEX document: %s.", OUTFILE_LATEX_DOC)
-
+    #Create HTML
     htmlGenerator = HtmlGenerator(setup, inputMarkup, filters, HTML_TEMPLATE, OUTFILE_HTML)
-    htmlGenerator.createOutputFile()
+    htmlGenerator.createOutput()
 
 class Setup(object):
     def __init__(self, setupFilePath):
@@ -237,13 +200,26 @@ class LatexSetupData(object):
         self.hasColorLinks = setupToml['latex']['hascolorlinks']
         self.urlColor = setupToml['latex']['urlcolor']
         self.linkColor = setupToml['latex']['linkcolor']        
-    
-class HtmlGenerator(object):
-    def __init__(self, setup, inputMarkup, filters, templateFilePath, outputFilePath):
+
+class Generator(object):
+    def __init__(self, setup, inputMarkup, filters, templateFilePath):
         self.templateFilePath = templateFilePath
-        self.outputFilePath = outputFilePath
         self.applyFilters(filters, inputMarkup)
         self.substitute(setup)
+
+    def applyFilters(self, filters, inputMarkup):        
+        pass
+        
+    def substitute(self, setup):
+        pass
+
+    def createOutput(self):
+        pass
+
+class HtmlGenerator(Generator):
+    def __init__(self, setup, inputMarkup, filters, templateFilePath, outputFilePath):
+        self.outputFilePath = outputFilePath
+        Generator.__init__(self, setup, inputMarkup, filters, templateFilePath)
 
     def applyFilters(self, filters, inputMarkup):
         # Push original contents through HTML filters (same order, order matters).
@@ -258,11 +234,57 @@ class HtmlGenerator(object):
         htmlTemplate = string.Template(DocumentReader(self.templateFilePath).getString())
         self.htmlDoc = htmlTemplate.substitute(html_content=self.outputHtml, lang=setup.general.language, locale=setup.html.locale, header_title=setup.html.headerTitle, title=setup.html.title, subtitle_tag=setup.html.subtitleTag, author=setup.general.author, meta_description=setup.html.metaDescription, url=setup.html.url, site_name=setup.html.siteName, og_image_tag=setup.html.ogImageTag)    
         
-    def createOutputFile(self):
+    def createOutput(self):
         with open(self.outputFilePath, "wb") as f:
             f.write(self.htmlDoc.encode("utf-8"))
         log.info("Wrote UTF-8-encoded HTML document: %s.", self.outputFilePath)    
-    
+
+class LatexGenerator(Generator):
+    def __init__(self, setup, inputMarkup, filters, templateFilePath, outputDocFilePath, outputBodyFilePath):
+        self.outputDocFilePath = outputDocFilePath
+        self.outputBodyFilePath = outputBodyFilePath
+        Generator.__init__(self, setup, inputMarkup, filters, templateFilePath)
+        
+    def applyFilters(self, filters, inputMarkup):
+        # Push original contents through all LaTeX filters (order matters).
+        self.outputLatex = inputMarkup
+        for f in filters:
+            log.info("Process with %s", f)
+            self.outputLatex = f.to_latex(self.outputLatex)
+            log.info("Done.")
+
+    def substitute(self, setup):
+        latexFirstPageSetup = ""
+        if setup.latex.tableOfContents:
+            latexFirstPageSetup = "\\thispagestyle{empty}\n\n{\\large\n"
+            if setup.latex.latexContentsTitle:
+                latexFirstPageSetup += "\n{\\vspace{0.5cm}\\noindent\\LARGE %s}\n\n" % setup.latex.latexContentsTitle
+            latexFirstPageSetup += "\\vspace{0.5cm}\\noindent\\begin{tabular}{lr}\n"
+            for chapter in latexChapters:
+                latexFirstPageSetup += chapter['name'] + " & \\pageref{" + chapter['id'] + "} \\\\\n"
+            latexFirstPageSetup += "\\end{tabular}\n"
+            latexFirstPageSetup += "}\n\n" 
+            if setup.latex.chapterPagebreak or setup.latex.tableOfContentsPagebreak:
+                latexFirstPageSetup += "\clearpage\n\n"
+            else:
+                latexFirstPageSetup += "\\vspace{0.5cm}\n\n"
+        if not setup.latex.bookPrint:
+            latexFirstPageSetup = "\\thispagestyle{empty}\n\n\\printtitle\n" + latexFirstPageSetup
+               
+        log.info("Performing LaTeX template substitution")
+        latexTemplate = string.Template(DocumentReader(self.templateFilePath).getString())
+        self.latexDoc = latexTemplate.substitute(isbn=setup.latex.isbn, document_type=setup.latex.latexDocumentType, geometry=setup.latex.latexGeometry, font_size=setup.latex.latexFontSize, title=setup.latex.latexTitle, subtitle=setup.latex.latexSubtitle, half_title=setup.latex.latexHalfTitle, print_title=setup.latex.printTitle, author=setup.general.author, first_page_setup=latexFirstPageSetup, i_head=setup.general.author, o_head=setup.latex.latexTitle, pdf_title=setup.latex.latexTitle, pdf_author=setup.general.author, pdf_subject=setup.latex.pdfSubject, pdf_keywords=setup.latex.pdfKeywords, has_color_links=setup.latex.hasColorLinks, url_color=setup.latex.urlColor, link_color=setup.latex.linkColor, preliminaries=setup.latex.preliminaries, appendix=setup.latex.appendix)
+ 
+    def createOutput(self): 
+        #writing latex document
+        with open(self.outputDocFilePath, "wb") as f:
+            f.write(self.latexDoc.encode("utf-8"))
+        log.info("Wrote UTF-8-encoded LaTeX document: %s.", self.outputDocFilePath)  
+        #writing latex document body
+        with open(self.outputBodyFilePath, "wb") as f:
+            f.write(self.outputLatex.encode("utf-8"))
+        log.info("Wrote UTF-8-encoded LaTeX document body: %s.", self.outputBodyFilePath)   
+      
 class DocumentReader(object):
     def __init__(self, documentPath):
         self.documentPath = documentPath
@@ -284,6 +306,9 @@ class Filter(object):
 
 # Lines beginning with ## will be formatted as headlines
 class FilterHeadlines(Filter):
+    def __init__(self, latexChapterPagebreak):
+        self.latexChapterPagebreak = latexChapterPagebreak
+    
     def to_html(self, s):
         def replacefunc(matchobj):
             text = matchobj.group(1)
@@ -302,7 +327,7 @@ class FilterHeadlines(Filter):
             labelText = str(chaptersCount) + text
             latexChapters.append({'id':labelText, 'name':text})
             result = "\n{\\label{%s}\\vspace{0.5cm}\\noindent\\LARGE %s}" % (labelText, text, )
-            if latexChapterPagebreak and chaptersCount > 0:
+            if self.latexChapterPagebreak and chaptersCount > 0:
                 result = "\\clearpage\n\n" + result
             return result
 
