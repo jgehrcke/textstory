@@ -31,17 +31,21 @@ APPENDIX_LATEX_PATH = "bookAppendix/"
 latexChapters = []
         
 def main():
+    log.info("++++++++++ textstory-to-beautiful-latex-html ++++++++++")
+    
     if len(sys.argv) < 2:
         sys.exit("First argument must be path to document source.")
     infilePath = sys.argv[1]
     inputMarkup = DocumentReader(infilePath).getString()
     
     #Setup
+    log.info("***************** Running setup *****************")
     setupFilePath = SETUP_FILE
     if len(sys.argv) > 2:
         setupFilePath = sys.argv[2]
     setup = Setup(setupFilePath)
-
+    log.info("Done with setup.")
+    
     filters = [
         FilterConvertLineEndings(),  # needs to be done first
         FilterMaskEscapedCharacters(), # needs to be done second
@@ -58,12 +62,16 @@ def main():
     ]
     
     #Create LaTeX
+    log.info("***************** Creating LaTeX *****************")
     latexGenerator = LatexGenerator(setup, inputMarkup, filters, LATEX_TEMPLATE, OUTFILE_LATEX_DOC, OUTFILE_LATEX_BODY)
     latexGenerator.createOutput()
-
+    log.info("Done creating LaTeX.")
+    
     #Create HTML
+    log.info("***************** Creating HTML *****************")
     htmlGenerator = HtmlGenerator(setup, inputMarkup, filters, HTML_TEMPLATE, OUTFILE_HTML)
     htmlGenerator.createOutput()
+    log.info("Done creating HTML.")
 
 class Setup(object):
     def __init__(self, setupFilePath):
