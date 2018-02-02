@@ -40,11 +40,10 @@ def main():
     setupFilePath = SETUP_FILE
     if len(sys.argv) > 2:
         setupFilePath = sys.argv[2]
-    setupData = DocumentReader(setupFilePath).getString()
-    setup = toml.loads(setupData)
+    setup = Setup(setupFilePath)
 
-    #this needs to be set before LaTeX body is 
-    if 'chapterPagebreak' in setup['latex'] and setup['latex']['chapterPagebreak'].lower() == "true":
+    #this needs to be set before LaTeX body is created
+    if setup.latex.chapterPagebreak: #'chapterPagebreak' in setup['latex'] and setup['latex']['chapterPagebreak'].lower() == "true":
         global latexChapterPagebreak 
         latexChapterPagebreak = True
 
@@ -71,105 +70,35 @@ def main():
         log.info("Done.")
     with open(OUTFILE_LATEX_BODY, "wb") as f:
         f.write(outputLatex.encode("utf-8"))
-    log.info("Wrote UTF-8-encoded LaTeX source file: %s.", OUTFILE_LATEX_BODY)
-        
-    #setup general substitutions
-    title = setup['general']['title']
-    subtitle = setup['general']['subtitle']
-    author = setup['general']['author']
-    language = setup['general']['language']
-    
+    log.info("Wrote UTF-8-encoded LaTeX source file: %s.", OUTFILE_LATEX_BODY)   
        
     #setup latex substitutions
-    preliminaries = ""
-    appendix = ""
-    if 'tableOfContents' in setup['latex'] and setup['latex']['tableOfContents'].lower() == "true":
+    latexFirstPageSetup = ""
+    if setup.latex.tableOfContents:
         latexFirstPageSetup = "\\thispagestyle{empty}\n\n{\\large\n"
-        if 'contentsTitle' in setup['latex'] and setup['latex']['contentsTitle'] != "":
-            latexContentsTitle = setup['latex']['contentsTitle']
-            latexFirstPageSetup += "\n{\\vspace{0.5cm}\\noindent\\LARGE %s}\n\n" % latexContentsTitle
+        if setup.latex.latexContentsTitle:
+            latexFirstPageSetup += "\n{\\vspace{0.5cm}\\noindent\\LARGE %s}\n\n" % setup.latex.latexContentsTitle
         latexFirstPageSetup += "\\vspace{0.5cm}\\noindent\\begin{tabular}{lr}\n"
         for chapter in latexChapters:
             latexFirstPageSetup += chapter['name'] + " & \\pageref{" + chapter['id'] + "} \\\\\n"
         latexFirstPageSetup += "\\end{tabular}\n"
         latexFirstPageSetup += "}\n\n" 
-        if latexChapterPagebreak or 'tableOfContentsPagebreak' in setup['latex'] and setup['latex']['tableOfContentsPagebreak'].lower() == "true":
+        if setup.latex.chapterPagebreak or setup.latex.tableOfContentsPagebreak:
             latexFirstPageSetup += "\clearpage\n\n"
         else:
             latexFirstPageSetup += "\\vspace{0.5cm}\n\n"
-    else:
-        latexFirstPageSetup = ""
-    if 'bookPrint' in setup['latex'] and setup['latex']['bookPrint'].lower() == "true":
-        latexDocumentType = "scrbook"
-        
-        #adding preliminary pages     
-        for root, dirs, files in os.walk(PRELIMINARIES_PATH):
-            for name in files:
-                log.info("adding preliminary page " + name)
-                preliminaries += "\\input{" + PRELIMINARIES_LATEX_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
-        #adding appendix pages
-        for root, dirs, files in os.walk(APPENDIX_PATH):
-            for name in files:
-                log.info("adding appendix page " + name)
-                appendix += "\\input{" + APPENDIX_LATEX_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
-    else:
-        latexDocumentType = "scrreprt"
+    if not setup.latex.bookPrint:
         latexFirstPageSetup = "\\thispagestyle{empty}\n\n\\printtitle\n" + latexFirstPageSetup
-    latexGeometry = "\\usepackage["
-    if 'isbn' in setup['latex']:
-        isbn = setup['latex']['isbn']
-    else:
-        isbn = ""
-    if 'pageFormat' in setup['latex']:
-        latexGeometry += "%spaper" % setup['latex']['pageFormat']
-    elif 'pageWidth' in setup['latex'] and 'pageHeight' in setup['latex']:
-        latexGeometry += "paperwidth=%s, paperheight=%s" % (setup['latex']['pageWidth'], setup['latex']['pageHeight'], )
-    else:
-        #default
-        latexGeometry += "a5paper"
-    if 'bindingOffset' in setup['latex']:
-        latexGeometry += ", bindingoffset=%s" % setup['latex']['bindingOffset']
-    latexGeometry += ", heightrounded, vmarginratio=1:1]{geometry}"
-    if 'fontSize' in setup['latex']:
-        latexFontSize = "fontsize=%spt," % setup['latex']['fontSize']
-    else:
-        latexFontSize = "fontsize=11pt,"
-    if 'title' in setup['latex']:
-        latexTitle = setup['latex']['title']
-    else:
-        latexTitle = title
-    if 'subtitle' in setup['latex']:
-        latexSubtitle = setup['latex']['subtitle']
-    else:
-        latexSubtitle = subtitle
-    printTitle = "\\begin{center}\n"
-    if setup['latex']['printAuthorOnTitle'] == 'true':
-        printTitle += "{\\large \\storyauthor}\n\n\\vspace{0.6cm}\n"   
-    printTitle += "{\\huge \\storytitle}\n"
-    if latexSubtitle != "":
-        printTitle += "\n\\vspace{0.3cm}\n{\\large \\storysubtitle}\n"
-        #latexSubtitle = '\n\\vspace{0.1cm}\n\n\\noindent\n\\textit{%s}\n' % latexSubtitle
-    printTitle += "\\end{center}\n"
-
-    latexHalfTitle = latexTitle
-    if 'halfTitle' in setup['latex']:
-        latexHalfTitle = setup['latex']['halfTitle']
-
-    pdfSubject = setup['latex']['pdfsubject']
-    pdfKeywords = setup['latex']['pdfkeywords']
-    hasColorLinks = setup['latex']['hascolorlinks']
-    urlColor = setup['latex']['urlcolor']
-    linkColor = setup['latex']['linkcolor']    
+     
     
     #substitute latex
     latexTemplate = string.Template(DocumentReader(LATEX_TEMPLATE).getString())
-    latexDoc = latexTemplate.substitute(isbn=isbn, document_type=latexDocumentType, geometry=latexGeometry, font_size=latexFontSize, title=latexTitle, subtitle=latexSubtitle, half_title=latexHalfTitle, print_title=printTitle, author=author, first_page_setup=latexFirstPageSetup, i_head=author, o_head=latexTitle, pdf_title=latexTitle, pdf_author=author, pdf_subject=pdfSubject, pdf_keywords=pdfKeywords, has_color_links=hasColorLinks, url_color=urlColor, link_color=linkColor, preliminaries=preliminaries, appendix=appendix)
+    latexDoc = latexTemplate.substitute(isbn=setup.latex.isbn, document_type=setup.latex.latexDocumentType, geometry=setup.latex.latexGeometry, font_size=setup.latex.latexFontSize, title=setup.latex.latexTitle, subtitle=setup.latex.latexSubtitle, half_title=setup.latex.latexHalfTitle, print_title=setup.latex.printTitle, author=setup.general.author, first_page_setup=latexFirstPageSetup, i_head=setup.general.author, o_head=setup.latex.latexTitle, pdf_title=setup.latex.latexTitle, pdf_author=setup.general.author, pdf_subject=setup.latex.pdfSubject, pdf_keywords=setup.latex.pdfKeywords, has_color_links=setup.latex.hasColorLinks, url_color=setup.latex.urlColor, link_color=setup.latex.linkColor, preliminaries=setup.latex.preliminaries, appendix=setup.latex.appendix)
 
     with open(OUTFILE_LATEX_DOC, "wb") as f:
         f.write(latexDoc.encode("utf-8"))
     log.info("Wrote UTF-8-encoded LATEX document: %s.", OUTFILE_LATEX_DOC)
 
-    setup = Setup(setupFilePath)
     htmlGenerator = HtmlGenerator(setup, inputMarkup, filters, HTML_TEMPLATE, OUTFILE_HTML)
     htmlGenerator.createOutputFile()
 
@@ -179,6 +108,7 @@ class Setup(object):
         self.setupToml = toml.loads(setupFileString)
         self.general = GeneralSetupData(self.setupToml)
         self.html = HtmlSetupData(self.setupToml, self.general)
+        self.latex = LatexSetupData(self.setupToml, self.general)
     
 class GeneralSetupData(object):
     def __init__(self, setupToml):
@@ -210,6 +140,103 @@ class HtmlSetupData(object):
             self.ogImageTag = '<meta property="og:image" content="%s" />' % setupToml['html']['previewimage']
         else:
             self.ogImageTag = ""
+ 
+class LatexSetupData(object):        
+    def __init__(self, setupToml, general): 
+
+        #table of contents setup
+        if 'tableOfContents' in setupToml['latex'] and setupToml['latex']['tableOfContents'].lower() == "true":
+            self.tableOfContents = True
+            if 'contentsTitle' in setupToml['latex'] and setupToml['latex']['contentsTitle'] != "":
+                self.latexContentsTitle = setupToml['latex']['contentsTitle']
+            if 'tableOfContentsPagebreak' in setupToml['latex'] and setupToml['latex']['tableOfContentsPagebreak'].lower() == "true":
+                self.tableOfContentsPagebreak = True
+            else:
+                self.tableOfContentsPagebreak = False
+        else:
+            self.tableOfContents = False
+        
+        #book print setup
+        self.preliminaries = ""
+        self.appendix = ""
+        if 'bookPrint' in setupToml['latex'] and setupToml['latex']['bookPrint'].lower() == "true":
+            self.bookPrint = True
+            self.latexDocumentType = "scrbook"
+            
+            #adding preliminary pages     
+            for root, dirs, files in os.walk(PRELIMINARIES_PATH):
+                if files:
+                    log.info("Preliminary pages:")
+                for name in files:
+                    log.info("  " + name)
+                    self.preliminaries += "\\input{" + PRELIMINARIES_LATEX_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
+            #adding appendix pages
+            for root, dirs, files in os.walk(APPENDIX_PATH):
+                if files:
+                    log.info("Appendix pages:")
+                for name in files:
+                    log.info("  " + name)
+                    self.appendix += "\\input{" + APPENDIX_LATEX_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
+        else:
+            self.bookPrint = False
+            self.latexDocumentType = "scrreprt"
+            
+        #chapter pagebreak
+        if 'chapterPagebreak' in setupToml['latex'] and setupToml['latex']['chapterPagebreak'].lower() == "true":
+            self.chapterPagebreak = True
+        else:
+            self.chapterPagebreak = True
+
+        #isbn
+        if 'isbn' in setupToml['latex']:
+            self.isbn = setupToml['latex']['isbn']
+        else:
+            self.isbn = ""
+        
+        #geometry
+        self.latexGeometry = "\\usepackage["
+        if 'pageFormat' in setupToml['latex']:
+            self.latexGeometry += "%spaper" % setupToml['latex']['pageFormat']
+        elif 'pageWidth' in setupToml['latex'] and 'pageHeight' in setupToml['latex']:
+            self.latexGeometry += "paperwidth=%s, paperheight=%s" % (setupToml['latex']['pageWidth'], setupToml['latex']['pageHeight'], )
+        else:#default            
+            self.latexGeometry += "a5paper"
+        if 'bindingOffset' in setupToml['latex']:
+            self.latexGeometry += ", bindingoffset=%s" % setupToml['latex']['bindingOffset']
+        self.latexGeometry += ", heightrounded, vmarginratio=1:1]{geometry}"
+        
+        #font size
+        if 'fontSize' in setupToml['latex']:
+            self.latexFontSize = "fontsize=%spt," % setupToml['latex']['fontSize']
+        else:
+            self.latexFontSize = "fontsize=11pt,"
+        
+        #title setup
+        if 'title' in setupToml['latex']:
+            self.latexTitle = setupToml['latex']['title']
+        else:
+            self.latexTitle = general.title
+        if 'subtitle' in setupToml['latex']:
+            self.latexSubtitle = setupToml['latex']['subtitle']
+        else:
+            self.latexSubtitle = general.subtitle
+        self.printTitle = "\\begin{center}\n"
+        if setupToml['latex']['printAuthorOnTitle'] == 'true':
+            self.printTitle += "{\\large \\storyauthor}\n\n\\vspace{0.6cm}\n"   
+        self.printTitle += "{\\huge \\storytitle}\n"
+        if self.latexSubtitle != "":
+            self.printTitle += "\n\\vspace{0.3cm}\n{\\large \\storysubtitle}\n"
+        self.printTitle += "\\end{center}\n"
+        self.latexHalfTitle = self.latexTitle
+        if 'halfTitle' in setupToml['latex']:
+            self.latexHalfTitle = setupToml['latex']['halfTitle']
+
+        #pdf keywords
+        self.pdfSubject = setupToml['latex']['pdfsubject']
+        self.pdfKeywords = setupToml['latex']['pdfkeywords']
+        self.hasColorLinks = setupToml['latex']['hascolorlinks']
+        self.urlColor = setupToml['latex']['urlcolor']
+        self.linkColor = setupToml['latex']['linkcolor']        
     
 class HtmlGenerator(object):
     def __init__(self, setup, inputMarkup, filters, templateFilePath, outputFilePath):
