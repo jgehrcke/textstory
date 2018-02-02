@@ -34,21 +34,11 @@ latexChapters = []
 def main():
     if len(sys.argv) < 2:
         sys.exit("First argument must be path to document source.")
-    infile_path = sys.argv[1]
-    if not os.path.isfile(infile_path):
-        sys.exit("File not found: %s" % infile_path)
-    with open(infile_path, "rb") as f:
-        inputtext = f.read().decode("utf-8").strip()
-    
-    setupFilePath = SETUP_FILE
-    if len(sys.argv) > 2:
-        setupFilePath = sys.argv[2]
-    if not os.path.isfile(setupFilePath):
-        sys.exit("File not found: %s" % setupFilePath)        
-    log.info("Read setup file: %s.", setupFilePath)
-    with open(setupFilePath, "rb") as f:
-        setupData = f.read().decode("utf-8").strip()
-        setup = toml.loads(setupData)
+    infilePath = sys.argv[1]
+    inputMarkup = DocumentReader(infilePath).getString()
+
+    setupData = DocumentReader(SETUP_FILE).getString()
+    setup = toml.loads(setupData)
 
     #this needs to be set before LaTeX body is 
     if 'chapterPagebreak' in setup['latex'] and setup['latex']['chapterPagebreak'].lower() == "true":
@@ -71,13 +61,13 @@ def main():
     ]
         
     # Push original contents through all LaTeX filters (order matters).
-    outputlatex = inputtext
+    outputLatex = inputMarkup
     for f in filters:
         log.info("Process with %s", f)
-        outputlatex = f.to_latex(outputlatex)
+        outputLatex = f.to_latex(outputLatex)
         log.info("Done.")
     with open(OUTFILE_LATEX_BODY, "wb") as f:
-        f.write(outputlatex.encode("utf-8"))
+        f.write(outputLatex.encode("utf-8"))
     log.info("Wrote UTF-8-encoded LaTeX source file: %s.", OUTFILE_LATEX_BODY)
         
     #setup general substitutions
@@ -86,10 +76,7 @@ def main():
     author = setup['general']['author']
     language = setup['general']['language']
     
-    log.info("Read LATEX template file: %s.", LATEX_TEMPLATE)
-    with open(LATEX_TEMPLATE, "rb") as f:
-        latextemplate = string.Template(f.read().decode("utf-8").strip())
-        
+       
     #setup latex substitutions
     preliminaries = ""
     appendix = ""
@@ -172,17 +159,18 @@ def main():
     linkColor = setup['latex']['linkcolor']    
     
     #substitute latex
-    latexdoc = latextemplate.substitute(isbn=isbn, document_type=latexDocumentType, geometry=latexGeometry, font_size=latexFontSize, title=latexTitle, subtitle=latexSubtitle, half_title=latexHalfTitle, print_title=printTitle, author=author, first_page_setup=latexFirstPageSetup, i_head=author, o_head=latexTitle, pdf_title=latexTitle, pdf_author=author, pdf_subject=pdfSubject, pdf_keywords=pdfKeywords, has_color_links=hasColorLinks, url_color=urlColor, link_color=linkColor, preliminaries=preliminaries, appendix=appendix)
+    latexTemplate = string.Template(DocumentReader(LATEX_TEMPLATE).getString())
+    latexDoc = latexTemplate.substitute(isbn=isbn, document_type=latexDocumentType, geometry=latexGeometry, font_size=latexFontSize, title=latexTitle, subtitle=latexSubtitle, half_title=latexHalfTitle, print_title=printTitle, author=author, first_page_setup=latexFirstPageSetup, i_head=author, o_head=latexTitle, pdf_title=latexTitle, pdf_author=author, pdf_subject=pdfSubject, pdf_keywords=pdfKeywords, has_color_links=hasColorLinks, url_color=urlColor, link_color=linkColor, preliminaries=preliminaries, appendix=appendix)
 
     with open(OUTFILE_LATEX_DOC, "wb") as f:
-        f.write(latexdoc.encode("utf-8"))
+        f.write(latexDoc.encode("utf-8"))
     log.info("Wrote UTF-8-encoded LATEX document: %s.", OUTFILE_LATEX_DOC)
 
     # Push original contents through HTML filters (same order, order matters).
-    outputhtml = inputtext
+    outputHtml = inputMarkup
     for f in filters:
         log.info("Process with %s", f)
-        outputhtml = f.to_html(outputhtml)
+        outputHtml = f.to_html(outputHtml)
         log.info("Done.")
 
     log.info("Read HTML template file: %s.", HTML_TEMPLATE)
@@ -214,12 +202,24 @@ def main():
     else:
         ogImageTag = ""
     #substitute html
-    htmldoc = htmltemplate.substitute(html_content=outputhtml, lang=lang, locale=locale, header_title=headerTitle, title=htmlTitle, subtitle_tag=subtitleTag, author=author, meta_description=metaDescription, url=url, site_name=siteName, og_image_tag=ogImageTag)
+    htmldoc = htmltemplate.substitute(html_content=outputHtml, lang=lang, locale=locale, header_title=headerTitle, title=htmlTitle, subtitle_tag=subtitleTag, author=author, meta_description=metaDescription, url=url, site_name=siteName, og_image_tag=ogImageTag)
 
     with open(OUTFILE_HTML, "wb") as f:
         f.write(htmldoc.encode("utf-8"))
     log.info("Wrote UTF-8-encoded HTML document: %s.", OUTFILE_HTML)
 
+    
+class DocumentReader(object):
+    def __init__(self, documentPath):
+        self.documentPath = documentPath
+        if not os.path.isfile(self.documentPath):
+            sys.exit("File not found: %s" % self.documentPath)        
+        log.info("Reading file: %s.", self.documentPath)
+        with open(self.documentPath, "rb") as f:
+            self.fileString = f.read().decode("utf-8").strip()
+            
+    def getString(self):
+        return self.fileString
 
 class Filter(object):
     def __init__(self):
