@@ -84,7 +84,10 @@ class Setup(object):
 class GeneralSetupData(object):
     def __init__(self, setupToml):
         self.title = setupToml['general']['title']
-        self.subtitle = setupToml['general']['subtitle']
+        if 'subtitle' in setupToml['general']:
+            self.subtitle = setupToml['general']['subtitle']
+        else:
+            self.subtitle = ""
         self.author = setupToml['general']['author']
         self.language = setupToml['general']['language']   
 
@@ -439,7 +442,10 @@ class FilterItalics(Filter):
     def to_latex(self, s):
         def replacefunc(matchobj):
             text = matchobj.group(1)
-            result = "\\textit{%s}" % text
+            if "\n" in text: #itshape works over multiple lines but gets easily disturbed
+                result = "\\begin{itshape}%s\\end{itshape}" % text
+            else: #\textit can be combined with \textbf etc. but does not work over multiple lines
+                result = "\\textit{%s}" % text
             return result
 
         pattern = '_(.*?)_'
