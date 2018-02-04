@@ -104,11 +104,10 @@ class HtmlSetupData(object):
             self.subtitle = setupToml['html']['subtitle']
         else:
             self.subtitle = general.subtitle
-        if self.subtitle == "":
-            self.subtitleTag = ""
+        if 'headertitle' in setupToml['html']:
+            self.headerTitle = setupToml['html']['headertitle']
         else:
-            self.subtitleTag = '<p class="subtitle">%s</p>\n' % self.subtitle
-        self.headerTitle = setupToml['html']['headertitle']
+            self.headerTitle = self.title + " | " + general.author
         self.metaDescription = setupToml['html']['metadescription']
         self.url = setupToml['html']['url']
         self.siteName = setupToml['html']['sitename']
@@ -161,11 +160,11 @@ class LatexSetupData(object):
         if 'headerLeft' in setupToml['latex']:
             self.headerLeft = setupToml['latex']['headerLeft']
         else:
-            self.headerLeft = "\storytitle"
+            self.headerLeft = "\\storytitle"
         if 'headerRight' in setupToml['latex']:
             self.headerRight = setupToml['latex']['headerRight']
         else:
-            self.headerRight = "\storychapter"
+            self.headerRight = "\\storychapter"
         
         #chapter pagebreak
         if 'chapterPagebreak' in setupToml['latex']:
@@ -213,7 +212,11 @@ class LatexSetupData(object):
         else:
             self.latexSubtitle = general.subtitle
         self.printTitle = "\\begin{center}\n"
-        if setupToml['latex']['printAuthorOnTitle'] == 'true':
+        if 'printAuthorOnTitle' in setupToml['latex']:
+            self.printAuthorOnTitle = setupToml['latex']['printAuthorOnTitle'] == 'true'
+        else:
+            self.printAuthorOnTitle = False
+        if self.printAuthorOnTitle:
             self.printTitle += "{\\large \\storyauthor}\n\n\\vspace{0.6cm}\n"   
         self.printTitle += "{\\huge \\storytitle}\n"
         if self.latexSubtitle != "":
@@ -226,9 +229,18 @@ class LatexSetupData(object):
         #pdf keywords
         self.pdfSubject = setupToml['latex']['pdfsubject']
         self.pdfKeywords = setupToml['latex']['pdfkeywords']
-        self.hasColorLinks = setupToml['latex']['hascolorlinks']
-        self.urlColor = setupToml['latex']['urlcolor']
-        self.linkColor = setupToml['latex']['linkcolor']        
+        if 'hascolorlinks' in setupToml['latex']:
+            self.hasColorLinks = setupToml['latex']['hascolorlinks']
+        else:
+            self.hasColorLinks = "false"
+        if 'urlcolor' in setupToml['latex']:
+            self.urlColor = setupToml['latex']['urlcolor']
+        else:
+            self.urlColor = "blue"
+        if 'linkcolor' in setupToml['latex']:
+            self.linkColor = setupToml['latex']['linkcolor']
+        else:
+            self.linkColor = "black"
 
 class Generator(object):
     def __init__(self, setup, inputMarkup, filters, templateFilePath):
@@ -261,9 +273,15 @@ class HtmlGenerator(Generator):
 
     def substitute(self, setup):
         log.info("Performing HTML template substitution")
+        
+        if setup.html.subtitle == "":
+            subtitleTag = ""
+        else:
+            subtitleTag = '<p class="subtitle">%s</p>\n' % setup.html.subtitle
+        
         htmlLicense = DocumentReader(self.licenseFilePath).getString()
         htmlTemplate = string.Template(DocumentReader(self.templateFilePath).getString())
-        self.htmlDoc = htmlTemplate.substitute(html_content=self.outputHtml, license=htmlLicense, lang=setup.general.language, locale=setup.html.locale, header_title=setup.html.headerTitle, title=setup.html.title, subtitle_tag=setup.html.subtitleTag, author=setup.general.author, meta_description=setup.html.metaDescription, url=setup.html.url, site_name=setup.html.siteName, og_image_tag=setup.html.ogImageTag)    
+        self.htmlDoc = htmlTemplate.substitute(html_content=self.outputHtml, license=htmlLicense, lang=setup.general.language, locale=setup.html.locale, header_title=setup.html.headerTitle, title=setup.html.title, subtitle_tag=subtitleTag, author=setup.general.author, meta_description=setup.html.metaDescription, url=setup.html.url, site_name=setup.html.siteName, og_image_tag=setup.html.ogImageTag)    
         
     def createOutput(self):
         with open(self.outputFilePath, "wb") as f:
