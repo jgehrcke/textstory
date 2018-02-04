@@ -1,8 +1,8 @@
-Ein Projekt zur Konversion eines Dokuments, geschrieben in einem simplen Markup-Format, zu HTML- und LaTeX-Dokumenten  &ndash; optimiert für Lesbarkeit, mit besten typographischen Absichten.
+Ein Projekt zur Konversion eines Dokuments, geschrieben in einem simplen Markup-Format, zu HTML- und LaTeX-Dokumenten -- optimiert für Lesbarkeit, mit besten typographischen Absichten.
 
-Document conversion from a simple markup format to HTML and LaTeX documents &ndash; optimised for readability with best typographical intentions.
+**Document conversion from a simple markup format to HTML and LaTeX documents -- optimised for readability with best typographical intentions.**
 
-Credits:
+## Credits
 
 * [Python](https://www.python.org/)
 * [TeX Live](https://www.tug.org/texlive/)
@@ -20,7 +20,7 @@ Credits:
 
 # Dokumentation
 
-English version [below](#markdown-header-english-documentation)
+**English version [below](#markdown-header-english-documentation)**
 
 ## Anforderungen / Installation
 Natürlich muss [Python](https://www.python.org/) installiert sein.
@@ -286,7 +286,7 @@ Wird unverändert in den HTML- und LaTeX-Code übertragen.
 
 Refs:
 
-* <http://jakubmarian.com/hyphen-minus-en-dash-and-em-dash-difference-and-usage-in-english/>
+* <https://de.wikipedia.org/wiki/Viertelgeviertstrich#Bindestrich-Minus>
 
 
 ### Gedankenstriche (en-dash)
@@ -299,7 +299,7 @@ LaTeX: wird übersetzt zu `--`.
 
 Refs:
 
-* <http://jakubmarian.com/hyphen-minus-en-dash-and-em-dash-difference-and-usage-in-english/>
+* <https://de.wikipedia.org/wiki/Halbgeviertstrich>
 
 
 ### Gedankenstriche (em-dash)
@@ -312,7 +312,7 @@ LaTeX: wird übersetzt zu `---`.
 
 Refs:
 
-* <http://jakubmarian.com/hyphen-minus-en-dash-and-em-dash-difference-and-usage-in-english/>
+* <https://de.wikipedia.org/wiki/Geviertstrich>
 
 
 ### Kursiv
@@ -324,7 +324,7 @@ Der markierte Textabschnitt wird kursiv dargestellt.
 
 Refs:
 
-* <https://en.wikipedia.org/wiki/Italic_type>
+* <https://de.wikipedia.org/wiki/Kursivschrift>
 
 
 ### Fett
@@ -336,7 +336,7 @@ Der markierte Textabschnitt wird fett dargestellt.
 
 Refs:
 
-* <https://en.wikipedia.org/wiki/Emphasis_(typography)>
+* <https://de.wikipedia.org/wiki/Schriftschnitt>
 
 
 ### Auslassungspunkte
@@ -349,7 +349,7 @@ LaTeX: wird übersetzt zu `\dots`.
 
 Refs:
 
-* <https://en.wikipedia.org/wiki/Ellipsis>
+* <https://de.wikipedia.org/wiki/Auslassungspunkte>
 
 
 ### Fußnoten
@@ -394,7 +394,7 @@ Beispiel: `Spitze <voll spitze> und eckige Klammern \[weil es so schön ist\].`
 
 Refs:
 
-* <https://www.w3.org/International/questions/qa-escapes#use>
+* <https://www.w3.org/International/questions/qa-escapes.de#use>
 * <https://www.namsu.de/Extra/strukturen/Sonderzeichen.html>
 
 # English Documentation
@@ -774,4 +774,4 @@ Example: `Angle brackets <very angular> and square brackets \[because it's squar
 Refs:
 
 * <https://www.w3.org/International/questions/qa-escapes#use>
-* <https://www.namsu.de/Extra/strukturen/Sonderzeichen.html>
+* <https://en.wikibooks.org/wiki/LaTeX/Basics#Reserved_Characters>
