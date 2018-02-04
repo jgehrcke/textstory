@@ -51,7 +51,7 @@ def main():
         FilterMaskEscapedCharacters(), # needs to be done second
         FilterHyphens(),
         FilterSectionsParagraphs(), # introduces HTML-minuses, must run after FilterHyphens
-        FilterHeadlines(setup.latex.chapterPagebreak),
+        FilterHeadlines(setup.latex.chapterPagebreak, setup.latex.hideChapterHeader),
         FilterImages(), # has to be done before FilterFootnotes
         FilterFootnotes(),
         FilterQuotes(),
@@ -166,11 +166,17 @@ class LatexSetupData(object):
             self.headerRight = "\storychapter"
         
         #chapter pagebreak
-        if 'chapterPagebreak' in setupToml['latex'] and setupToml['latex']['chapterPagebreak'].lower() == "true":
-            self.chapterPagebreak = True
+        if 'chapterPagebreak' in setupToml['latex']:
+            self.chapterPagebreak = setupToml['latex']['chapterPagebreak'].lower() == "true"
         else:
-            self.chapterPagebreak = True
+            self.chapterPagebreak = False
 
+        #header again
+        if 'hideChapterHeader' in setupToml['latex']:
+            self.hideChapterHeader = setupToml['latex']['hideChapterHeader'].lower() == "true"
+        else:
+            self.hideChapterHeader = self.chapterPagebreak
+            
         #isbn
         if 'isbn' in setupToml['latex']:
             self.isbn = setupToml['latex']['isbn']
@@ -335,8 +341,9 @@ class Filter(object):
 
 # Lines beginning with ## will be formatted as headlines
 class FilterHeadlines(Filter):
-    def __init__(self, latexChapterPagebreak):
+    def __init__(self, latexChapterPagebreak, latexHideChapterHeader):
         self.latexChapterPagebreak = latexChapterPagebreak
+        self.latexHideChapterHeader = latexHideChapterHeader
     
     def to_html(self, s):
         def replacefunc(matchobj):
@@ -358,6 +365,8 @@ class FilterHeadlines(Filter):
             result = "\n{\\label{%s}\\vspace{0.5cm}\\noindent\\LARGE %s}\n\\renewcommand{\\storychapter}{%s}" % (labelText, text, text, )
             if self.latexChapterPagebreak and chaptersCount > 0:
                 result = "\\clearpage\n\n" + result
+            if self.latexHideChapterHeader:
+                result += "\n\\thispagestyle{empty}"
             return result
 
         pattern = '^##\s*(.*?)$'
