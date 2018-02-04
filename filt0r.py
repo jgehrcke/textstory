@@ -20,13 +20,15 @@ log.setLevel(logging.INFO)
 SETUP_FILE = "setup.toml"
 OUTFILE_LATEX_BODY = "latex/latex-body.tex"
 OUTFILE_LATEX_DOC = "latex/latex-document.tex"
-OUTFILE_HTML = "html/index.html"
 LATEX_TEMPLATE = "latex/latex-document.tpl.tex"
-HTML_TEMPLATE = "html/index.tpl.html"
 PRELIMINARIES_PATH = "latex/bookPreliminaries"
 PRELIMINARIES_LATEX_PATH = "bookPreliminaries/"
 APPENDIX_PATH = "latex/bookAppendix"
 APPENDIX_LATEX_PATH = "bookAppendix/"
+
+OUTFILE_HTML = "html/index.html"
+HTML_TEMPLATE = "html/index.tpl.html"
+HTML_LICENSE = "html/license.tpl.html"
 
 latexChapters = []
         
@@ -69,7 +71,7 @@ def main():
     
     #Create HTML
     log.info("***************** Creating HTML *****************")
-    htmlGenerator = HtmlGenerator(setup, inputMarkup, filters, HTML_TEMPLATE, OUTFILE_HTML)
+    htmlGenerator = HtmlGenerator(setup, inputMarkup, filters, HTML_TEMPLATE, OUTFILE_HTML, HTML_LICENSE)
     htmlGenerator.createOutput()
     log.info("Done creating HTML.")
 
@@ -244,8 +246,9 @@ class Generator(object):
         pass
 
 class HtmlGenerator(Generator):
-    def __init__(self, setup, inputMarkup, filters, templateFilePath, outputFilePath):
+    def __init__(self, setup, inputMarkup, filters, templateFilePath, outputFilePath, licenseFilePath):
         self.outputFilePath = outputFilePath
+        self.licenseFilePath = licenseFilePath
         Generator.__init__(self, setup, inputMarkup, filters, templateFilePath)
 
     def applyFilters(self, filters, inputMarkup):
@@ -258,8 +261,9 @@ class HtmlGenerator(Generator):
 
     def substitute(self, setup):
         log.info("Performing HTML template substitution")
+        htmlLicense = DocumentReader(self.licenseFilePath).getString()
         htmlTemplate = string.Template(DocumentReader(self.templateFilePath).getString())
-        self.htmlDoc = htmlTemplate.substitute(html_content=self.outputHtml, lang=setup.general.language, locale=setup.html.locale, header_title=setup.html.headerTitle, title=setup.html.title, subtitle_tag=setup.html.subtitleTag, author=setup.general.author, meta_description=setup.html.metaDescription, url=setup.html.url, site_name=setup.html.siteName, og_image_tag=setup.html.ogImageTag)    
+        self.htmlDoc = htmlTemplate.substitute(html_content=self.outputHtml, license=htmlLicense, lang=setup.general.language, locale=setup.html.locale, header_title=setup.html.headerTitle, title=setup.html.title, subtitle_tag=setup.html.subtitleTag, author=setup.general.author, meta_description=setup.html.metaDescription, url=setup.html.url, site_name=setup.html.siteName, og_image_tag=setup.html.ogImageTag)    
         
     def createOutput(self):
         with open(self.outputFilePath, "wb") as f:
