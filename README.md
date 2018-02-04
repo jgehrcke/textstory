@@ -199,9 +199,22 @@ Für die Verwendung in (zusätzlichen) LaTeX-Dokumenten (s.u.) und bestimmten Se
 
 Für die Verwendung in der Setup-TOML ist `\` als Escape-Charakter voranzustellen (e.g. `\\storytitle`).
 
-## LaTeX Templates, Lizenz, Titelei und Anhang
+## LaTeX Lizenz
 
-tbd
+Unter dem Dateipfad `latex/license.tex` kann eine Lizenz (als gültiges LaTeX-Dokument) bereitgestellt werden. Fehlt diese Datei, wird keine Lizenz an das Dokument angefügt. 
+
+Für die Lizenzen existieren Vorlagen im Verzeichnis `latex/templates/licenses`.
+
+## LaTeX Titelei und Anhang
+
+Wurde die Setup-Option `bookPrint` gewählt, können LaTeX-Dokumente für die Titelei und den Anhang des Buches in dafür vorgesehene Verzeichnisse eingefügt werden. 
+Die Dateien im jeweiligen Verzeichnis werden in alphanumerischer Reihenfolge in das Dokument eingefügt.
+
+Verzeichnis für die Titelei: `latex/bookPreliminaries`
+
+Verzeichnis für den Anhang: `latex/bookAppendix`
+
+Vorlagen finden sich unter `latex/templates`.
 
 ## LaTeX build
 Im `latex`-Verzeichnis dieses Projekts muss `latex-document.tex` per `lualatex` kompiliert werden (für das Erstellen des Inhaltsverzeichnisses ist dies zweimal durchzuführen). `build.bat` dient als Helferlein für Windows:
@@ -214,9 +227,11 @@ Transcript written on latex-document.log.
 
 Der Kompiliervorgang wurde mit TeX Live 2015's `lualatex` getestet.
 
-## HTML Templates und Lizenz
+## HTML Lizenz
 
-tbd
+Unter dem Dateipfad `html/license.tpl.html` kann eine Lizenz (als gültiges HTML ohne header und body) eingefügt werden. Das dafür vorgesehene CSS-Stylesheet findet sich unter `html/css/license-styles.css`. 
+
+Für Lizenz und zugehöriges CSS finden sich Templates im Verzeichnis `html/templates/licenses`.
 
 ## Dateiformat der Dokumentenquelle
 Erwartet wird eine Text-Datei in UTF-8-Kodierung.
