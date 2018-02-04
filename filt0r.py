@@ -155,6 +155,16 @@ class LatexSetupData(object):
             self.bookPrint = False
             self.latexDocumentType = "scrreprt"
             
+        #header
+        if 'headerLeft' in setupToml['latex']:
+            self.headerLeft = setupToml['latex']['headerLeft']
+        else:
+            self.headerLeft = "\storytitle"
+        if 'headerRight' in setupToml['latex']:
+            self.headerRight = setupToml['latex']['headerRight']
+        else:
+            self.headerRight = "\storychapter"
+        
         #chapter pagebreak
         if 'chapterPagebreak' in setupToml['latex'] and setupToml['latex']['chapterPagebreak'].lower() == "true":
             self.chapterPagebreak = True
@@ -279,12 +289,20 @@ class LatexGenerator(Generator):
                 latexFirstPageSetup += "\clearpage\n\n"
             else:
                 latexFirstPageSetup += "\\vspace{0.5cm}\n\n"
-        if not setup.latex.bookPrint:
+        if setup.latex.bookPrint:
+            header = "\\ohead{\\thepage}\n"
+            header += "\\cehead{" + setup.latex.headerLeft + "}\n"
+            header += "\\cohead{" + setup.latex.headerRight + "}\n"
+        else:
+            header = "\\setkomafont{pageheadfoot}{\\small\\textit}\n"
+            header += "\\ihead{" + setup.latex.headerLeft + "}\n"
+            header += "\\chead{\\thepage}\n"
+            header += "\\ohead{" + setup.latex.headerRight + "}\n"
             latexFirstPageSetup = "\\thispagestyle{empty}\n\n\\printtitle\n" + latexFirstPageSetup
                
         log.info("Performing LaTeX template substitution")
         latexTemplate = string.Template(DocumentReader(self.templateFilePath).getString())
-        self.latexDoc = latexTemplate.substitute(isbn=setup.latex.isbn, document_type=setup.latex.latexDocumentType, geometry=setup.latex.latexGeometry, font_size=setup.latex.latexFontSize, title=setup.latex.latexTitle, subtitle=setup.latex.latexSubtitle, half_title=setup.latex.latexHalfTitle, print_title=setup.latex.printTitle, author=setup.general.author, first_page_setup=latexFirstPageSetup, i_head=setup.general.author, o_head=setup.latex.latexTitle, pdf_title=setup.latex.latexTitle, pdf_author=setup.general.author, pdf_subject=setup.latex.pdfSubject, pdf_keywords=setup.latex.pdfKeywords, has_color_links=setup.latex.hasColorLinks, url_color=setup.latex.urlColor, link_color=setup.latex.linkColor, preliminaries=setup.latex.preliminaries, appendix=setup.latex.appendix)
+        self.latexDoc = latexTemplate.substitute(isbn=setup.latex.isbn, document_type=setup.latex.latexDocumentType, geometry=setup.latex.latexGeometry, font_size=setup.latex.latexFontSize, title=setup.latex.latexTitle, subtitle=setup.latex.latexSubtitle, half_title=setup.latex.latexHalfTitle, print_title=setup.latex.printTitle, author=setup.general.author, first_page_setup=latexFirstPageSetup, header=header, pdf_title=setup.latex.latexTitle, pdf_author=setup.general.author, pdf_subject=setup.latex.pdfSubject, pdf_keywords=setup.latex.pdfKeywords, has_color_links=setup.latex.hasColorLinks, url_color=setup.latex.urlColor, link_color=setup.latex.linkColor, preliminaries=setup.latex.preliminaries, appendix=setup.latex.appendix)
  
     def createOutput(self): 
         #writing latex document
@@ -337,7 +355,7 @@ class FilterHeadlines(Filter):
             chaptersCount = len(latexChapters)
             labelText = str(chaptersCount) + text
             latexChapters.append({'id':labelText, 'name':text})
-            result = "\n{\\label{%s}\\vspace{0.5cm}\\noindent\\LARGE %s}" % (labelText, text, )
+            result = "\n{\\label{%s}\\vspace{0.5cm}\\noindent\\LARGE %s}\n\\renewcommand{\\storychapter}{%s}" % (labelText, text, text, )
             if self.latexChapterPagebreak and chaptersCount > 0:
                 result = "\\clearpage\n\n" + result
             return result

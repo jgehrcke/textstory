@@ -6,6 +6,8 @@ language = "de" #de, en, ...
 
 [latex]
 bookPrint = "true" #true, false #create document for book printing, allow preliminaries and appendix (directories: latex/bookPreliminaries and latex/bookAppendix)
+#headerLeft = "" #define text for left header, you may use commands \\storytitle, \\storysubtitle, \\storyhalftitle, \\storyauthor, \\storychapter; default: \\storytitle
+#headerRight = "" #define text for right header, you may use commands \\storytitle, \\storysubtitle, \\storyhalftitle, \\storyauthor, \\storychapter; default: \\storychapter
 chapterPagebreak = "true" #true, false #true: new chapter starts on new page
 tableOfContents = "true" #true, false
 #tableOfContentsPagebreak = "true" #true, false #true: after tableOfContents a new page is started

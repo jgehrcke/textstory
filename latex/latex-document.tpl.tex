@@ -31,6 +31,7 @@ $geometry
 \newcommand{\storysubtitle}{$subtitle}
 \newcommand{\storyhalftitle}{$half_title}
 \newcommand{\storyauthor}{$author}
+\newcommand{\storychapter}{}%the current chapter (will be redefined for each chapter)
 \newcommand{\isbn}{$isbn}
 
 \newcommand{\printtitle}{$print_title}
@@ -54,9 +55,7 @@ $geometry
 %% header and footer
 
 \clearscrheadfoot
-\ihead{$i_head}
-\ohead{$o_head}
-\chead{\includegraphics[width=0.4cm]{img/tilde.png} \normalfont{\thepage} \includegraphics[width=0.4cm]{img/tilde.png}}
+$header
 
 %% document
 
@@ -71,6 +70,13 @@ $first_page_setup
 \clearpage
 
 $appendix
+
+%license
+
+\clearscrheadfoot
+\setkomafont{pageheadfoot}{\licensefont\small}
+\ihead{\storyauthor}
+\ohead{\storytitle}
 
 \urlstyle{rm}
 
