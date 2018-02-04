@@ -279,7 +279,11 @@ class HtmlGenerator(Generator):
         else:
             subtitleTag = '<p class="subtitle">%s</p>\n' % setup.html.subtitle
         
-        htmlLicense = DocumentReader(self.licenseFilePath).getString()
+        if os.path.isfile(self.licenseFilePath):
+            htmlLicense = DocumentReader(self.licenseFilePath).getString()
+        else:
+            htmlLicense = ""
+        
         htmlTemplate = string.Template(DocumentReader(self.templateFilePath).getString())
         self.htmlDoc = htmlTemplate.substitute(html_content=self.outputHtml, license=htmlLicense, lang=setup.general.language, locale=setup.html.locale, header_title=setup.html.headerTitle, title=setup.html.title, subtitle_tag=subtitleTag, author=setup.general.author, meta_description=setup.html.metaDescription, url=setup.html.url, site_name=setup.html.siteName, og_image_tag=setup.html.ogImageTag)    
         
