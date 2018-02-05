@@ -142,14 +142,14 @@ class LatexSetupData(object):
             for root, dirs, files in os.walk(PRELIMINARIES_PATH):
                 if files:
                     log.info("Preliminary pages:")
-                for name in files:
+                for name in sorted(files):
                     log.info("  " + name)
                     self.preliminaries += "\\input{" + PRELIMINARIES_LATEX_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
             #adding appendix pages
             for root, dirs, files in os.walk(APPENDIX_PATH):
                 if files:
                     log.info("Appendix pages:")
-                for name in files:
+                for name in sorted(files):
                     log.info("  " + name)
                     self.appendix += "\\input{" + APPENDIX_LATEX_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
         else:

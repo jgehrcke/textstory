@@ -23,6 +23,7 @@ Ein Projekt zur Konversion eines Dokuments, geschrieben in einem simplen Markup-
 **English version [below](#markdown-header-english-documentation)**
 
 ## Anforderungen / Installation
+
 Natürlich muss [Python](https://www.python.org/) installiert sein.
 
 `filt0r.py` hat zudem folgende Voraussetzungen
@@ -33,7 +34,10 @@ Vor der ersten Ausführung sind diese zu installieren:
 `pip install -r requirements.txt`
 
 ## Konversion der Dokumentenquelle zu HTML & LaTeX
-Die Konversion zu HTML & LaTeX wird mit `filt0r.py` durchgeführt. `filt0r.py` wurde mit Python 2.7 und 3.4 getestet. Erwartet wird ein Argument: der Pfad zur Dokumentenquelle. Beispiel:
+
+Die Konversion zu HTML & LaTeX wird mit `filt0r.py` durchgeführt. `filt0r.py` wurde mit Python 2.7 und 3.4 getestet. Erwartet wird ein Argument: der Pfad zur Dokumentenquelle. 
+
+Beispiel:
 ```
 $ python filt0r.py doc.txt
 [...]
@@ -217,7 +221,9 @@ Verzeichnis für den Anhang: `latex/bookAppendix`
 Vorlagen finden sich unter `latex/templates`.
 
 ## LaTeX build
-Im `latex`-Verzeichnis dieses Projekts muss `latex-document.tex` per `lualatex` kompiliert werden (für das Erstellen des Inhaltsverzeichnisses ist dies zweimal durchzuführen). `build.bat` dient als Helferlein für Windows:
+
+Im `latex`-Verzeichnis dieses Projekts muss `latex-document.tex` per `lualatex` kompiliert werden (für das Erstellen des Inhaltsverzeichnisses ist dies zweimal durchzuführen). `build.bat` dient als Helferlein für Windows (unter Linux  kann `./build.bash` ausgeführt werden).
+
 ```
 $ build.bat
 [...]
@@ -412,7 +418,9 @@ Install requirements before first usage:
 
 ## Conversion of Source Document to HTML & LaTeX
 
-The Conversion to HTML & LaTeX is done with `filt0r.py`. `filt0r.py` was tested with Python 2.7 and 3.4. One argument is expected: the path to the source document. Example:
+The Conversion to HTML & LaTeX is done with `filt0r.py`. `filt0r.py` was tested with Python 2.7 and 3.4. One argument is expected: the path to the source document. 
+
+Example:
 ```
 $ python filt0r.py doc.txt
 [...]
@@ -597,7 +605,8 @@ Templates can be found in `latex/templates`.
 
 ## LaTeX build
 
-In the projects `latex` directory `latex-document.tex` has to be compiled with `lualatex` (for correct creation of table of contents this has to be done twice). `build.bat` is a helper for Windows:
+In the projects `latex` directory `latex-document.tex` has to be compiled with `lualatex` (for correct creation of table of contents this has to be done twice). `build.bat` is a helper for Windows, `./build.bash` can be used on Linux systems.
+
 ```
 $ build.bat
 [...]
