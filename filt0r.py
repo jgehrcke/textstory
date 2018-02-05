@@ -194,7 +194,7 @@ class LatexSetupData(object):
             self.latexGeometry += "a5paper"
         if 'bindingOffset' in setupToml['latex']:
             self.latexGeometry += ", bindingoffset=%s" % setupToml['latex']['bindingOffset']
-        self.latexGeometry += ", heightrounded, vmarginratio=1:1]{geometry}"
+        self.latexGeometry += ", heightrounded, hmarginratio=1:1, vmarginratio=1:1]{geometry}"
         
         #font size
         if 'fontSize' in setupToml['latex']:
