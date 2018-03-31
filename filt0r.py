@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015 Jan-Philip Gehrcke. See LICENSE file for details.
+# Copyright (c) 2015-2018 Jan-Philip Gehrcke. See LICENSE file for details.
 
 
 from __future__ import unicode_literals
 import re
 import os
 import sys
+from distutils import dir_util, file_util
 import string
 import logging
 import toml
@@ -31,20 +32,30 @@ HTML_TEMPLATE = "html/index.tpl.html"
 HTML_LICENSE = "html/license.tpl.html"
 
 latexChapters = []
+
         
-def main():
-    log.info("++++++++++ textstory-to-beautiful-latex-html ++++++++++")
+def main():   
+    # checking command line args
     
+    # required arg 1: input document
     if len(sys.argv) < 2:
         sys.exit("First argument must be path to document source.")
     infilePath = sys.argv[1]
-    inputMarkup = DocumentReader(infilePath).getString()
     
-    #Setup
-    log.info("***************** Running setup *****************")
+    # optional arg 2: setup file path (otherwise using default)
     setupFilePath = SETUP_FILE
     if len(sys.argv) > 2:
         setupFilePath = sys.argv[2]
+    run(setupFilePath, infilePath)
+
+    
+def run(setupFilePath, inputFilePath, outputFolderPath = None):
+    log.info("++++++++++ textstory-to-beautiful-latex-html ++++++++++")
+
+    inputMarkup = DocumentReader(inputFilePath).getString()
+    
+    #Setup
+    log.info("***************** Running setup *****************")
     setup = Setup(setupFilePath)
     log.info("Done with setup.")
     
@@ -63,18 +74,99 @@ def main():
         FilterRestoreEscapedCharacters(), # needs to be done last
     ]
     
+    outfileLatexDoc = OUTFILE_LATEX_DOC
+    outfileLatexBody = OUTFILE_LATEX_BODY
+    outfileHtml = OUTFILE_HTML
+    
+    if outputFolderPath != None:
+        # prepare output folder
+        outputFolderPath = os.path.normpath(outputFolderPath)
+        # test/create output folder path
+        if not os.path.isdir(outputFolderPath):
+            # create if not existent
+            if not os.path.exists(outputFolderPath):
+                try:
+                    os.makedirs(outputFolderPath)
+                    log.info("Created output directory: " + str(outputFolderPath))
+                except Exception as e:
+                    log.info("Failed creating output directory: " + type(e).__name__ + str(e.args))
+                    log.info("Abort.")
+                    return
+            else:
+                # abort: existent but not a dir
+                log.info("Output folder path is invalid.")
+                log.info("Abort.")
+                return
+        # create directory structure
+        latexOutputPath = os.path.join(outputFolderPath, 'latex')
+        htmlOutputPath = os.path.join(outputFolderPath, 'html')
+        try:
+            if not os.path.exists(latexOutputPath):
+                os.makedirs(latexOutputPath)
+            #preliminariesPath = os.path.join(latexOutputPath, 'bookPreliminaries')
+            #if not os.path.exists(preliminariesPath):
+            #    os.makedirs(preliminariesPath)
+            #appendixPath = os.path.join(latexOutputPath, 'bookAppendix')
+            #if not os.path.exists(appendixPath):
+            #    os.makedirs(appendixPath)
+            if not os.path.exists(htmlOutputPath):
+                os.makedirs(htmlOutputPath)
+        except Exception as e:
+            log.info("Failed creating output subdirectories: " + type(e).__name__ + str(e.args))
+            log.info("Abort.")
+            return           
+
+        # copy required files from latex template folders
+        dir_util.copy_tree(os.path.join('latex', 'bookAppendix'), 
+            os.path.join(latexOutputPath, 'bookAppendix'), update=1) #TODO appendix files from config?
+        dir_util.copy_tree(os.path.join('latex', 'bookPreliminaries'), 
+            os.path.join(latexOutputPath, 'bookPreliminaries'), update=1) #TODO preliminary files from config?
+        dir_util.copy_tree(os.path.join('latex', 'img'), 
+            os.path.join(latexOutputPath, 'img'), update=1)
+        latex_files = [
+            'build.bash',
+            'build.bat',
+            'license.tex'#TODO get license from config, allow not using license
+        ]
+        for fileName in latex_files:
+            copy_file(fileName, 'latex', latexOutputPath)
+        
+        # copy required files from html template folders
+        dir_util.copy_tree(os.path.join('html', 'css'), os.path.join(htmlOutputPath, 'css'), update=1)
+        dir_util.copy_tree(os.path.join('html', 'img'), os.path.join(htmlOutputPath, 'img'), update=1)
+        html_files = [#TODO get license from config, allow not using license
+            'apple-touch-icon.png',
+            'browserconfig.xml',
+            'favicon.ico',
+            'humans.txt',
+            'tile.png',
+            'tile-wide.png'
+        ]
+        for fileName in html_files:
+            copy_file(fileName, 'html', htmlOutputPath)
+                
+        # set outfile paths
+        outfileLatexDoc = os.path.normpath(os.path.join(outputFolderPath, outfileLatexDoc))
+        outfileLatexBody = os.path.normpath(os.path.join(outputFolderPath, outfileLatexBody))
+        outfileHtml = os.path.normpath(os.path.join(outputFolderPath, outfileHtml))
+    
     #Create LaTeX
     log.info("***************** Creating LaTeX *****************")
-    latexGenerator = LatexGenerator(setup, inputMarkup, filters, LATEX_TEMPLATE, OUTFILE_LATEX_DOC, OUTFILE_LATEX_BODY)
+    latexGenerator = LatexGenerator(setup, inputMarkup, filters, LATEX_TEMPLATE, outfileLatexDoc, outfileLatexBody)
     latexGenerator.createOutput()
     log.info("Done creating LaTeX.")
     
     #Create HTML
     log.info("***************** Creating HTML *****************")
-    htmlGenerator = HtmlGenerator(setup, inputMarkup, filters, HTML_TEMPLATE, OUTFILE_HTML, HTML_LICENSE)
+    htmlGenerator = HtmlGenerator(setup, inputMarkup, filters, HTML_TEMPLATE, HTML_LICENSE, outfileHtml)
     htmlGenerator.createOutput()
-    log.info("Done creating HTML.")
+    log.info("Done creating HTML.")  
 
+
+def copy_file(fileName, srcFolder, dstFolder):
+    file_util.copy_file(os.path.join(srcFolder, fileName), os.path.join(dstFolder, fileName), update=1)
+
+        
 class Setup(object):
     def __init__(self, setupFilePath):
         setupFileString = DocumentReader(setupFilePath).getString()
@@ -258,7 +350,7 @@ class Generator(object):
         pass
 
 class HtmlGenerator(Generator):
-    def __init__(self, setup, inputMarkup, filters, templateFilePath, outputFilePath, licenseFilePath):
+    def __init__(self, setup, inputMarkup, filters, templateFilePath, licenseFilePath, outputFilePath):
         self.outputFilePath = outputFilePath
         self.licenseFilePath = licenseFilePath
         Generator.__init__(self, setup, inputMarkup, filters, templateFilePath)
