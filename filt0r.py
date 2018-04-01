@@ -18,18 +18,21 @@ logging.basicConfig(
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
-SETUP_FILE = "setup.toml"
-OUTFILE_LATEX_BODY = "latex/latex-body.tex"
-OUTFILE_LATEX_DOC = "latex/latex-document.tex"
-LATEX_TEMPLATE = "latex/latex-document.tpl.tex"
-PRELIMINARIES_PATH = "latex/bookPreliminaries"
-PRELIMINARIES_LATEX_PATH = "bookPreliminaries/"
-APPENDIX_PATH = "latex/bookAppendix"
-APPENDIX_LATEX_PATH = "bookAppendix/"
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
-OUTFILE_HTML = "html/index.html"
-HTML_TEMPLATE = "html/index.tpl.html"
-HTML_LICENSE = "html/license.tpl.html"
+SETUP_FILE = os.path.join(dir_path, "setup.toml")
+
+LATEX_TEMPLATE = os.path.normpath(os.path.join(dir_path, "latex/latex-document.tpl.tex"))
+
+HTML_TEMPLATE = os.path.normpath(os.path.join(dir_path, "html/index.tpl.html"))
+HTML_LICENSE = os.path.normpath(os.path.join(dir_path, "html/license.tpl.html"))
+
+OUTFILE_LATEX_BODY = os.path.normpath("latex/latex-body.tex")
+OUTFILE_LATEX_DOC = os.path.normpath("latex/latex-document.tex")
+PRELIMINARIES_PATH = "bookPreliminaries/"
+APPENDIX_PATH = "bookAppendix/"
+
+OUTFILE_HTML = os.path.normpath("html/index.html")
 
 latexChapters = []
 
@@ -48,7 +51,7 @@ def main():
         setupFilePath = sys.argv[2]
     run(setupFilePath, infilePath)
 
-    
+
 def run(setupFilePath, inputFilePath, outputFolderPath = None):
     log.info("++++++++++ textstory-to-beautiful-latex-html ++++++++++")
 
@@ -56,7 +59,7 @@ def run(setupFilePath, inputFilePath, outputFolderPath = None):
     
     #Setup
     log.info("***************** Running setup *****************")
-    setup = Setup(setupFilePath)
+    setup = Setup(setupFilePath, outputFolderPath)
     log.info("Done with setup.")
     
     filters = [
@@ -74,9 +77,9 @@ def run(setupFilePath, inputFilePath, outputFolderPath = None):
         FilterRestoreEscapedCharacters(), # needs to be done last
     ]
     
-    outfileLatexDoc = OUTFILE_LATEX_DOC
-    outfileLatexBody = OUTFILE_LATEX_BODY
-    outfileHtml = OUTFILE_HTML
+    outfileLatexDoc = os.path.normpath(os.path.join(dir_path, OUTFILE_LATEX_DOC))
+    outfileLatexBody = os.path.normpath(os.path.join(dir_path, OUTFILE_LATEX_BODY))
+    outfileHtml = os.path.normpath(os.path.join(dir_path, OUTFILE_HTML))
     
     if outputFolderPath != None:
         # prepare output folder
@@ -117,11 +120,11 @@ def run(setupFilePath, inputFilePath, outputFolderPath = None):
             return           
 
         # copy required files from latex template folders
-        dir_util.copy_tree(os.path.join('latex', 'bookAppendix'), 
+        dir_util.copy_tree(os.path.join(dir_path, 'latex', 'bookAppendix'), 
             os.path.join(latexOutputPath, 'bookAppendix'), update=1) #TODO appendix files from config?
-        dir_util.copy_tree(os.path.join('latex', 'bookPreliminaries'), 
+        dir_util.copy_tree(os.path.join(dir_path, 'latex', 'bookPreliminaries'), 
             os.path.join(latexOutputPath, 'bookPreliminaries'), update=1) #TODO preliminary files from config?
-        dir_util.copy_tree(os.path.join('latex', 'img'), 
+        dir_util.copy_tree(os.path.join(dir_path, 'latex', 'img'), 
             os.path.join(latexOutputPath, 'img'), update=1)
         latex_files = [
             'build.bash',
@@ -132,8 +135,8 @@ def run(setupFilePath, inputFilePath, outputFolderPath = None):
             copy_file(fileName, 'latex', latexOutputPath)
         
         # copy required files from html template folders
-        dir_util.copy_tree(os.path.join('html', 'css'), os.path.join(htmlOutputPath, 'css'), update=1)
-        dir_util.copy_tree(os.path.join('html', 'img'), os.path.join(htmlOutputPath, 'img'), update=1)
+        dir_util.copy_tree(os.path.join(dir_path, 'html', 'css'), os.path.join(htmlOutputPath, 'css'), update=1)
+        dir_util.copy_tree(os.path.join(dir_path, 'html', 'img'), os.path.join(htmlOutputPath, 'img'), update=1)
         html_files = [#TODO get license from config, allow not using license
             'apple-touch-icon.png',
             'browserconfig.xml',
@@ -146,9 +149,9 @@ def run(setupFilePath, inputFilePath, outputFolderPath = None):
             copy_file(fileName, 'html', htmlOutputPath)
                 
         # set outfile paths
-        outfileLatexDoc = os.path.normpath(os.path.join(outputFolderPath, outfileLatexDoc))
-        outfileLatexBody = os.path.normpath(os.path.join(outputFolderPath, outfileLatexBody))
-        outfileHtml = os.path.normpath(os.path.join(outputFolderPath, outfileHtml))
+        outfileLatexDoc = os.path.normpath(os.path.join(outputFolderPath, OUTFILE_LATEX_DOC))
+        outfileLatexBody = os.path.normpath(os.path.join(outputFolderPath, OUTFILE_LATEX_BODY))
+        outfileHtml = os.path.normpath(os.path.join(outputFolderPath, OUTFILE_HTML))
     
     #Create LaTeX
     log.info("***************** Creating LaTeX *****************")
@@ -164,16 +167,24 @@ def run(setupFilePath, inputFilePath, outputFolderPath = None):
 
 
 def copy_file(fileName, srcFolder, dstFolder):
-    file_util.copy_file(os.path.join(srcFolder, fileName), os.path.join(dstFolder, fileName), update=1)
+    file_util.copy_file(os.path.join(dir_path, srcFolder, fileName), os.path.join(dstFolder, fileName), update=1)
 
         
 class Setup(object):
-    def __init__(self, setupFilePath):
+    def __init__(self, setupFilePath, outputFolderPath = None):
         setupFileString = DocumentReader(setupFilePath).getString()
         self.setupToml = toml.loads(setupFileString)
         self.general = GeneralSetupData(self.setupToml)
         self.html = HtmlSetupData(self.setupToml, self.general)
-        self.latex = LatexSetupData(self.setupToml, self.general)
+        
+        if outputFolderPath == None:
+            preliminariesPath = os.path.normpath(os.path.join(dir_path, 'latex', PRELIMINARIES_PATH))
+            appendixPath = os.path.normpath(os.path.join(dir_path, 'latex', APPENDIX_PATH))
+        else:
+            preliminariesPath = os.path.normpath(os.path.join(outputFolderPath, 'latex', PRELIMINARIES_PATH))
+            appendixPath = os.path.normpath(os.path.join(outputFolderPath, 'latex', APPENDIX_PATH))
+            
+        self.latex = LatexSetupData(self.setupToml, self.general, preliminariesPath, appendixPath)
     
 class GeneralSetupData(object):
     def __init__(self, setupToml):
@@ -209,7 +220,7 @@ class HtmlSetupData(object):
             self.ogImageTag = ""
  
 class LatexSetupData(object):        
-    def __init__(self, setupToml, general): 
+    def __init__(self, setupToml, general, preliminariesPath, appendixPath): 
 
         #table of contents setup
         if 'tableOfContents' in setupToml['latex'] and setupToml['latex']['tableOfContents'].lower() == "true":
@@ -231,19 +242,19 @@ class LatexSetupData(object):
             self.latexDocumentType = "scrbook"
             
             #adding preliminary pages     
-            for root, dirs, files in os.walk(PRELIMINARIES_PATH):
+            for root, dirs, files in os.walk(preliminariesPath):
                 if files:
                     log.info("Preliminary pages:")
                 for name in sorted(files):
                     log.info("  " + name)
-                    self.preliminaries += "\\input{" + PRELIMINARIES_LATEX_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
+                    self.preliminaries += "\\input{" + PRELIMINARIES_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
             #adding appendix pages
-            for root, dirs, files in os.walk(APPENDIX_PATH):
+            for root, dirs, files in os.walk(appendixPath):
                 if files:
                     log.info("Appendix pages:")
                 for name in sorted(files):
                     log.info("  " + name)
-                    self.appendix += "\\input{" + APPENDIX_LATEX_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
+                    self.appendix += "\\input{" + APPENDIX_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
         else:
             self.bookPrint = False
             self.latexDocumentType = "scrreprt"
@@ -382,7 +393,7 @@ class HtmlGenerator(Generator):
     def createOutput(self):
         with open(self.outputFilePath, "wb") as f:
             f.write(self.htmlDoc.encode("utf-8"))
-        log.info("Wrote UTF-8-encoded HTML document: %s.", self.outputFilePath)    
+        log.info("Wrote UTF-8-encoded HTML document: %s.", self.outputFilePath)
 
 class LatexGenerator(Generator):
     def __init__(self, setup, inputMarkup, filters, templateFilePath, outputDocFilePath, outputBodyFilePath):
