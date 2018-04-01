@@ -120,10 +120,16 @@ def run(setupFilePath, inputFilePath, outputFolderPath = None):
             return           
 
         # copy required files from latex template folders
-        dir_util.copy_tree(os.path.join(dir_path, 'latex', 'bookAppendix'), 
-            os.path.join(latexOutputPath, 'bookAppendix'), update=1) #TODO appendix files from config?
-        dir_util.copy_tree(os.path.join(dir_path, 'latex', 'bookPreliminaries'), 
-            os.path.join(latexOutputPath, 'bookPreliminaries'), update=1) #TODO preliminary files from config?
+        appendixSourcePath = os.path.join(dir_path, 'latex', APPENDIX_PATH)
+        if not os.path.exists(appendixSourcePath):
+            os.makedirs(appendixSourcePath)
+        dir_util.copy_tree(appendixSourcePath, 
+            os.path.join(latexOutputPath, APPENDIX_PATH), update=1) #TODO appendix files from config?
+        preliminariesSourcePath = os.path.join(dir_path, 'latex', PRELIMINARIES_PATH)
+        if not os.path.exists(preliminariesSourcePath):
+            os.makedirs(preliminariesSourcePath)
+        dir_util.copy_tree(preliminariesSourcePath, 
+            os.path.join(latexOutputPath, PRELIMINARIES_PATH), update=1) #TODO preliminary files from config?
         dir_util.copy_tree(os.path.join(dir_path, 'latex', 'img'), 
             os.path.join(latexOutputPath, 'img'), update=1)
         latex_files = [
