@@ -88,7 +88,7 @@ sitename = "Name der Seite, auf der der Text zu finden ist" #meta property og:si
 [general]
 subtitle = "Untertitel des Textes"
 ```
-#### Latex Layout:
+#### LaTeX Layout:
 ```
 [latex]
 pageFormat = "Seitenformat" #a0 - a6, b0 - b6 #default: a5 #Falls angegeben, werden pageWidth und pageHeight ignoriert
@@ -140,9 +140,9 @@ hideChapterHeader = "Keine Kopfzeile bei Kapitelanfang" #true, false #default: s
 
 #### LaTeX PDF-Einstellungen
 ```
-hascolorlinks = "Farbige Links" #default: false
-urlcolor = "URL-Farbe" #default: blue
-linkcolor = "Linkfarbe" #default: black
+hascolorlinks = "Farbige Links" #default: "false"
+urlcolor = "URL-Farbe" #default: "blue"
+linkcolor = "Linkfarbe" #default: "black"
 ```
 
 #### HTML:
@@ -163,15 +163,24 @@ author = "Josa Wode"
 language = "de" #de, en, ...
 
 [latex]
-bookPrint = "true" #true, false #Dokument wird für den Druck als Buch erstellt, es können Seiten zu Titelei und Anhang hinzugefügt werden (Verzeichnisse: latex/bookPreliminaries und latex/bookAppendix)
-pageFormat = "a5" # a0 - a6, b0 - b6 # define page size
-#pageWidth = "210" # in mm # only when not using pageFormat
-#pageHeight = "297" # in mm # only when not using pageFormat
+bookPrint = true #true, false #Dokument wird für den Druck als Buch erstellt, es können Seiten zu Titelei und Anhang hinzugefügt werden (Verzeichnisse: latex/bookPreliminaries und latex/bookAppendix)
+#headerLeft = "" #Text für Kopfzeile links festlegen; verfügbare Befehle \\storytitle, \\storysubtitle, \\storyhalftitle, \\storyauthor, \\storychapter; default: \\storytitle
+#headerRight = "" #Text für Kopfzeile rechts festlegen; verfügbare Befehle \\storytitle, \\storysubtitle, \\storyhalftitle, \\storyauthor, \\storychapter; default: \\storychapter
+#hideChapterHeader = true #true, false #default: chapterPagebreak #keine Kopfzeile zum Kapitelanfang
+chapterPagebreak = true #true, false #true: neues Kapitel beginnt auf neuer Seite
+tableOfContents = true #true, false #Inhaltsverzeichnis
+#tableOfContentsPagebreak = true #true, false #default: false #true: neue Seite nach Inhaltsverzeichnis
+contentsTitle = "Inhalt" #Falls angegeben, wird dies als Titel des Inhaltsverzeichnisses verwendet
+isbn = "978-3-7460-9728-2"
+pageFormat = "a5" # a0 - a6, b0 - b6 # Seitenformat festlegen
+#pageWidth = "210" # in mm # Seitenbreite, nur wenn nicht durch 'pageFormat' festgelegt
+#pageHeight = "297" # in mm # Seitenhöhe, nur wenn nicht durch 'pageFormat' festgelegt
 bindingOffset = "15mm" #Seitenanteil der in der Bindung verschwindet
-fontSize = "11" # e.g. 11 12.5 # in pt
-printAuthorOnTitle = "false" #true, false #Legt fest, ob die Titelseite mit dem Namen des Autors bzw. der Autorin beginnt
+fontSize = "11" # e.g. 11 12.5 # Schriftgröße in pt
+printAuthorOnTitle = false #true, false #Legt fest, ob die Titelseite mit dem Namen des Autors bzw. der Autorin beginnt
 #title = "" #Auskommentieren, falls identisch mit 'general.title'
 subtitle = "Eine Geschichte von Josa Wode" #Auskommentieren, falls identisch mit 'general.subtitle'
+#halfTitle = "" #Schmutztitel für Buchdruck #Auskommentieren, falls identisch mit 'title'
 pdfsubject = "Geschichte"
 pdfkeywords = "geschichte, alte, josa, wode"
 hascolorlinks = "true"
@@ -471,7 +480,7 @@ sitename = "Name of Site that hosts text" #meta property og:site_name
 [general]
 subtitle = "Subtitle of text"
 ```
-#### Latex Layout:
+#### LaTeX Layout:
 ```
 [latex]
 pageFormat = "Page format" #a0 - a6, b0 - b6 #default: a5 #if set, pageWidth and pageHeight will be ignored
@@ -523,9 +532,9 @@ hideChapterHeader = "No header at new chapter" #true, false #default: self.chapt
 
 #### LaTeX PDF Settings
 ```
-hascolorlinks = "Colored links" #default: false
-urlcolor = "URL color" #default: blue
-linkcolor = "Link color" #default: black
+hascolorlinks = "Colored links" #default: "false"
+urlcolor = "URL color" #default: "blue"
+linkcolor = "Link color" #default: "black"
 ```
 
 #### HTML:
@@ -546,15 +555,24 @@ author = "Josa Wode"
 language = "de" #de, en, ...
 
 [latex]
-bookPrint = "true" #true, false #create document for book printing, allow preliminaries and appendix (directories: latex/bookPreliminaries and latex/bookAppendix)
+bookPrint = true #true, false #create document for book printing, allow preliminaries and appendix (directories: latex/bookPreliminaries and latex/bookAppendix)
+#headerLeft = "" #define text for left header, you may use commands \\storytitle, \\storysubtitle, \\storyhalftitle, \\storyauthor, \\storychapter; default: \\storytitle
+#headerRight = "" #define text for right header, you may use commands \\storytitle, \\storysubtitle, \\storyhalftitle, \\storyauthor, \\storychapter; default: \\storychapter
+#hideChapterHeader = true #true, false #default: chapterPagebreak
+chapterPagebreak = true #true, false #true: new chapter starts on new page
+tableOfContents = true #true, false
+#tableOfContentsPagebreak = true #true, false #true: after tableOfContents a new page is started
+contentsTitle = "Inhalt" #if specified this is used as title for the table of contents
+isbn = "978-3-7460-9728-2"
 pageFormat = "a5" # a0 - a6, b0 - b6 # define page size
 #pageWidth = "210" # in mm # only when not using pageFormat
 #pageHeight = "297" # in mm # only when not using pageFormat
 bindingOffset = "15mm" #part of the page that is lost in binding
 fontSize = "11" # e.g. 11 12.5 # in pt
-printAuthorOnTitle = "false" #true, false #determines if title page begins with author name
+printAuthorOnTitle = false #true, false #determines if title page begins with author name
 #title = "" #comment out if same as general.title
 subtitle = "Eine Geschichte von Josa Wode" #comment out if same as general.subtitle
+#halfTitle = "" #half title for book printing #comment out if same as title
 pdfsubject = "Geschichte"
 pdfkeywords = "geschichte, alte, josa, wode"
 hascolorlinks = "true"

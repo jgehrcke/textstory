@@ -11,6 +11,7 @@ import string
 import logging
 import toml
 
+PY2 = sys.version_info.major == 2
 
 logging.basicConfig(
     format='%(asctime)s:%(msecs)05.1f  %(levelname)s: %(message)s',
@@ -191,19 +192,43 @@ class Setup(object):
             appendixPath = os.path.normpath(os.path.join(outputFolderPath, 'latex', APPENDIX_PATH))
             
         self.latex = LatexSetupData(self.setupToml, self.general, preliminariesPath, appendixPath)
-    
-class GeneralSetupData(object):
+
+class SetupData(object):
     def __init__(self, setupToml):
+        self.setupToml = setupToml
+
+    def get_bool(self, category, item, default=False):
+        # test if entry is in setup toml
+        if not category in self.setupToml or not item in self.setupToml[category]:
+            log.info("[" + category + "][" + item + "] not in setup TOML.")
+            return default
+        
+        value = self.setupToml[category][item]
+        # if string, convert:
+        if isinstance(value, basestring if PY2 else str):
+            log.info("[" + category + "][" + item + "] string conversion, result: " + str(value.lower() == "true") + ".")
+            return value.lower() == "true"
+        # actually already boolean:
+        if isinstance(value, bool):
+            return value
+        # type mismatch
+        log.warning("[" + category + "][" + item + "] wrong type, expected bool.")
+        return default
+
+class GeneralSetupData(SetupData):
+    def __init__(self, setupToml):
+        super(GeneralSetupData, self).__init__(setupToml)
         self.title = setupToml['general']['title']
         if 'subtitle' in setupToml['general']:
             self.subtitle = setupToml['general']['subtitle']
         else:
             self.subtitle = ""
         self.author = setupToml['general']['author']
-        self.language = setupToml['general']['language']   
+        self.language = setupToml['general']['language']
 
-class HtmlSetupData(object):        
+class HtmlSetupData(SetupData):        
     def __init__(self, setupToml, general):
+        super(HtmlSetupData, self).__init__(setupToml)
         self.locale = setupToml['html']['locale']
         if 'title' in setupToml['html']:
             self.title = setupToml['html']['title']
@@ -225,15 +250,15 @@ class HtmlSetupData(object):
         else:
             self.ogImageTag = ""
  
-class LatexSetupData(object):        
+class LatexSetupData(SetupData):        
     def __init__(self, setupToml, general, preliminariesPath, appendixPath): 
-
+        super(LatexSetupData, self).__init__(setupToml)
         #table of contents setup
-        if 'tableOfContents' in setupToml['latex'] and setupToml['latex']['tableOfContents'].lower() == "true":
+        if self.get_bool('latex', 'tableOfContents'):
             self.tableOfContents = True
             if 'contentsTitle' in setupToml['latex'] and setupToml['latex']['contentsTitle'] != "":
                 self.latexContentsTitle = setupToml['latex']['contentsTitle']
-            if 'tableOfContentsPagebreak' in setupToml['latex'] and setupToml['latex']['tableOfContentsPagebreak'].lower() == "true":
+            if self.get_bool('latex', 'tableOfContentsPagebreak'):
                 self.tableOfContentsPagebreak = True
             else:
                 self.tableOfContentsPagebreak = False
@@ -243,7 +268,7 @@ class LatexSetupData(object):
         #book print setup
         self.preliminaries = ""
         self.appendix = ""
-        if 'bookPrint' in setupToml['latex'] and setupToml['latex']['bookPrint'].lower() == "true":
+        if self.get_bool('latex', 'bookPrint'):
             self.bookPrint = True
             self.latexDocumentType = "scrbook"
             
@@ -276,15 +301,11 @@ class LatexSetupData(object):
             self.headerRight = "\\storychapter"
         
         #chapter pagebreak
-        if 'chapterPagebreak' in setupToml['latex']:
-            self.chapterPagebreak = setupToml['latex']['chapterPagebreak'].lower() == "true"
-        else:
-            self.chapterPagebreak = False
+        self.chapterPagebreak = self.get_bool('latex', 'chapterPagebreak')
 
         #header again
-        if 'hideChapterHeader' in setupToml['latex']:
-            self.hideChapterHeader = setupToml['latex']['hideChapterHeader'].lower() == "true"
-        else:
+        self.hideChapterHeader = self.get_bool('latex', 'hideChapterHeader', default=None)
+        if self.hideChapterHeader == None:
             self.hideChapterHeader = self.chapterPagebreak
             
         #isbn
@@ -321,10 +342,7 @@ class LatexSetupData(object):
         else:
             self.latexSubtitle = general.subtitle
         self.printTitle = "\\begin{center}\n"
-        if 'printAuthorOnTitle' in setupToml['latex']:
-            self.printAuthorOnTitle = setupToml['latex']['printAuthorOnTitle'] == 'true'
-        else:
-            self.printAuthorOnTitle = False
+        self.printAuthorOnTitle = self.get_bool('latex', 'printAuthorOnTitle')
         if self.printAuthorOnTitle:
             self.printTitle += "{\\large \\storyauthor}\n\n\\vspace{0.6cm}\n"   
         self.printTitle += "{\\huge \\storytitle}\n"
