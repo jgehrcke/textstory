@@ -57,6 +57,9 @@ def run(setupFilePath, inputFilePath, outputFolderPath = None):
     log.info("++++++++++ textstory-to-beautiful-latex-html ++++++++++")
 
     inputMarkup = DocumentReader(inputFilePath).getString()
+    if not inputMarkup:
+        log.info("Abort.")
+        exit()
     
     #Setup
     log.info("***************** Running setup *****************")
@@ -180,6 +183,9 @@ def copy_file(fileName, srcFolder, dstFolder):
 class Setup(object):
     def __init__(self, setupFilePath, outputFolderPath = None):
         setupFileString = DocumentReader(setupFilePath).getString()
+        if not setupFileString:
+            log.info("Abort.")
+            exit()
         self.setupToml = toml.loads(setupFileString)
         self.general = GeneralSetupData(self.setupToml)
         self.html = HtmlSetupData(self.setupToml, self.general)
@@ -408,10 +414,16 @@ class HtmlGenerator(Generator):
         
         if os.path.isfile(self.licenseFilePath):
             htmlLicense = DocumentReader(self.licenseFilePath).getString()
+            if not htmlLicense:
+                htmlLicense = ""
         else:
             htmlLicense = ""
         
-        htmlTemplate = string.Template(DocumentReader(self.templateFilePath).getString())
+        htmlTemplateString = DocumentReader(self.templateFilePath).getString()
+        if not htmlTemplateString:
+            log.error("Could not read HTML template.")
+            return
+        htmlTemplate = string.Template(htmlTemplateString)
         self.htmlDoc = htmlTemplate.substitute(html_content=self.outputHtml, license=htmlLicense, lang=setup.general.language, locale=setup.html.locale, header_title=setup.html.headerTitle, title=setup.html.title, subtitle_tag=subtitleTag, author=setup.general.author, meta_description=setup.html.metaDescription, url=setup.html.url, site_name=setup.html.siteName, og_image_tag=setup.html.ogImageTag)    
         
     def createOutput(self):
@@ -460,7 +472,11 @@ class LatexGenerator(Generator):
             latexFirstPageSetup = "\\thispagestyle{empty}\n\n\\printtitle\n" + latexFirstPageSetup
                
         log.info("Performing LaTeX template substitution")
-        latexTemplate = string.Template(DocumentReader(self.templateFilePath).getString())
+        latexTemplateString = DocumentReader(self.templateFilePath).getString()
+        if not latexTemplateString:
+            log.error("Could not read LaTeX template.")
+            return
+        latexTemplate = string.Template(latexTemplateString)
         self.latexDoc = latexTemplate.substitute(isbn=setup.latex.isbn, document_type=setup.latex.latexDocumentType, geometry=setup.latex.latexGeometry, font_size=setup.latex.latexFontSize, title=setup.latex.latexTitle, subtitle=setup.latex.latexSubtitle, half_title=setup.latex.latexHalfTitle, print_title=setup.latex.printTitle, author=setup.general.author, first_page_setup=latexFirstPageSetup, header=header, pdf_title=setup.latex.latexTitle, pdf_author=setup.general.author, pdf_subject=setup.latex.pdfSubject, pdf_keywords=setup.latex.pdfKeywords, has_color_links=setup.latex.hasColorLinks, url_color=setup.latex.urlColor, link_color=setup.latex.linkColor, preliminaries=setup.latex.preliminaries, appendix=setup.latex.appendix)
  
     def createOutput(self): 
@@ -480,10 +496,14 @@ class DocumentReader(object):
             sys.exit("File not found: %s" % self.documentPath)        
         log.info("Reading file: %s.", self.documentPath)
         with open(self.documentPath, "rb") as f:
-            self.fileString = f.read().decode("utf-8").strip()
-            
+            self.fileString = f.read()
+
     def getString(self):
-        return self.fileString
+        try:
+            return self.fileString.decode("utf-8").strip()
+        except UnicodeDecodeError:
+            log.error("Cannot read '" + self.documentPath + "': UnicodeDecodeError.")
+            return None
 
 class Filter(object):
     def __init__(self):
