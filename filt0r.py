@@ -50,16 +50,18 @@ def main():
     setupFilePath = SETUP_FILE
     if len(sys.argv) > 2:
         setupFilePath = sys.argv[2]
-    run(setupFilePath, infilePath)
+    try:
+        run(setupFilePath, infilePath)
+    except SystemExit as e:
+        log.info(str(e.args[0]))
+        log.info("Abort.")
+        return
 
 
 def run(setupFilePath, inputFilePath, outputFolderPath = None):
     log.info("++++++++++ textstory-to-beautiful-latex-html ++++++++++")
 
     inputMarkup = DocumentReader(inputFilePath).getString()
-    if not inputMarkup:
-        log.info("Abort.")
-        exit()
     
     #Setup
     log.info("***************** Running setup *****************")
@@ -183,9 +185,6 @@ def copy_file(fileName, srcFolder, dstFolder):
 class Setup(object):
     def __init__(self, setupFilePath, outputFolderPath = None):
         setupFileString = DocumentReader(setupFilePath).getString()
-        if not setupFileString:
-            log.info("Abort.")
-            exit()
         self.setupToml = toml.loads(setupFileString)
         self.general = GeneralSetupData(self.setupToml)
         self.html = HtmlSetupData(self.setupToml, self.general)
@@ -493,7 +492,7 @@ class DocumentReader(object):
     def __init__(self, documentPath):
         self.documentPath = documentPath
         if not os.path.isfile(self.documentPath):
-            sys.exit("File not found: %s" % self.documentPath)        
+            raise SystemExit("File not found: %s" % self.documentPath)        
         log.info("Reading file: %s.", self.documentPath)
         with open(self.documentPath, "rb") as f:
             self.fileString = f.read()
@@ -502,8 +501,7 @@ class DocumentReader(object):
         try:
             return self.fileString.decode("utf-8").strip()
         except UnicodeDecodeError:
-            log.error("Cannot read '" + self.documentPath + "': UnicodeDecodeError.")
-            return None
+            raise SystemExit("Cannot read '" + self.documentPath + "': UnicodeDecodeError.")
 
 class Filter(object):
     def __init__(self):

@@ -259,8 +259,10 @@ Erwartet wird eine Text-Datei in UTF-8-Kodierung.
 Markup: Zeilenumbruch
 
 Beispiel: 
-`Dies ist der erste Absatz.
-Hier beginnt der zweite Absatz.`
+```
+Dies ist der erste Absatz.
+Hier beginnt der zweite Absatz.
+```
 
 
 ### Sektionstrennung
@@ -645,14 +647,16 @@ For license and license CSS templates can be found in `html/templates/licenses`.
 An UTF-8 encoded document is expected.
 
 
-## Markupformat der Dokumentenquelle
+## Markup of Source Document
 
 ### New Paragraph
 Markup: newline
 
 Example: 
-`This is the first paragraph.
-Here the second one begins.`
+```
+This is the first paragraph.
+Here the second one begins.
+```
 
 
 ### New Section
