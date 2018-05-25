@@ -61,6 +61,10 @@ def main():
 def run(setupFilePath, inputFilePath, outputFolderPath = None):
     log.info("++++++++++ textstory-to-beautiful-latex-html ++++++++++")
 
+    #initialize collecting of latex chapters
+    global latexChapters
+    latexChapters = []
+    
     inputMarkup = DocumentReader(inputFilePath).getString()
     
     #Setup
