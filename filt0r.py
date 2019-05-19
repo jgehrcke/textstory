@@ -35,7 +35,7 @@ APPENDIX_PATH = "bookAppendix/"
 
 OUTFILE_HTML = os.path.normpath("html/index.html")
 
-latexChapters = []
+latex_chapters = []
 
         
 def main():   
@@ -44,63 +44,63 @@ def main():
     # required arg 1: input document
     if len(sys.argv) < 2:
         sys.exit("First argument must be path to document source.")
-    infilePath = sys.argv[1]
+    infile_path = sys.argv[1]
     
     # optional arg 2: setup file path (otherwise using default)
-    setupFilePath = SETUP_FILE
+    setup_file_path = SETUP_FILE
     if len(sys.argv) > 2:
-        setupFilePath = sys.argv[2]
+        setup_file_path = sys.argv[2]
     try:
-        run(setupFilePath, infilePath)
+        run(setup_file_path, infile_path)
     except SystemExit as e:
         log.info(str(e.args[0]))
         log.info("Abort.")
         return
 
 
-def run(setupFilePath, inputFilePath, outputFolderPath = None):
+def run(setup_file_path, input_file_path, output_folder_path=None):
     log.info("++++++++++ textstory-to-beautiful-latex-html ++++++++++")
 
-    #initialize collecting of latex chapters
-    global latexChapters
-    latexChapters = []
+    # initialize collecting of latex chapters
+    global latex_chapters
+    latex_chapters = []
     
-    inputMarkup = DocumentReader(inputFilePath).getString()
+    input_markup = DocumentReader(input_file_path).get_string()
     
-    #Setup
+    # Setup
     log.info("***************** Running setup *****************")
-    setup = Setup(setupFilePath, outputFolderPath)
+    setup = Setup(setup_file_path, output_folder_path)
     log.info("Done with setup.")
     
     filters = [
         FilterConvertLineEndings(),  # needs to be done first
-        FilterMaskEscapedCharacters(), # needs to be done second
+        FilterMaskEscapedCharacters(),  # needs to be done second
         FilterHyphens(),
-        FilterSectionsParagraphs(), # introduces HTML-minuses, must run after FilterHyphens
-        FilterHeadlines(setup.latex.chapterPagebreak, setup.latex.hideChapterHeader),
-        FilterImages(), # has to be done before FilterFootnotes
+        FilterSectionsParagraphs(),  # introduces HTML-minuses, must run after FilterHyphens
+        FilterHeadlines(setup.latex.chapter_pagebreak, setup.latex.hide_chapter_header),
+        FilterImages(),  # has to be done before FilterFootnotes
         FilterFootnotes(),
         FilterQuotes(),
-        FilterBold(), # has to be done before FilterItalics
+        FilterBold(),  # has to be done before FilterItalics
         FilterItalics(),
         FilterDots(),
-        FilterRestoreEscapedCharacters(), # needs to be done last
+        FilterRestoreEscapedCharacters(),  # needs to be done last
     ]
     
-    outfileLatexDoc = os.path.normpath(os.path.join(dir_path, OUTFILE_LATEX_DOC))
-    outfileLatexBody = os.path.normpath(os.path.join(dir_path, OUTFILE_LATEX_BODY))
-    outfileHtml = os.path.normpath(os.path.join(dir_path, OUTFILE_HTML))
+    outfile_latex_doc = os.path.normpath(os.path.join(dir_path, OUTFILE_LATEX_DOC))
+    outfile_latex_body = os.path.normpath(os.path.join(dir_path, OUTFILE_LATEX_BODY))
+    outfile_html = os.path.normpath(os.path.join(dir_path, OUTFILE_HTML))
     
-    if outputFolderPath != None:
+    if output_folder_path is not None:
         # prepare output folder
-        outputFolderPath = os.path.normpath(outputFolderPath)
+        output_folder_path = os.path.normpath(output_folder_path)
         # test/create output folder path
-        if not os.path.isdir(outputFolderPath):
+        if not os.path.isdir(output_folder_path):
             # create if not existent
-            if not os.path.exists(outputFolderPath):
+            if not os.path.exists(output_folder_path):
                 try:
-                    os.makedirs(outputFolderPath)
-                    log.info("Created output directory: " + str(outputFolderPath))
+                    os.makedirs(output_folder_path)
+                    log.info("Created output directory: " + str(output_folder_path))
                 except Exception as e:
                     log.info("Failed creating output directory: " + type(e).__name__ + str(e.args))
                     log.info("Abort.")
@@ -111,49 +111,51 @@ def run(setupFilePath, inputFilePath, outputFolderPath = None):
                 log.info("Abort.")
                 return
         # create directory structure
-        latexOutputPath = os.path.join(outputFolderPath, 'latex')
-        htmlOutputPath = os.path.join(outputFolderPath, 'html')
+        latex_output_path = os.path.join(output_folder_path, 'latex')
+        html_output_path = os.path.join(output_folder_path, 'html')
         try:
-            if not os.path.exists(latexOutputPath):
-                os.makedirs(latexOutputPath)
-            #preliminariesPath = os.path.join(latexOutputPath, 'bookPreliminaries')
-            #if not os.path.exists(preliminariesPath):
-            #    os.makedirs(preliminariesPath)
-            #appendixPath = os.path.join(latexOutputPath, 'bookAppendix')
-            #if not os.path.exists(appendixPath):
-            #    os.makedirs(appendixPath)
-            if not os.path.exists(htmlOutputPath):
-                os.makedirs(htmlOutputPath)
+            if not os.path.exists(latex_output_path):
+                os.makedirs(latex_output_path)
+            # preliminariesPath = os.path.join(latex_output_path, 'bookPreliminaries')
+            # if not os.path.exists(preliminariesPath):
+            #     os.makedirs(preliminariesPath)
+            # appendixPath = os.path.join(latex_output_path, 'bookAppendix')
+            # if not os.path.exists(appendixPath):
+            #     os.makedirs(appendixPath)
+            if not os.path.exists(html_output_path):
+                os.makedirs(html_output_path)
         except Exception as e:
             log.info("Failed creating output subdirectories: " + type(e).__name__ + str(e.args))
             log.info("Abort.")
             return           
 
         # copy required files from latex template folders
-        appendixSourcePath = os.path.join(dir_path, 'latex', APPENDIX_PATH)
-        if not os.path.exists(appendixSourcePath):
-            os.makedirs(appendixSourcePath)
-        dir_util.copy_tree(appendixSourcePath, 
-            os.path.join(latexOutputPath, APPENDIX_PATH), update=1) #TODO appendix files from config?
-        preliminariesSourcePath = os.path.join(dir_path, 'latex', PRELIMINARIES_PATH)
-        if not os.path.exists(preliminariesSourcePath):
-            os.makedirs(preliminariesSourcePath)
-        dir_util.copy_tree(preliminariesSourcePath, 
-            os.path.join(latexOutputPath, PRELIMINARIES_PATH), update=1) #TODO preliminary files from config?
+        appendix_source_path = os.path.join(dir_path, 'latex', APPENDIX_PATH)
+        if not os.path.exists(appendix_source_path):
+            os.makedirs(appendix_source_path)
+        dir_util.copy_tree(appendix_source_path,
+                           os.path.join(latex_output_path, APPENDIX_PATH), update=1)
+        # TODO appendix files from config?
+        preliminaries_source_path = os.path.join(dir_path, 'latex', PRELIMINARIES_PATH)
+        if not os.path.exists(preliminaries_source_path):
+            os.makedirs(preliminaries_source_path)
+        dir_util.copy_tree(preliminaries_source_path,
+                           os.path.join(latex_output_path, PRELIMINARIES_PATH), update=1)
+        # TODO preliminary files from config?
         dir_util.copy_tree(os.path.join(dir_path, 'latex', 'img'), 
-            os.path.join(latexOutputPath, 'img'), update=1)
+                           os.path.join(latex_output_path, 'img'), update=1)
         latex_files = [
             'build.bash',
             'build.bat',
-            'license.tex'#TODO get license from config, allow not using license
+            'license.tex'  # TODO get license from config, allow not using license
         ]
-        for fileName in latex_files:
-            copy_file(fileName, 'latex', latexOutputPath)
+        for file_name in latex_files:
+            copy_file(file_name, 'latex', latex_output_path)
         
         # copy required files from html template folders
-        dir_util.copy_tree(os.path.join(dir_path, 'html', 'css'), os.path.join(htmlOutputPath, 'css'), update=1)
-        dir_util.copy_tree(os.path.join(dir_path, 'html', 'img'), os.path.join(htmlOutputPath, 'img'), update=1)
-        html_files = [#TODO get license from config, allow not using license
+        dir_util.copy_tree(os.path.join(dir_path, 'html', 'css'), os.path.join(html_output_path, 'css'), update=1)
+        dir_util.copy_tree(os.path.join(dir_path, 'html', 'img'), os.path.join(html_output_path, 'img'), update=1)
+        html_files = [  # TODO get license from config, allow not using license
             'apple-touch-icon.png',
             'browserconfig.xml',
             'favicon.ico',
@@ -161,61 +163,64 @@ def run(setupFilePath, inputFilePath, outputFolderPath = None):
             'tile.png',
             'tile-wide.png'
         ]
-        for fileName in html_files:
-            copy_file(fileName, 'html', htmlOutputPath)
+        for file_name in html_files:
+            copy_file(file_name, 'html', html_output_path)
                 
         # set outfile paths
-        outfileLatexDoc = os.path.normpath(os.path.join(outputFolderPath, OUTFILE_LATEX_DOC))
-        outfileLatexBody = os.path.normpath(os.path.join(outputFolderPath, OUTFILE_LATEX_BODY))
-        outfileHtml = os.path.normpath(os.path.join(outputFolderPath, OUTFILE_HTML))
+        outfile_latex_doc = os.path.normpath(os.path.join(output_folder_path, OUTFILE_LATEX_DOC))
+        outfile_latex_body = os.path.normpath(os.path.join(output_folder_path, OUTFILE_LATEX_BODY))
+        outfile_html = os.path.normpath(os.path.join(output_folder_path, OUTFILE_HTML))
     
-    #Create LaTeX
+    # Create LaTeX
     log.info("***************** Creating LaTeX *****************")
-    latexGenerator = LatexGenerator(setup, inputMarkup, filters, LATEX_TEMPLATE, outfileLatexDoc, outfileLatexBody)
-    latexGenerator.createOutput()
+    latex_generator = LatexGenerator(setup, input_markup, filters,
+                                     LATEX_TEMPLATE, outfile_latex_doc, outfile_latex_body)
+    latex_generator.create_output()
     log.info("Done creating LaTeX.")
     
-    #Create HTML
+    # Create HTML
     log.info("***************** Creating HTML *****************")
-    htmlGenerator = HtmlGenerator(setup, inputMarkup, filters, HTML_TEMPLATE, HTML_LICENSE, outfileHtml)
-    htmlGenerator.createOutput()
+    html_generator = HtmlGenerator(setup, input_markup, filters, HTML_TEMPLATE, HTML_LICENSE, outfile_html)
+    html_generator.create_output()
     log.info("Done creating HTML.")  
 
 
-def copy_file(fileName, srcFolder, dstFolder):
-    file_util.copy_file(os.path.join(dir_path, srcFolder, fileName), os.path.join(dstFolder, fileName), update=1)
+def copy_file(file_name, src_folder, dst_folder):
+    file_util.copy_file(os.path.join(dir_path, src_folder, file_name), os.path.join(dst_folder, file_name), update=1)
 
         
 class Setup(object):
-    def __init__(self, setupFilePath, outputFolderPath = None):
-        setupFileString = DocumentReader(setupFilePath).getString()
-        self.setupToml = toml.loads(setupFileString)
-        self.general = GeneralSetupData(self.setupToml)
-        self.html = HtmlSetupData(self.setupToml, self.general)
+    def __init__(self, setup_file_path, output_folder_path=None):
+        setup_file_string = DocumentReader(setup_file_path).get_string()
+        self.setup_toml = toml.loads(setup_file_string)
+        self.general = GeneralSetupData(self.setup_toml)
+        self.html = HtmlSetupData(self.setup_toml, self.general)
         
-        if outputFolderPath == None:
-            preliminariesPath = os.path.normpath(os.path.join(dir_path, 'latex', PRELIMINARIES_PATH))
-            appendixPath = os.path.normpath(os.path.join(dir_path, 'latex', APPENDIX_PATH))
+        if output_folder_path is None:
+            preliminaries_path = os.path.normpath(os.path.join(dir_path, 'latex', PRELIMINARIES_PATH))
+            appendix_path = os.path.normpath(os.path.join(dir_path, 'latex', APPENDIX_PATH))
         else:
-            preliminariesPath = os.path.normpath(os.path.join(outputFolderPath, 'latex', PRELIMINARIES_PATH))
-            appendixPath = os.path.normpath(os.path.join(outputFolderPath, 'latex', APPENDIX_PATH))
+            preliminaries_path = os.path.normpath(os.path.join(output_folder_path, 'latex', PRELIMINARIES_PATH))
+            appendix_path = os.path.normpath(os.path.join(output_folder_path, 'latex', APPENDIX_PATH))
             
-        self.latex = LatexSetupData(self.setupToml, self.general, preliminariesPath, appendixPath)
+        self.latex = LatexSetupData(self.setup_toml, self.general, preliminaries_path, appendix_path)
+
 
 class SetupData(object):
-    def __init__(self, setupToml):
-        self.setupToml = setupToml
+    def __init__(self, setup_toml):
+        self.setup_toml = setup_toml
 
-    def get_bool(self, category, item, default=False):
+    def get_bool(self, category, item, default):
         # test if entry is in setup toml
-        if not category in self.setupToml or not item in self.setupToml[category]:
+        if category not in self.setup_toml or item not in self.setup_toml[category]:
             log.info("[" + category + "][" + item + "] not in setup TOML.")
             return default
         
-        value = self.setupToml[category][item]
+        value = self.setup_toml[category][item]
         # if string, convert:
         if isinstance(value, basestring if PY2 else str):
-            log.info("[" + category + "][" + item + "] string conversion, result: " + str(value.lower() == "true") + ".")
+            log.info("[" + category + "][" + item + "] string conversion, result: "
+                     + str(value.lower() == "true") + ".")
             return value.lower() == "true"
         # actually already boolean:
         if isinstance(value, bool):
@@ -224,288 +229,326 @@ class SetupData(object):
         log.warning("[" + category + "][" + item + "] wrong type, expected bool.")
         return default
 
+
 class GeneralSetupData(SetupData):
-    def __init__(self, setupToml):
-        super(GeneralSetupData, self).__init__(setupToml)
-        self.title = setupToml['general']['title']
-        if 'subtitle' in setupToml['general']:
-            self.subtitle = setupToml['general']['subtitle']
+    def __init__(self, setup_toml):
+        super(GeneralSetupData, self).__init__(setup_toml)
+        self.title = setup_toml['general']['title']
+        if 'subtitle' in setup_toml['general']:
+            self.subtitle = setup_toml['general']['subtitle']
         else:
             self.subtitle = ""
-        self.author = setupToml['general']['author']
-        self.language = setupToml['general']['language']
+        self.author = setup_toml['general']['author']
+        self.language = setup_toml['general']['language']
+
 
 class HtmlSetupData(SetupData):        
-    def __init__(self, setupToml, general):
-        super(HtmlSetupData, self).__init__(setupToml)
-        self.locale = setupToml['html']['locale']
-        if 'title' in setupToml['html']:
-            self.title = setupToml['html']['title']
+    def __init__(self, setup_toml, general):
+        super(HtmlSetupData, self).__init__(setup_toml)
+        self.locale = setup_toml['html']['locale']
+        if 'title' in setup_toml['html']:
+            self.title = setup_toml['html']['title']
         else:
             self.title = general.title
-        if 'subtitle' in setupToml['html']:
-            self.subtitle = setupToml['html']['subtitle']
+        if 'subtitle' in setup_toml['html']:
+            self.subtitle = setup_toml['html']['subtitle']
         else:
             self.subtitle = general.subtitle
-        if 'headertitle' in setupToml['html']:
-            self.headerTitle = setupToml['html']['headertitle']
+        if 'headertitle' in setup_toml['html']:
+            self.header_title = setup_toml['html']['headertitle']
         else:
-            self.headerTitle = self.title + " | " + general.author
-        self.metaDescription = setupToml['html']['metadescription']
-        self.url = setupToml['html']['url']
-        self.siteName = setupToml['html']['sitename']
-        if 'previewimage' in setupToml['html']:
-            self.ogImageTag = '<meta property="og:image" content="%s" />' % setupToml['html']['previewimage']
+            self.header_title = self.title + " | " + general.author
+        self.meta_description = setup_toml['html']['metadescription']
+        self.url = setup_toml['html']['url']
+        self.site_name = setup_toml['html']['sitename']
+        if 'previewimage' in setup_toml['html']:
+            self.og_image_tag = '<meta property="og:image" content="%s" />' % setup_toml['html']['previewimage']
         else:
-            self.ogImageTag = ""
- 
+            self.og_image_tag = ""
+
+
 class LatexSetupData(SetupData):        
-    def __init__(self, setupToml, general, preliminariesPath, appendixPath): 
-        super(LatexSetupData, self).__init__(setupToml)
-        #table of contents setup
-        if self.get_bool('latex', 'tableOfContents'):
-            self.tableOfContents = True
-            if 'contentsTitle' in setupToml['latex'] and setupToml['latex']['contentsTitle'] != "":
-                self.latexContentsTitle = setupToml['latex']['contentsTitle']
-            if self.get_bool('latex', 'tableOfContentsPagebreak'):
-                self.tableOfContentsPagebreak = True
+    def __init__(self, setup_toml, general, preliminaries_path, appendix_path):
+        super(LatexSetupData, self).__init__(setup_toml)
+        # table of contents setup
+        if self.get_bool('latex', 'tableOfContents', False):
+            self.table_of_contents = True
+            if 'contentsTitle' in setup_toml['latex'] and setup_toml['latex']['contentsTitle'] != "":
+                self.latex_contents_title = setup_toml['latex']['contentsTitle']
+            if self.get_bool('latex', 'tableOfContentsPagebreak', False):
+                self.table_of_contents_pagebreak = True
             else:
-                self.tableOfContentsPagebreak = False
+                self.table_of_contents_pagebreak = False
         else:
-            self.tableOfContents = False
+            self.table_of_contents = False
         
-        #book print setup
+        # book print setup
         self.preliminaries = ""
         self.appendix = ""
-        if self.get_bool('latex', 'bookPrint'):
-            self.bookPrint = True
-            self.latexDocumentType = "scrbook"
+        if self.get_bool('latex', 'bookPrint', False):
+            self.book_print = True
+            self.latex_document_type = "scrbook"
             
-            #adding preliminary pages     
-            for root, dirs, files in os.walk(preliminariesPath):
+            # adding preliminary pages
+            for root, dirs, files in os.walk(preliminaries_path):
                 if files:
                     log.info("Preliminary pages:")
                 for name in sorted(files):
                     log.info("  " + name)
                     self.preliminaries += "\\input{" + PRELIMINARIES_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
-            #adding appendix pages
-            for root, dirs, files in os.walk(appendixPath):
+            # adding appendix pages
+            for root, dirs, files in os.walk(appendix_path):
                 if files:
                     log.info("Appendix pages:")
                 for name in sorted(files):
                     log.info("  " + name)
                     self.appendix += "\\input{" + APPENDIX_PATH + name[:len(name)-4] + "}\n\\clearpage\n"
         else:
-            self.bookPrint = False
-            self.latexDocumentType = "scrreprt"
+            self.book_print = False
+            self.latex_document_type = "scrreprt"
             
-        #header
-        if 'headerLeft' in setupToml['latex']:
-            self.headerLeft = setupToml['latex']['headerLeft']
+        # header
+        if 'headerLeft' in setup_toml['latex']:
+            self.header_left = setup_toml['latex']['headerLeft']
         else:
-            self.headerLeft = "\\storytitle"
-        if 'headerRight' in setupToml['latex']:
-            self.headerRight = setupToml['latex']['headerRight']
+            self.header_left = "\\storytitle"
+        if 'headerRight' in setup_toml['latex']:
+            self.header_right = setup_toml['latex']['headerRight']
         else:
-            self.headerRight = "\\storychapter"
+            self.header_right = "\\storychapter"
         
-        #chapter pagebreak
-        self.chapterPagebreak = self.get_bool('latex', 'chapterPagebreak')
+        # chapter page break
+        self.chapter_pagebreak = self.get_bool('latex', 'chapterPagebreak', False)
 
-        #header again
-        self.hideChapterHeader = self.get_bool('latex', 'hideChapterHeader', default=None)
-        if self.hideChapterHeader == None:
-            self.hideChapterHeader = self.chapterPagebreak
+        # header again
+        self.hide_chapter_header = self.get_bool('latex', 'hideChapterHeader', None)
+        if self.hide_chapter_header is None:
+            self.hide_chapter_header = self.chapter_pagebreak
             
-        #isbn
-        if 'isbn' in setupToml['latex']:
-            self.isbn = setupToml['latex']['isbn']
+        # isbn
+        if 'isbn' in setup_toml['latex']:
+            self.isbn = setup_toml['latex']['isbn']
         else:
             self.isbn = ""
         
-        #geometry
-        self.latexGeometry = "\\usepackage["
-        if 'pageFormat' in setupToml['latex']:
-            self.latexGeometry += "%spaper" % setupToml['latex']['pageFormat']
-        elif 'pageWidth' in setupToml['latex'] and 'pageHeight' in setupToml['latex']:
-            self.latexGeometry += "paperwidth=%s, paperheight=%s" % (setupToml['latex']['pageWidth'], setupToml['latex']['pageHeight'], )
-        else:#default            
-            self.latexGeometry += "a5paper"
-        if 'bindingOffset' in setupToml['latex']:
-            self.latexGeometry += ", bindingoffset=%s" % setupToml['latex']['bindingOffset']
-        self.latexGeometry += ", heightrounded, hmarginratio=1:1, vmarginratio=1:1]{geometry}"
+        # geometry
+        self.latex_geometry = "\\usepackage["
+        if 'pageFormat' in setup_toml['latex']:
+            self.latex_geometry += "%spaper" % setup_toml['latex']['pageFormat']
+        elif 'pageWidth' in setup_toml['latex'] and 'pageHeight' in setup_toml['latex']:
+            self.latex_geometry += "paperwidth=%s, paperheight=%s" % (setup_toml['latex']['pageWidth'], 
+                                                                      setup_toml['latex']['pageHeight'],)
+        else:  # default
+            self.latex_geometry += "a5paper"
+        if 'bindingOffset' in setup_toml['latex']:
+            self.latex_geometry += ", bindingoffset=%s" % setup_toml['latex']['bindingOffset']
+        self.latex_geometry += ", heightrounded, hmarginratio=1:1, vmarginratio=1:1]{geometry}"
         
-        #font size
-        if 'fontSize' in setupToml['latex']:
-            self.latexFontSize = "fontsize=%spt," % setupToml['latex']['fontSize']
+        # font size
+        if 'fontSize' in setup_toml['latex']:
+            self.latex_font_size = "fontsize=%spt," % setup_toml['latex']['fontSize']
         else:
-            self.latexFontSize = "fontsize=11pt,"
+            self.latex_font_size = "fontsize=11pt,"
         
-        #title setup
-        if 'title' in setupToml['latex']:
-            self.latexTitle = setupToml['latex']['title']
+        # title setup
+        if 'title' in setup_toml['latex']:
+            self.latex_title = setup_toml['latex']['title']
         else:
-            self.latexTitle = general.title
-        if 'subtitle' in setupToml['latex']:
-            self.latexSubtitle = setupToml['latex']['subtitle']
+            self.latex_title = general.title
+        if 'subtitle' in setup_toml['latex']:
+            self.latex_subtitle = setup_toml['latex']['subtitle']
         else:
-            self.latexSubtitle = general.subtitle
-        self.printTitle = "\\begin{center}\n"
-        self.printAuthorOnTitle = self.get_bool('latex', 'printAuthorOnTitle')
-        if self.printAuthorOnTitle:
-            self.printTitle += "{\\large \\storyauthor}\n\n\\vspace{0.6cm}\n"   
-        self.printTitle += "{\\huge \\storytitle}\n"
-        if self.latexSubtitle != "":
-            self.printTitle += "\n\\vspace{0.3cm}\n{\\large \\storysubtitle}\n"
-        self.printTitle += "\\end{center}\n"
-        self.latexHalfTitle = self.latexTitle
-        if 'halfTitle' in setupToml['latex']:
-            self.latexHalfTitle = setupToml['latex']['halfTitle']
+            self.latex_subtitle = general.subtitle
+        self.print_title = "\\begin{center}\n"
+        self.print_author_on_title = self.get_bool('latex', 'printAuthorOnTitle', False)
+        if self.print_author_on_title:
+            self.print_title += "{\\large \\storyauthor}\n\n\\vspace{0.6cm}\n"
+        self.print_title += "{\\huge \\storytitle}\n"
+        if self.latex_subtitle != "":
+            self.print_title += "\n\\vspace{0.3cm}\n{\\large \\storysubtitle}\n"
+        self.print_title += "\\end{center}\n"
+        self.latex_half_title = self.latex_title
+        if 'halfTitle' in setup_toml['latex']:
+            self.latex_half_title = setup_toml['latex']['halfTitle']
 
-        #pdf keywords
-        self.pdfSubject = setupToml['latex']['pdfsubject']
-        self.pdfKeywords = setupToml['latex']['pdfkeywords']
-        if 'hascolorlinks' in setupToml['latex']:
-            self.hasColorLinks = setupToml['latex']['hascolorlinks']
+        # pdf keywords
+        self.pdf_subject = setup_toml['latex']['pdfsubject']
+        self.pdf_keywords = setup_toml['latex']['pdfkeywords']
+        if 'hascolorlinks' in setup_toml['latex']:
+            self.has_color_links = setup_toml['latex']['hascolorlinks']
         else:
-            self.hasColorLinks = "false"
-        if 'urlcolor' in setupToml['latex']:
-            self.urlColor = setupToml['latex']['urlcolor']
+            self.has_color_links = "false"
+        if 'urlcolor' in setup_toml['latex']:
+            self.url_color = setup_toml['latex']['urlcolor']
         else:
-            self.urlColor = "blue"
-        if 'linkcolor' in setupToml['latex']:
-            self.linkColor = setupToml['latex']['linkcolor']
+            self.url_color = "blue"
+        if 'linkcolor' in setup_toml['latex']:
+            self.link_color = setup_toml['latex']['linkcolor']
         else:
-            self.linkColor = "black"
+            self.link_color = "black"
+
 
 class Generator(object):
-    def __init__(self, setup, inputMarkup, filters, templateFilePath):
-        self.templateFilePath = templateFilePath
-        self.applyFilters(filters, inputMarkup)
+    def __init__(self, setup, input_markup, filters, template_file_path):
+        self.template_file_path = template_file_path
+        self.apply_filters(filters, input_markup)
         self.substitute(setup)
 
-    def applyFilters(self, filters, inputMarkup):        
+    def apply_filters(self, filters, input_markup):
         pass
         
     def substitute(self, setup):
         pass
 
-    def createOutput(self):
+    def create_output(self):
         pass
 
-class HtmlGenerator(Generator):
-    def __init__(self, setup, inputMarkup, filters, templateFilePath, licenseFilePath, outputFilePath):
-        self.outputFilePath = outputFilePath
-        self.licenseFilePath = licenseFilePath
-        Generator.__init__(self, setup, inputMarkup, filters, templateFilePath)
 
-    def applyFilters(self, filters, inputMarkup):
+class HtmlGenerator(Generator):
+    def __init__(self, setup, input_markup, filters, template_file_path, license_file_path, output_file_path):
+        self.output_file_path = output_file_path
+        self.license_file_path = license_file_path
+        self.output_html = ""
+        self.html_doc = ""
+        Generator.__init__(self, setup, input_markup, filters, template_file_path)
+
+    def apply_filters(self, filters, input_markup):
         # Push original contents through HTML filters (same order, order matters).
-        self.outputHtml = inputMarkup
+        self.output_html = input_markup
         for f in filters:
             log.info("Process with %s", f)
-            self.outputHtml = f.to_html(self.outputHtml)
+            self.output_html = f.to_html(self.output_html)
             log.info("Done.")   
 
     def substitute(self, setup):
         log.info("Performing HTML template substitution")
         
         if setup.html.subtitle == "":
-            subtitleTag = ""
+            subtitle_tag = ""
         else:
-            subtitleTag = '<p class="subtitle">%s</p>\n' % setup.html.subtitle
+            subtitle_tag = '<p class="subtitle">%s</p>\n' % setup.html.subtitle
         
-        if os.path.isfile(self.licenseFilePath):
-            htmlLicense = DocumentReader(self.licenseFilePath).getString()
-            if not htmlLicense:
-                htmlLicense = ""
+        if os.path.isfile(self.license_file_path):
+            html_license = DocumentReader(self.license_file_path).get_string()
+            if not html_license:
+                html_license = ""
         else:
-            htmlLicense = ""
+            html_license = ""
         
-        htmlTemplateString = DocumentReader(self.templateFilePath).getString()
-        if not htmlTemplateString:
+        html_template_string = DocumentReader(self.template_file_path).get_string()
+        if not html_template_string:
             log.error("Could not read HTML template.")
             return
-        htmlTemplate = string.Template(htmlTemplateString)
-        self.htmlDoc = htmlTemplate.substitute(html_content=self.outputHtml, license=htmlLicense, lang=setup.general.language, locale=setup.html.locale, header_title=setup.html.headerTitle, title=setup.html.title, subtitle_tag=subtitleTag, author=setup.general.author, meta_description=setup.html.metaDescription, url=setup.html.url, site_name=setup.html.siteName, og_image_tag=setup.html.ogImageTag)    
+        html_template = string.Template(html_template_string)
+        self.html_doc = html_template.substitute(html_content=self.output_html, license=html_license, 
+                                                 lang=setup.general.language, locale=setup.html.locale, 
+                                                 header_title=setup.html.header_title, title=setup.html.title,
+                                                 subtitle_tag=subtitle_tag, author=setup.general.author, 
+                                                 meta_description=setup.html.meta_description, url=setup.html.url,
+                                                 site_name=setup.html.site_name, og_image_tag=setup.html.og_image_tag)
         
-    def createOutput(self):
-        with open(self.outputFilePath, "wb") as f:
-            f.write(self.htmlDoc.encode("utf-8"))
-        log.info("Wrote UTF-8-encoded HTML document: %s.", self.outputFilePath)
+    def create_output(self):
+        with open(self.output_file_path, "wb") as f:
+            f.write(self.html_doc.encode("utf-8"))
+        log.info("Wrote UTF-8-encoded HTML document: %s.", self.output_file_path)
+
 
 class LatexGenerator(Generator):
-    def __init__(self, setup, inputMarkup, filters, templateFilePath, outputDocFilePath, outputBodyFilePath):
-        self.outputDocFilePath = outputDocFilePath
-        self.outputBodyFilePath = outputBodyFilePath
-        Generator.__init__(self, setup, inputMarkup, filters, templateFilePath)
+    def __init__(self, setup, input_markup, filters, template_file_path, output_doc_file_path, output_body_file_path):
+        self.output_doc_file_path = output_doc_file_path
+        self.output_body_file_path = output_body_file_path
+        self.output_latex = ""
+        self.latex_doc = ""
+        Generator.__init__(self, setup, input_markup, filters, template_file_path)
         
-    def applyFilters(self, filters, inputMarkup):
+    def apply_filters(self, filters, input_markup):
         # Push original contents through all LaTeX filters (order matters).
-        self.outputLatex = inputMarkup
+        self.output_latex = input_markup
         for f in filters:
             log.info("Process with %s", f)
-            self.outputLatex = f.to_latex(self.outputLatex)
+            self.output_latex = f.to_latex(self.output_latex)
             log.info("Done.")
 
     def substitute(self, setup):
-        latexFirstPageSetup = ""
-        if setup.latex.tableOfContents:
-            latexFirstPageSetup = "\\thispagestyle{empty}\n\n{\\large\n"
-            if setup.latex.latexContentsTitle:
-                latexFirstPageSetup += "\n{\\vspace{0.5cm}\\noindent\\LARGE %s}\n\n" % setup.latex.latexContentsTitle
-            latexFirstPageSetup += "\\vspace{0.5cm}\\noindent\\begin{tabular}{lr}\n"
-            for chapter in latexChapters:
-                latexFirstPageSetup += chapter['name'] + " & \\pageref{" + chapter['id'] + "} \\\\\n"
-            latexFirstPageSetup += "\\end{tabular}\n"
-            latexFirstPageSetup += "}\n\n" 
-            if setup.latex.chapterPagebreak or setup.latex.tableOfContentsPagebreak:
-                latexFirstPageSetup += "\clearpage\n\n"
+        latex_first_page_setup = ""
+        if setup.latex.table_of_contents:
+            latex_first_page_setup = "\\thispagestyle{empty}\n\n{\\large\n"
+            if setup.latex.latex_contents_title:
+                latex_first_page_setup += "\n{\\vspace{0.5cm}\\noindent\\LARGE %s}\n\n" \
+                                          % setup.latex.latex_contents_title
+            latex_first_page_setup += "\\vspace{0.5cm}\\noindent\\begin{tabular}{lr}\n"
+            for chapter in latex_chapters:
+                latex_first_page_setup += chapter['name'] + " & \\pageref{" + chapter['id'] + "} \\\\\n"
+            latex_first_page_setup += "\\end{tabular}\n"
+            latex_first_page_setup += "}\n\n"
+            if setup.latex.chapter_pagebreak or setup.latex.table_of_contents_pagebreak:
+                latex_first_page_setup += "\\clearpage\n\n"
             else:
-                latexFirstPageSetup += "\\vspace{0.5cm}\n\n"
-        if setup.latex.bookPrint:
+                latex_first_page_setup += "\\vspace{0.5cm}\n\n"
+        if setup.latex.book_print:
             header = "\\ohead{\\thepage}\n"
-            header += "\\cehead{" + setup.latex.headerLeft + "}\n"
-            header += "\\cohead{" + setup.latex.headerRight + "}\n"
+            header += "\\cehead{" + setup.latex.header_left + "}\n"
+            header += "\\cohead{" + setup.latex.header_right + "}\n"
         else:
             header = "\\setkomafont{pageheadfoot}{\\small\\textit}\n"
-            header += "\\ihead{" + setup.latex.headerLeft + "}\n"
+            header += "\\ihead{" + setup.latex.header_left + "}\n"
             header += "\\chead{\\thepage}\n"
-            header += "\\ohead{" + setup.latex.headerRight + "}\n"
-            latexFirstPageSetup = "\\thispagestyle{empty}\n\n\\printtitle\n" + latexFirstPageSetup
+            header += "\\ohead{" + setup.latex.header_right + "}\n"
+            latex_first_page_setup = "\\thispagestyle{empty}\n\n\\printtitle\n" + latex_first_page_setup
                
         log.info("Performing LaTeX template substitution")
-        latexTemplateString = DocumentReader(self.templateFilePath).getString()
-        if not latexTemplateString:
+        latex_template_string = DocumentReader(self.template_file_path).get_string()
+        if not latex_template_string:
             log.error("Could not read LaTeX template.")
             return
-        latexTemplate = string.Template(latexTemplateString)
-        self.latexDoc = latexTemplate.substitute(isbn=setup.latex.isbn, document_type=setup.latex.latexDocumentType, geometry=setup.latex.latexGeometry, font_size=setup.latex.latexFontSize, title=setup.latex.latexTitle, subtitle=setup.latex.latexSubtitle, half_title=setup.latex.latexHalfTitle, print_title=setup.latex.printTitle, author=setup.general.author, first_page_setup=latexFirstPageSetup, header=header, pdf_title=setup.latex.latexTitle, pdf_author=setup.general.author, pdf_subject=setup.latex.pdfSubject, pdf_keywords=setup.latex.pdfKeywords, has_color_links=setup.latex.hasColorLinks, url_color=setup.latex.urlColor, link_color=setup.latex.linkColor, preliminaries=setup.latex.preliminaries, appendix=setup.latex.appendix)
+        latex_template = string.Template(latex_template_string)
+        self.latex_doc = latex_template.substitute(isbn=setup.latex.isbn, 
+                                                   document_type=setup.latex.latex_document_type,
+                                                   geometry=setup.latex.latex_geometry,
+                                                   font_size=setup.latex.latex_font_size,
+                                                   title=setup.latex.latex_title,
+                                                   subtitle=setup.latex.latex_subtitle,
+                                                   half_title=setup.latex.latex_half_title,
+                                                   print_title=setup.latex.print_title,
+                                                   author=setup.general.author, 
+                                                   first_page_setup=latex_first_page_setup, 
+                                                   header=header,
+                                                   pdf_title=setup.latex.latex_title,
+                                                   pdf_author=setup.general.author, 
+                                                   pdf_subject=setup.latex.pdf_subject,
+                                                   pdf_keywords=setup.latex.pdf_keywords,
+                                                   has_color_links=setup.latex.has_color_links,
+                                                   url_color=setup.latex.url_color,
+                                                   link_color=setup.latex.link_color,
+                                                   preliminaries=setup.latex.preliminaries, 
+                                                   appendix=setup.latex.appendix)
  
-    def createOutput(self): 
-        #writing latex document
-        with open(self.outputDocFilePath, "wb") as f:
-            f.write(self.latexDoc.encode("utf-8"))
-        log.info("Wrote UTF-8-encoded LaTeX document: %s.", self.outputDocFilePath)  
-        #writing latex document body
-        with open(self.outputBodyFilePath, "wb") as f:
-            f.write(self.outputLatex.encode("utf-8"))
-        log.info("Wrote UTF-8-encoded LaTeX document body: %s.", self.outputBodyFilePath)   
-      
-class DocumentReader(object):
-    def __init__(self, documentPath):
-        self.documentPath = documentPath
-        if not os.path.isfile(self.documentPath):
-            raise SystemExit("File not found: %s" % self.documentPath)        
-        log.info("Reading file: %s.", self.documentPath)
-        with open(self.documentPath, "rb") as f:
-            self.fileString = f.read()
+    def create_output(self):
+        # writing latex document
+        with open(self.output_doc_file_path, "wb") as f:
+            f.write(self.latex_doc.encode("utf-8"))
+        log.info("Wrote UTF-8-encoded LaTeX document: %s.", self.output_doc_file_path)
+        # writing latex document body
+        with open(self.output_body_file_path, "wb") as f:
+            f.write(self.output_latex.encode("utf-8"))
+        log.info("Wrote UTF-8-encoded LaTeX document body: %s.", self.output_body_file_path)
 
-    def getString(self):
+
+class DocumentReader(object):
+    def __init__(self, document_path):
+        self.document_path = document_path
+        if not os.path.isfile(self.document_path):
+            raise SystemExit("File not found: %s" % self.document_path)
+        log.info("Reading file: %s.", self.document_path)
+        with open(self.document_path, "rb") as f:
+            self.file_string = f.read()
+
+    def get_string(self):
         try:
-            return self.fileString.decode("utf-8").strip()
+            return self.file_string.decode("utf-8").strip()
         except UnicodeDecodeError:
-            raise SystemExit("Cannot read '" + self.documentPath + "': UnicodeDecodeError.")
+            raise SystemExit("Cannot read '" + self.document_path + "': UnicodeDecodeError.")
+
 
 class Filter(object):
     def __init__(self):
@@ -514,40 +557,44 @@ class Filter(object):
     def __str__(self):
         return self.__class__.__name__
 
+
 # Lines beginning with ## will be formatted as headlines
 class FilterHeadlines(Filter):
-    def __init__(self, latexChapterPagebreak, latexHideChapterHeader):
-        self.latexChapterPagebreak = latexChapterPagebreak
-        self.latexHideChapterHeader = latexHideChapterHeader
-    
+    def __init__(self, latex_chapter_pagebreak, latex_hide_chapter_header):
+        self.latex_chapter_pagebreak = latex_chapter_pagebreak
+        self.latex_hide_chapter_header = latex_hide_chapter_header
+        super(FilterHeadlines, self).__init__()
+
     def to_html(self, s):
-        def replacefunc(matchobj):
-            text = matchobj.group(1)
+        def replace_func(match_obj):
+            text = match_obj.group(1)
             result = "<h2>%s</h2>" % (text, )
             return result
 
         pattern = '^<p.*>##\s*(.*?)</p>$'
-        new, n = re.subn(pattern, replacefunc, s, flags=re.MULTILINE)
+        new, n = re.subn(pattern, replace_func, s, flags=re.MULTILINE)
         log.info("Made %s headline replacements.", n)
         return new
 
     def to_latex(self, s):
-        def replacefunc(matchobj):
-            text = matchobj.group(1)
-            chaptersCount = len(latexChapters)
-            labelText = str(chaptersCount) + text
-            latexChapters.append({'id':labelText, 'name':text})
-            result = "\n{\\label{%s}\\vspace{0.5cm}\\noindent\\LARGE %s}\n\\renewcommand{\\storychapter}{%s}" % (labelText, text, text, )
-            if self.latexChapterPagebreak and chaptersCount > 0:
+        def replace_func(match_obj):
+            text = match_obj.group(1)
+            chapters_count = len(latex_chapters)
+            label_text = str(chapters_count) + text
+            latex_chapters.append({'id': label_text, 'name': text})
+            result = "\n{\\label{%s}\\vspace{0.5cm}\\noindent\\LARGE %s}\n\\renewcommand{\\storychapter}{%s}" \
+                     % (label_text, text, text, )
+            if self.latex_chapter_pagebreak and chapters_count > 0:
                 result = "\\clearpage\n\n" + result
-            if self.latexHideChapterHeader:
+            if self.latex_hide_chapter_header:
                 result += "\n\\thispagestyle{empty}"
             return result
 
         pattern = '^##\s*(.*?)$'
-        new, n = re.subn(pattern, replacefunc, s, flags=re.MULTILINE)
+        new, n = re.subn(pattern, replace_func, s, flags=re.MULTILINE)
         log.info("Made %s headline replacements.", n)
         return new
+
 
 class FilterDots(Filter):
     def to_html(self, s):
@@ -559,29 +606,29 @@ class FilterDots(Filter):
 
 class FilterQuotes(Filter):
     def to_html(self, s):
-        def replacefunc(matchobj):
-            quote = matchobj.group(1)
+        def replace_func(match_obj):
+            quote = match_obj.group(1)
             # Implement paragraphs with vertical space and w/o indentation.
             quote = quote.replace('<p class=$DQ$indent$DQ$>', "<p>")
             result = "»%s«" % (quote, )
             return result
 
         pattern = '"(.*?)"'
-        new, n = re.subn(pattern, replacefunc, s, flags=re.DOTALL)
+        new, n = re.subn(pattern, replace_func, s, flags=re.DOTALL)
         log.info("Made %s quotation replacements.", n)
         # Restore HTML doublequotes.
         new = new.replace("$DQ$", '"')
         return new
 
     def to_latex(self, s):
-        def replacefunc(matchobj):
+        def replace_func(match_obj):
             """
             Paragraphs within quotations should not be indented.
             In this func, also filter the quote *contents* to implement
             this criterion.
             """
             # Extract quote content.
-            quote = matchobj.group(1)
+            quote = match_obj.group(1)
             # Implement paragraphs with vspace and w/o indentation.
             quote = quote.replace(
                 "\n\n", "\n\n\\noindent\n")
@@ -594,118 +641,123 @@ class FilterQuotes(Filter):
         # match object argument, and returns the replacement string."
         # Make the search non-greedy, and search across newlines.
         pattern = '"(.*?)"'
-        new, n = re.subn(pattern, replacefunc, s, flags=re.DOTALL)
+        new, n = re.subn(pattern, replace_func, s, flags=re.DOTALL)
         log.info("Made %s quotation replacements.", n)
         return new
+
 
 # Text surrounded by double underscores or double asterisks will be shown bold
 class FilterBold(Filter):
     def to_html(self, s):
-        def replacefunc(matchobj):
-            text = matchobj.group(1)
+        def replace_func(match_obj):
+            text = match_obj.group(1)
             result = "<strong>%s</strong>" % (text, )
             return result
 
         pattern = '__(.*?)__'
-        new, n = re.subn(pattern, replacefunc, s, flags=re.DOTALL)
+        new, n = re.subn(pattern, replace_func, s, flags=re.DOTALL)
         pattern = '\*\*(.*?)\*\*'
-        new, m = re.subn(pattern, replacefunc, new, flags=re.DOTALL)
+        new, m = re.subn(pattern, replace_func, new, flags=re.DOTALL)
         log.info("Made %s bold replacements.", n+m)
         return new
 
     def to_latex(self, s):
-        def replacefunc(matchobj):
-            text = matchobj.group(1)
+        def replace_func(match_obj):
+            text = match_obj.group(1)
             result = "{\\boldfont\\textbf{%s}}" % text
             return result
 
         pattern = '__(.*?)__'
-        new, n = re.subn(pattern, replacefunc, s, flags=re.DOTALL)
+        new, n = re.subn(pattern, replace_func, s, flags=re.DOTALL)
         pattern = '\*\*(.*?)\*\*'
-        new, m = re.subn(pattern, replacefunc, new, flags=re.DOTALL)
+        new, m = re.subn(pattern, replace_func, new, flags=re.DOTALL)
         log.info("Made %s bold replacements.", n+m)
         return new
-		
+
+
 # Text surrounded by underscores or asterisks will be shown in italics
 class FilterItalics(Filter):
     def to_html(self, s):
-        def replacefunc(matchobj):
-            text = matchobj.group(1)
+        def replace_func(match_obj):
+            text = match_obj.group(1)
             result = "<em>%s</em>" % (text, )
             return result
 
         pattern = '_(.*?)_'
-        new, n = re.subn(pattern, replacefunc, s, flags=re.DOTALL)
+        new, n = re.subn(pattern, replace_func, s, flags=re.DOTALL)
         pattern = '\*(.*?)\*'
-        new, m = re.subn(pattern, replacefunc, new, flags=re.DOTALL)
+        new, m = re.subn(pattern, replace_func, new, flags=re.DOTALL)
         log.info("Made %s italic replacements.", n+m)
         return new
 
     def to_latex(self, s):
-        def replacefunc(matchobj):
-            text = matchobj.group(1)
-            if "\n" in text: #itshape works over multiple lines but gets easily disturbed
+        def replace_func(match_obj):
+            text = match_obj.group(1)
+            if "\n" in text:  # itshape works over multiple lines but gets easily disturbed
                 result = "\\begin{itshape}%s\\end{itshape}" % text
-            else: #\textit can be combined with \textbf etc. but does not work over multiple lines
+            else:  # \textit can be combined with \textbf etc. but does not work over multiple lines
                 result = "\\textit{%s}" % text
             return result
 
         pattern = '_(.*?)_'
-        new, n = re.subn(pattern, replacefunc, s, flags=re.DOTALL)
+        new, n = re.subn(pattern, replace_func, s, flags=re.DOTALL)
         pattern = '\*(.*?)\*'
-        new, m = re.subn(pattern, replacefunc, new, flags=re.DOTALL)
+        new, m = re.subn(pattern, replace_func, new, flags=re.DOTALL)
         log.info("Made %s italic replacements.", n+m)
         return new
 
+
 class FilterImages(Filter):
-    #![Alt text](/path/to/img.jpg "optional title")
+    # ![Alt text](/path/to/img.jpg "optional title")
     pattern = '!\[(.*)\]\(([^")]*)(\s"(.*)")?\)'
     
     def to_html(self, s):
-        def replacefunc(matchobj):
-            altText = matchobj.group(1)
-            path = matchobj.group(2)
-            title = matchobj.group(4)
+        def replace_func(match_obj):
+            alt_text = match_obj.group(1)
+            path = match_obj.group(2)
+            title = match_obj.group(4)
             result = '<figure class=$DQ$textimage$DQ$>\n'
-            result += '<img src=$DQ$%s$DQ$ alt=$DQ$%s$DQ$ ' % (path, altText, )
-            #if title != None:
-            #    result += 'title=$DQ$%s$DQ$ ' %(title, )
+            result += '<img src=$DQ$%s$DQ$ alt=$DQ$%s$DQ$ ' % (path, alt_text, )
+            # if title != None:
+            #     result += 'title=$DQ$%s$DQ$ ' %(title, )
             result += ' />\n'
-            if title != None:
+            if title is not None:
                 result += '<figcaption>%s</figcaption>\n' % (title, )
             result += '</figure>'
             return result
 
-        new, n = re.subn('^<p.*>' + self.pattern + '</p>$', replacefunc, s, flags=re.MULTILINE)
+        new, n = re.subn('^<p.*>' + self.pattern + '</p>$', replace_func, s, flags=re.MULTILINE)
         log.info("Made %s image replacements.", n)
         return new
 
     def to_latex(self, s):
-        def replacefunc(matchobj):
-            altText = matchobj.group(1)
-            path = matchobj.group(2)
-            title = matchobj.group(4)
+        def replace_func(match_obj):
+            # alt_text = match_obj.group(1)
+            path = match_obj.group(2)
+            title = match_obj.group(4)
             result = '\\begin{figure}$squareBracketOpen$!ht$squareBracketClose$\n'
             result += '\\centering\n'
-            maxHeight = '1.0\\textheight'
+            max_height = '1.0\\textheight'
             caption = ''
-            if title != None:
-                maxHeight = '0.9\\textheight'
+            if title is not None:
+                max_height = '0.9\\textheight'
                 caption = '\\caption$asterisk${%s}\n' %(title, )
-            result += '\\includegraphics$squareBracketOpen$max height=' + maxHeight + ',max width=1.0\\textwidth$squareBracketClose${%s}\n' % (path, )
+            result += '\\includegraphics$squareBracketOpen$max height=' + max_height \
+                      + ',max width=1.0\\textwidth$squareBracketClose${%s}\n' % (path, )
             result += caption
             result += '\\end{figure}'
             return result
             
-        new, n = re.subn(self.pattern, replacefunc, s)
+        new, n = re.subn(self.pattern, replace_func, s)
         log.info("Made %s image replacements.", n)
         return new
 
+
 class FilterConvertLineEndings(Filter):
-    
-    def _convert(self, s):
-        new = s.replace("\r\n", "\n") # Windows
-        new = new.replace("\r", "\n") # Mac
+    @staticmethod
+    def _convert(s):
+        new = s.replace("\r\n", "\n")  # Windows
+        new = new.replace("\r", "\n")  # Mac
         return new
 
     def to_html(self, s):
@@ -714,38 +766,42 @@ class FilterConvertLineEndings(Filter):
     def to_latex(self, s):
         return self._convert(s)
 
-class FilterSectionsParagraphs(Filter):
 
-    def _convert(self, s, secsep, parsep):
-        _tmp_sectionspacer = "$NEWSECTION$"
+class FilterSectionsParagraphs(Filter):
+    @staticmethod
+    def _convert(s, section_separator, paragraph_separator):
+        _tmp_section_spacer = "$NEWSECTION$"
         # First remember and shim places with two LF (section separator).
-        new = s.replace("\n\n", _tmp_sectionspacer)
+        new = s.replace("\n\n", _tmp_section_spacer)
         # Replace single LF with paragraph separator.
-        new = new.replace("\n", parsep)
+        new = new.replace("\n", paragraph_separator)
         # Replace original two-LFs with markup for new section.
-        new = new.replace(_tmp_sectionspacer, secsep)
+        new = new.replace(_tmp_section_spacer, section_separator)
         return new
 
     def to_html(self, s):
-        sectionsep = "</p>\n</section>\n\n\n<section>\n<p>"
+        section_sep = "</p>\n</section>\n\n\n<section>\n<p>"
         # Temporarily shim HTML double quotes.
-        paragraphsep = '</p>\n\n<p class=$DQ$indent$DQ$>'
-        new = self._convert(s, sectionsep, paragraphsep)
+        paragraph_sep = '</p>\n\n<p class=$DQ$indent$DQ$>'
+        new = self._convert(s, section_sep, paragraph_sep)
         new = "<section>\n<p>%s</p>\n</section>" % (new, )
         return new
 
     def to_latex(self, s):
-        sectionsep = "\n\n\\vspace{0.5cm}\\noindent\n"
-        paragraphsep = "\n\n"
-        return self._convert(s, sectionsep, paragraphsep)
+        section_sep = "\n\n\\vspace{0.5cm}\\noindent\n"
+        paragraph_sep = "\n\n"
+        return self._convert(s, section_sep, paragraph_sep)
 
-#structure for defining how to escape and restore special characters
+
+# structure for defining how to escape and restore special characters
 class EscapeRoute(object):
     def __init__(self, original, temporary, html, latex):
         self.original = original
         self.temporary = temporary
         self.html = html
         self.latex = latex
+
+
 """
 list of all allowed EscapeRoutes (\ needs to be escaped in python too, so theres a lot of \)
 
@@ -778,7 +834,7 @@ _   underscore
 --  double minus
 
 """
-escapeRoutes = [
+escape_routes = [
     EscapeRoute('\\\\', '$escapeChar$', '\\', '\\textbackslash{}'),
     EscapeRoute('&', '$amp$', '&amp;', '\\&'),
     EscapeRoute('<', '$lt$', '&lt;', '<'),
@@ -797,13 +853,14 @@ escapeRoutes = [
     EscapeRoute('\\--', '$hyphen$', '--', '\\verb|--|'),
     EscapeRoute('\\"', '$doubleQuote$', '&quot;', '"{}'),
     EscapeRoute('\\!', '$exclamation$', '!', '!'),
-    #EscapeRoute('\\', '', '', ''),
+    # EscapeRoute('\\', '', '', ''),
 ]
+
 
 class FilterMaskEscapedCharacters(Filter):
     def _convert(self, s):
         new = s
-        for i in escapeRoutes:
+        for i in escape_routes:
             new = new.replace(i.original, i.temporary)
         return new
            
@@ -813,18 +870,20 @@ class FilterMaskEscapedCharacters(Filter):
     def to_latex(self, s):
         return self._convert(s)
 
+
 class FilterRestoreEscapedCharacters(Filter):
     def to_html(self, s):
         new = s
-        for i in escapeRoutes:
+        for i in escape_routes:
             new = new.replace(i.temporary, i.html)
         return new
-    
+
     def to_latex(self, s):
         new = s
-        for i in escapeRoutes:
+        for i in escape_routes:
             new = new.replace(i.temporary, i.latex)
         return new
+
 
 class FilterHyphens(Filter):
     def to_html(self, s):
@@ -844,23 +903,25 @@ class FilterFootnotes(Filter):
         log.info("Made %s footnote replacements.", n)
         return new
 
-    def _repair_footnote_ids(self, s):
-        id = 'sn-tufte-handout'
+    @staticmethod
+    def _repair_footnote_ids(s):
+        html_id = 'sn-tufte-handout'
         index = 1
         while True:
-            s, n = re.subn(id + '(?!\d)', (id + str(index)), s, 2)
+            s, n = re.subn(html_id + '(?!\d)', (html_id + str(index)), s, 2)
             index += 1
-            if n < 2: break
+            if n < 2:
+                break
         return s
 
     def to_html(self, s):
-        repl = (
+        replacement = (
             '<label for="sn-tufte-handout" class="margin-toggle sidenote-number">'
             '</label><input type="checkbox" id="sn-tufte-handout" class="margin-toggle"/>'
             '<span class="sidenote">\\1</span>')
         # Temporarily shim HTML double quotes.
-        repl = repl.replace('"', "$DQ$")
-        return self._repair_footnote_ids(self._convert(s, repl))
+        replacement = replacement.replace('"', "$DQ$")
+        return self._repair_footnote_ids(self._convert(s, replacement))
 
     def to_latex(self, s):
         return self._convert(s, r"\\footnote{\1}")
