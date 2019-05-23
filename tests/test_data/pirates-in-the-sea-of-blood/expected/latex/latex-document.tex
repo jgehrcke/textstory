@@ -1,0 +1,109 @@
+\documentclass[fontsize=10pt,]{scrreprt}
+
+\usepackage{calc}
+\usepackage[a5paper, heightrounded, hmarginratio=1:1, vmarginratio=1:1]{geometry}
+\geometry{textheight=0.82\paperheight}
+
+\usepackage{fontspec}
+
+\usepackage{cabin}
+\usepackage{gentium}
+\usepackage{fontenc}
+\setmainfont{GentiumPlus}
+\usepackage{microtype}
+\usepackage[ngerman]{babel}
+\usepackage[german=guillemets]{csquotes}
+\usepackage{changepage}
+\usepackage[hidelinks]{hyperref}
+\usepackage[absolute,overlay]{textpos}
+\usepackage[export]{adjustbox} % loads also graphicx
+\usepackage{caption}
+
+\newfontfamily\licensefont{Cabin}
+\newfontfamily\boldfont{GentiumBasic}
+
+\usepackage{scrlayer-scrpage}
+\usepackage{tabularx}
+
+%% some handy commands
+
+\newcommand{\storytitle}{Abenteuer in der blutigen See}
+\newcommand{\storysubtitle}{Schatzsuche auf der Totenkopfinsel}
+\newcommand{\storyhalftitle}{Abenteuer in der blutigen See}
+\newcommand{\storyauthor}{Josa Wode}
+\newcommand{\storychapter}{}%the current chapter (will be redefined for each chapter)
+\newcommand{\isbn}{}
+
+\newcommand{\printtitle}{\begin{center}
+{\large \storyauthor}
+
+\vspace{0.6cm}
+{\huge \storytitle}
+
+\vspace{0.3cm}
+{\large \storysubtitle}
+\end{center}
+}
+
+%% hypersetup
+
+\hypersetup{
+    %pdftoolbar=false,
+    %pdfmenubar=false,
+    pdftitle={Abenteuer in der blutigen See},
+    pdfauthor={Josa Wode},
+    pdfsubject={Pirat*innengeschichte},
+    %pdfcreator={Josa Wode},
+    pdfproducer={textstory-to-beautiful-latex-html},
+    pdfkeywords={Geschichte, Piraterie, Seefahrt, Abenteuer},
+    colorlinks=false,
+    urlcolor=blue,
+    linkcolor=black
+}
+
+%% header and footer
+
+\clearscrheadfoot
+\setkomafont{pageheadfoot}{\small\textit}
+\ihead{\storytitle}
+\chead{\thepage}
+\ohead{\storychapter}
+
+
+%% document
+
+\begin{document}
+
+
+
+\thispagestyle{empty}
+
+\printtitle
+\thispagestyle{empty}
+
+{\large
+
+{\vspace{0.5cm}\noindent\LARGE Navigieren in der blutigen See}
+
+\vspace{0.5cm}\noindent\begin{tabular}{lr}
+Kapitel 1: Irgendwo im Nirgendwo & \pageref{0Kapitel 1: Irgendwo im Nirgendwo} \\
+Kapitel 2: Das Ziel der Reise & \pageref{1Kapitel 2: Das Ziel der Reise} \\
+Kapitel 3: Landung & \pageref{2Kapitel 3: Landung} \\
+\end{tabular}
+}
+
+\vspace{0.5cm}
+
+
+
+\noindent
+\input{latex-body}
+\clearpage
+
+
+
+\IfFileExists{./license.tex}{
+\input{license}
+}{}
+
+\end{document}

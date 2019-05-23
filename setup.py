@@ -36,7 +36,7 @@ class SetupData(object):
         self.setup_toml = setup_toml
 
     def get_bool(self, category, item, default):
-        # test if entry is in setup toml
+        # tests if entry is in setup toml
         if category not in self.setup_toml or item not in self.setup_toml[category]:
             log.info("[" + category + "][" + item + "] not in setup TOML.")
             return default

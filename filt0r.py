@@ -55,7 +55,7 @@ def run(setup_file_path, input_file_path, output_folder_path=None):
     if output_folder_path is not None:
         # prepare output folder
         output_folder_path = os.path.normpath(output_folder_path)
-        # test/create output folder path
+        # tests/create output folder path
         if not os.path.isdir(output_folder_path):
             # create if not existent
             if not os.path.exists(output_folder_path):
