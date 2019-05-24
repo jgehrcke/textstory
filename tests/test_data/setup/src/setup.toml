@@ -1,0 +1,34 @@
+[general]
+author = "Josa Wode"
+title = "Abenteuer in der blutigen See"
+subtitle = "Schatzsuche auf der Totenkopfinsel"
+language = "cz"
+
+[html]
+title = "Digitale Abenteuer in der blutigen See"
+subtitle = "Digitale Schatzsuche auf der Totenkopfinsel"
+url = "http://writing.fotoelectrics.de/documents/pirates-in-the-sea-of-blood/de/html/"
+sitename = "http://writing.fotoelectrics.de"
+metadescription = "Abenteuer in der blutigen See -- Schatzsuche auf der Totenkopfinsel -- eine Geschichte von Josa Wode"
+locale = "cs_CZ"
+
+[latex]
+title = "Analoge Abenteuer in der blutigen See"
+subtitle = "Analoge Schatzsuche auf der Totenkopfinsel"
+halfTitle = "Blutige See"
+pdfsubject = "Pirat*innengeschichte"
+chapterPagebreak = true
+printAuthorOnTitle = true
+pdfkeywords = "Geschichte, Piraterie, Seefahrt, Abenteuer"
+tableOfContents = true
+contentsTitle = "Navigieren in der blutigen See"
+tableOfContentsPagebreak = true
+bookPrint = "True"
+pageFormat = "a4"
+fontSize = "10"
+hascolorlinks = "true"
+linkcolor = "pink"
+urlcolor = "unicorn"
+isbn = "123-456-ABC"
+headerLeft = "\\storychapter"
+headerRight = "\\storytitle"

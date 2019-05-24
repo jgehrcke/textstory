@@ -13,7 +13,7 @@ from filters import get_filters, get_latex_chapters
 from logger import log
 from paths import dir_path, SETUP_FILE, LATEX_TEMPLATE, HTML_TEMPLATE, HTML_LICENSE, OUTFILE_LATEX_BODY, \
     OUTFILE_LATEX_DOC, OUTFILE_HTML, PRELIMINARIES_PATH, APPENDIX_PATH
-from setup import Setup
+from textstory_setup import Setup
 
 
 def main():
