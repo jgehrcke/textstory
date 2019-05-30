@@ -79,6 +79,7 @@ class GeneralSetupData(SetupData):
         self.subtitle = self.get_string(category, 'subtitle')
         self.author = self.get_string(category, 'author', default="Unknown author")
         self.language = self.get_string(category, 'language', default="de")
+        self.draft = self.get_bool(category, 'draft', default=False)
 
 
 class HtmlSetupData(SetupData):
@@ -158,7 +159,9 @@ class LatexSetupData(SetupData):
         # geometry
         self.latex_geometry = "\\usepackage["
         page_format = self.get_string(category, 'pageFormat', default="")
-        if page_format:
+        if general.draft:
+            self.latex_geometry += "a4paper"
+        elif page_format:
             self.latex_geometry += "%spaper" % page_format
         else:
             page_width = self.get_string(category, 'pageWidth', default="")
@@ -195,3 +198,9 @@ class LatexSetupData(SetupData):
         self.has_color_links = self.get_string(category, 'hascolorlinks', default="false")
         self.url_color = self.get_string(category, 'urlcolor', default="blue")
         self.link_color = self.get_string(category, 'linkcolor', default="black")
+
+        # comments
+        self.todonotes_config = 'disable'
+        if general.draft:
+            self.todonotes_config = 'draft'
+        self.todonotes_config += ', backgroundcolor=white, linecolor=black'

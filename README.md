@@ -87,6 +87,7 @@ sitename = "Name der Seite, auf der der Text zu finden ist" #meta property og:si
 ```
 [general]
 subtitle = "Untertitel des Textes"
+draft = "Text als Entwurf ausgeben" #true, false #default: false
 ```
 #### LaTeX Layout:
 ```
@@ -161,6 +162,7 @@ title = "Kommt und holt sie"
 #subtitle = ""
 author = "Josa Wode"
 language = "de" #de, en, ...
+draft = false
 
 [latex]
 bookPrint = true #true, false #Dokument wird für den Druck als Buch erstellt, es können Seiten zu Titelei und Anhang hinzugefügt werden (Verzeichnisse: latex/bookPreliminaries und latex/bookAppendix)
@@ -375,6 +377,29 @@ Markup: Eckige Klammern.
 Beispiel: `Das ist das WortNachDemDieFußNoteKommt[Die Fußnote].`
 
 
+### Kommentare
+
+#### Unterstreichen
+Markup: Doppelte runde Klammern
+
+Derart markierter Text wird im Entwurfsmodus (Draft) mit geschlängelter Linie unterstrichen.
+
+Beispiel: `((Dieser Text ist überarbeitungswürdig))`
+
+#### Randnotiz
+Markup: Doppelte eckige Klammern
+
+Derart markierter Text wird im Entwurfsmodus (Draft) als Randnotiz dargestellt und sonst ausgeblendet.
+
+Beispiel: `Ihr Name war Thorsten[[Überlegen, ob Thorsten wirklich ein geeigneter Name ist.]]`
+
+#### In Kombination
+
+Es kann nützlich sein, die beiden Kommentarfunktionen zu kombinieren.
+
+Beispiel: `((Dieser Text ist sehr sehr ultra mega schlecht))[[Leicht übertrieben? Überflüssige Adverben streichen.]].`  
+
+
 ### Bilder
 Markup: \!\[altText\]\(Bildpfad "optionaler Titel"\)
 
@@ -392,6 +417,7 @@ Folgende Zeichen sind zu maskieren ('`\`' voranstellen):
 `*`   Asterisk  
 `_`   Unterstrich  
 `{}`  Geschweifte Klammern  
+`()`  Klammern (nur bei doppelten, also '((' bzw. '))', da dies Kommentar-Unterstreichungen markiert)  
 `[]`  Eckige Klammern  
 `#`   Raute  
 `"`   Anführungszeichen / Double-Quote  
@@ -481,6 +507,7 @@ sitename = "Name of Site that hosts text" #meta property og:site_name
 ```
 [general]
 subtitle = "Subtitle of text"
+draft = "Output is draft" #true, false #default: false
 ```
 #### LaTeX Layout:
 ```
@@ -555,6 +582,7 @@ title = "Kommt und holt sie"
 #subtitle = ""
 author = "Josa Wode"
 language = "de" #de, en, ...
+draft = false
 
 [latex]
 bookPrint = true #true, false #create document for book printing, allow preliminaries and appendix (directories: latex/bookPreliminaries and latex/bookAppendix)
@@ -768,6 +796,30 @@ Markup: Square brackets.
 
 Example: `This is the word-after-which-the-footnote-appears[The footnote].`
 
+
+### Comments
+
+#### Underline
+Markup: Double round brackets.
+
+Text marked like this will be underlined with a wiggly line in draft.
+
+Example: `((This text may need rework))`
+
+#### Sidenote
+Markup: Double square bracktes.
+
+Text marked like this will be shown as a sidenote in draft and is hidden otherwise.
+
+Example: `Her name was Thorsten[[Think about it. Is this really a good name for her?]]`
+
+#### Combined
+
+You may want to combine both comment types.
+
+Example: `((This text is very very ultra mega bad))[[Too much? Remove some adverbs.]].`  
+
+
 ### Images
 Markup: \!\[altText\]\(Image path "optional title"\)
 
@@ -780,17 +832,18 @@ Markup: Backslash followed by special character ('`\specialchar`')
 
 In HTML, LaTeX and our markup certain symbols are reserved as parts of the syntax. They have to be masked to be interpreted as the simple symbol and to be shown as such in the generated output text.
 
-The following characters have to be escaped (prepend '`\`'):
+The following characters have to be escaped (prepend '`\`'):  
 `\`   backslash &ndash; the escape character itself  
 `*`   asterisk  
-`_`   underscore
-`{}`  curly brackets
-`[]`  square brackets
-`#`   hash
-`"`   double quote
+`_`   underscore  
+`{}`  curly brackets  
+`()`  normal brackets (only if used in double, like '((' or '))', because this marks commentary underlining)  
+`[]`  square brackets  
+`#`   hash  
+`"`   double quote  
 `!`   exclamation mark (only when followed by '[')  
 `--`  double minus  
-`$`   dollar
+`$`   dollar  
 
 The following characters can be used as normal and will automatically be translated in HTML and LaTeX representation:  
 `&`   in HTML becomes '`&amp;`', in LaTeX '`\&`'  

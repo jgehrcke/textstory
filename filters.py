@@ -28,6 +28,7 @@ def get_filters(setup):
         FilterSectionsParagraphs(),  # introduces HTML-minuses, must run after FilterHyphens
         FilterHeadlines(setup.latex.chapter_pagebreak, setup.latex.hide_chapter_header),
         FilterImages(),  # has to be done before FilterFootnotes
+        FilterComments(setup.general.draft),  # has to be done before FilterFootnotes and after FilterImages
         FilterFootnotes(),
         FilterQuotes(),
         FilterBold(),  # has to be done before FilterItalics
@@ -54,6 +55,24 @@ class ChapterCollector(object):
 class Filter(object):
     def __init__(self):
         pass
+
+    @classmethod
+    def mask_substring(cls, string, substring, masked_substring):
+        return string.replace(substring, masked_substring)
+
+    @classmethod
+    def mask_double_quotes(cls, string):
+        return cls.mask_substring(string, '"', '$DQ$')
+
+    @classmethod
+    def add_running_index_to_pattern(cls, string, pattern, start_index=1):
+        index = start_index
+        while True:
+            string, n = re.subn(pattern + '(?!\d)', (pattern + str(index)), string, 2)
+            index += 1
+            if n < 2:
+                break
+        return string
 
     def __str__(self):
         return self.__class__.__name__
@@ -339,25 +358,61 @@ class FilterFootnotes(Filter):
         log.info("Made %s footnote replacements.", n)
         return new
 
-    @staticmethod
-    def _repair_footnote_ids(s):
-        html_id = 'sn-tufte-handout'
-        index = 1
-        while True:
-            s, n = re.subn(html_id + '(?!\d)', (html_id + str(index)), s, 2)
-            index += 1
-            if n < 2:
-                break
-        return s
+    @classmethod
+    def add_footnote_indices(cls, string):
+        return cls.add_running_index_to_pattern(string, 'sn-tufte-handout')
 
     def to_html(self, s):
-        replacement = (
+        replacement = self.mask_double_quotes(
             '<label for="sn-tufte-handout" class="margin-toggle sidenote-number">'
             '</label><input type="checkbox" id="sn-tufte-handout" class="margin-toggle"/>'
             '<span class="sidenote">\\1</span>')
-        # Temporarily shim HTML double quotes.
-        replacement = replacement.replace('"', "$DQ$")
-        return self._repair_footnote_ids(self._convert(s, replacement))
+        return self.add_footnote_indices(self._convert(s, replacement))
 
     def to_latex(self, s):
         return self._convert(s, r"\\footnote{\1}")
+
+
+class FilterComments(Filter):
+    def __init__(self, show_comments):
+        self.show_comments = show_comments
+
+    def _convert(self, input, pattern, replacement_pattern):
+        output, n = re.subn(pattern, replacement_pattern, input, flags=re.DOTALL)
+        log.info("Made %s commentary replacements.", n)  # TODO 2 convert functions
+        return output
+
+    @classmethod
+    def add_comment_indices(cls, string):
+        return cls.add_running_index_to_pattern(string, 'sn-tufte-comment')
+
+    def to_html(self, input_text):
+        # inline comment
+        inline_pattern = r'\(\((.*?)\)\)'
+        if self.show_comments:
+            inline_replacement_pattern = self.mask_double_quotes('<span class="inline-comment">\\1</span>')
+        else:
+            inline_replacement_pattern = '\\1'
+        inline_commented = self._convert(input_text, inline_pattern, inline_replacement_pattern)
+
+        # sidenote comment
+        comment_pattern = r'\[\[(.*?)\]\]'
+        if self.show_comments:
+            comment_replacement_pattern = self.mask_double_quotes(
+                '<label for="sn-tufte-comment" class="margin-toggle sidenote-comment-number">'
+                '</label><input type="checkbox" id="sn-tufte-comment" class="margin-toggle"/>'
+                '<span class="sidenote-comment">\\1</span>')
+        else:
+            comment_replacement_pattern = ''
+        return self.add_comment_indices(self._convert(inline_commented, comment_pattern, comment_replacement_pattern))
+
+    def to_latex(self, input_text):
+        # inline comment
+        inline_pattern = r'\(\((.*?)\)\)'
+        inline_replacement_pattern = r'\\wiggle{\1}'
+        inline_commented = self._convert(input_text, inline_pattern, inline_replacement_pattern)
+
+        # sidenote comment
+        comment_pattern = r'\[\[(.*?)\]\]'
+        comment_replacement_pattern = r'{\\todo{\1}}'
+        return self._convert(inline_commented, comment_pattern, comment_replacement_pattern)

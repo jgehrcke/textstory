@@ -7,15 +7,17 @@
 
 html { font-size: 15px; }
 
-body { width: 87.5%;
-       margin-left: auto;
-       margin-right: auto;
-       padding-left: 12.5%;
-       font-family: ETBembo, Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
-       background-color: #fffff8;
-       color: #111;
-       max-width: 1400px;
-       counter-reset: sidenote-counter; }
+body { 
+   width: 87.5%;
+   margin-left: auto;
+   margin-right: auto;
+   padding-left: 12.5%;
+   font-family: ETBembo, Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
+   background-color: #fffff8;
+   color: #111;
+   max-width: 1400px;
+   counter-reset: sidenote-counter 0 sidenote-comment-counter 0;
+}
 
 h1 { font-weight: 400;
      margin-top: 4rem;
@@ -149,16 +151,23 @@ a { color: #111;
 
 img { max-width: 100%; }
 
-.sidenote, .marginnote { float: right;
-                         clear: right;
-                         margin-right: -60%;
-                         width: 50%;
-                         margin-top: 0;
-                         margin-bottom: 0;
-                         font-size: 1.0rem;
-                         line-height: 1.6;
-                         vertical-align: baseline;
-                         position: relative; }
+.inline-comment {
+    color: #0F52BA;
+    font-style: italic;
+}
+
+.sidenote, .sidenote-comment, .marginnote { 
+    float: right;
+    clear: right;
+    margin-right: -60%;
+    width: 50%;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 1.0rem;
+    line-height: 1.6;
+    vertical-align: baseline;
+    position: relative; 
+}
 
 .table-caption { float:right;
                  clear:right;
@@ -169,26 +178,59 @@ img { max-width: 100%; }
                  font-size: 1.0rem;
                  line-height: 1.6; }
 
-.sidenote-number { counter-increment: sidenote-counter; }
+.sidenote-number { counter-increment: sidenote-counter 1; }
 
-.sidenote-number:after, .sidenote:before { content: counter(sidenote-counter) " ";
-                                           position: relative;
-                                           vertical-align: baseline;
-                                           color: #f00000; }
+.sidenote-comment-number { counter-increment: sidenote-comment-counter 1; }
 
-.sidenote-number:after { content: counter(sidenote-counter);
-                         font-size: 0.9rem;
-                         top: -0.5rem;
-                         left: 0.1rem; }
+.sidenote-number:after, .sidenote:before {
+    content: counter(sidenote-counter) " ";
+    position: relative;
+    vertical-align: baseline;
+    color: #f00000; 
+}
+                                           
+.sidenote-comment-number:after, .sidenote-comment:before { 
+    content: counter(sidenote-comment-counter) " ";
+    position: relative;
+    vertical-align: baseline;
+    color: #0F52BA; 
+}
 
-.sidenote:before { content: counter(sidenote-counter) ". ";
-                   position: absolute;
-                   /* 100% refers to the computed width of the number, so this transform
-                    * shifts the number just outside the left edge of the sidenote box,
-                    * with a buffer of 0.25rem, no matter how many digits the number has. */
-                   -webkit-transform: translateX(-100%) translateX(-0.25rem);
-                   -ms-transform: translateX(-100%) translateX(-0.25rem);
-                   transform: translateX(-100%) translateX(-0.25rem); }
+.sidenote-number:after {
+    content: counter(sidenote-counter);
+    font-size: 0.9rem;
+    top: -0.5rem;
+    left: 0.1rem; 
+}
+                         
+.sidenote-comment-number:after { 
+    content: counter(sidenote-comment-counter);
+    font-size: 0.9rem;
+    top: -0.5rem;
+    left: 0.1rem; 
+}
+
+.sidenote:before {
+    content: counter(sidenote-counter) ". ";
+    position: absolute;
+    /* 100% refers to the computed width of the number, so this transform
+    * shifts the number just outside the left edge of the sidenote box,
+    * with a buffer of 0.25rem, no matter how many digits the number has. */
+    -webkit-transform: translateX(-100%) translateX(-0.25rem);
+    -ms-transform: translateX(-100%) translateX(-0.25rem);
+    transform: translateX(-100%) translateX(-0.25rem);
+}
+                   
+.sidenote-comment:before { 
+    content: counter(sidenote-comment-counter) ". ";
+    position: absolute;
+    /* 100% refers to the computed width of the number, so this transform
+    * shifts the number just outside the left edge of the sidenote comment box,
+    * with a buffer of 0.25rem, no matter how many digits the number has. */
+    -webkit-transform: translateX(-100%) translateX(-0.25rem);
+    -ms-transform: translateX(-100%) translateX(-0.25rem);
+    transform: translateX(-100%) translateX(-0.25rem); 
+}
 
 p, footer, div.table-wrapper { width: 55%; }
 
@@ -207,7 +249,7 @@ p, footer, div.table-wrapper { width: 55%; }
 
 h1 .code, h2 .code, h3 .code { font-size: 0.80em; }
 
-.marginnote .code, .sidenote .code { font-size: 1rem; }
+.marginnote .code, .sidenote .code, .sidenote-comment .code { font-size: 1rem; }
 
 pre.code { width: 52.5%;
            padding-left: 2.5%;
@@ -220,33 +262,51 @@ span.newthought { font-variant: small-caps;
 
 input.margin-toggle { display: none; }
 
-label.sidenote-number { display: inline; }
+label.sidenote-number, label.sidenote-comment-number { display: inline; }
 
-label.margin-toggle:not(.sidenote-number) { display: none; }
+label.margin-toggle:not(.sidenote-number, .sidenote-comment-number) { display: none; }
 
-@media (max-width: 900px) { label.margin-toggle:not(.sidenote-number) { display: inline; }
-                            .sidenote, .marginnote { display: none; }
-                            .margin-toggle:checked + .sidenote,
-                            .margin-toggle:checked + .marginnote { display: block;
-                                                                   float: left;
-                                                                   left: 1rem;
-                                                                   clear: both;
-                                                                   width: 95%;
-                                                                   margin: 1rem 2.5%;
-                                                                   vertical-align: baseline;
-                                                                   position: relative; }
-                            label { cursor: pointer; }
-                            pre.code { width: 90%;
-                                       padding: 0; }
-                            .table-caption { display: block;
-                                             float: right;
-                                             clear: both;
-                                             width: 98%;
-                                             margin-top: 1rem;
-                                             margin-bottom: 0.5rem;
-                                             margin-left: 1%;
-                                             margin-right: 1%;
-                                             vertical-align: baseline;
-                                             position: relative; }
-                            table, table.booktabs { width: 85%; }
-                            img { width: 100%; } }
+@media (max-width: 900px) {
+
+    label.margin-toggle:not(.sidenote-number, .sidenote-comment-number) { display: inline; }
+    
+    .sidenote, .sidenote-comment, .marginnote { display: none; }
+    
+    .margin-toggle:checked + .sidenote,
+    .margin-toggle:checked + .sidenote-comment,
+    .margin-toggle:checked + .marginnote { 
+        display: block;
+        float: left;
+        left: 1rem;
+        clear: both;
+        width: 95%;
+        margin: 1rem 2.5%;
+        vertical-align: baseline;
+        position: relative; 
+    }
+    
+    label { cursor: pointer; }
+    
+    pre.code { 
+        width: 90%;
+        padding: 0; 
+    }
+    
+    .table-caption { 
+        display: block;
+        float: right;
+        clear: both;
+        width: 98%;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        margin-left: 1%;
+        margin-right: 1%;
+        vertical-align: baseline;
+        position: relative; 
+    }
+
+    table, table.booktabs { width: 85%; }
+
+    img { width: 100%; } 
+    
+}

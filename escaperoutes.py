@@ -38,6 +38,7 @@ TEXTSTORY MARKUP:
 *   asterisk
 _   underscore
 {}  curly braces
+()  normal brackets
 []  square brackets
 #   hash mark
 "   doublequote
@@ -56,6 +57,8 @@ escape_routes = [
     EscapeRoute('\\_', '$underscore$', '_', '\\_ '),
     EscapeRoute('\\{', '$curlyBracketOpen$', '{', '\\{ '),
     EscapeRoute('\\}', '$curlyBracketClose$', '}', '\\} '),
+    EscapeRoute('\\(', '$bracketOpen$', '(', '('),
+    EscapeRoute('\\)', '$bracketClose$', ')', ')'),
     EscapeRoute('\\[', '$squareBracketOpen$', '[', '['),
     EscapeRoute('\\]', '$squareBracketClose$', ']', ']'),
     EscapeRoute('~', '$tilde$', '~', '\\textasciitilde{}'),

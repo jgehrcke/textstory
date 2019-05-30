@@ -6,6 +6,7 @@ from unittest import TestCase
 
 
 from distutils import dir_util, file_util
+from inspect import currentframe
 import os
 
 
@@ -22,7 +23,7 @@ class TestBase(TestCase):
         cls.output_html_folder_path = os.path.join(cls.output_folder_path, "html")
         cls.output_html_index_file_path = os.path.join(cls.output_html_folder_path, "index.html")
         cls.failure_folder_path = os.path.join(test_data_folder_path, "_failed")
-        # dir_util.remove_tree(cls.failure_folder_path)
+        # dir_util.remove_tree(cls.failure_folder_path)  # TODO remove only once before all test
 
     @classmethod
     def set_paths(cls, test_folder_path):
@@ -45,19 +46,21 @@ class TestBase(TestCase):
             file_content = f.read()
         return file_content
 
-    def compare_file_contents(self, first_file_path, second_file_path):
+    def compare_file_contents(self, expected_file_path, actual_file_path):
+
         # Compare LaTeX body with expected
-        first_file = self.read_file(first_file_path)
-        second_file = self.read_file(second_file_path)
+        first_file = self.read_file(expected_file_path)
+        second_file = self.read_file(actual_file_path)
         if first_file != second_file:
             dir_util.mkpath(self.failure_folder_path)
-            split = os.path.split(first_file_path)
-            first_fail_path = os.path.join(self.failure_folder_path, "first_" + split[len(split) -1])
-            file_util.copy_file(first_file_path, first_fail_path, update=1)
-            split = os.path.split(second_file_path)
-            second_fail_path = os.path.join(self.failure_folder_path, "second_" + split[len(split) -1])
-            file_util.copy_file(second_file_path, second_fail_path, update=1)
-            self.fail("{0} does not match {1}".format(first_file_path, second_file_path))
+            split = os.path.split(expected_file_path)
+            failure_file_prefix = currentframe().f_back.f_code.co_name
+            first_fail_path = os.path.join(self.failure_folder_path, failure_file_prefix + "_expected_" + split[len(split) - 1])
+            file_util.copy_file(expected_file_path, first_fail_path, update=1)
+            split = os.path.split(actual_file_path)
+            second_fail_path = os.path.join(self.failure_folder_path, failure_file_prefix + "_actual_" + split[len(split) - 1])
+            file_util.copy_file(actual_file_path, second_fail_path, update=1)
+            self.fail("{0} does not match {1}".format(expected_file_path, actual_file_path))
 
     def tearDown(self):
         # Cleanup

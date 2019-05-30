@@ -283,7 +283,8 @@ class LatexGenerator(Generator):
                                                    url_color=setup.latex.url_color,
                                                    link_color=setup.latex.link_color,
                                                    preliminaries=setup.latex.preliminaries, 
-                                                   appendix=setup.latex.appendix)
+                                                   appendix=setup.latex.appendix,
+                                                   todonotes_config=setup.latex.todonotes_config)
  
     def create_output(self):
         # writing latex document

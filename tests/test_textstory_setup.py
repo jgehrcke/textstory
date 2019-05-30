@@ -27,6 +27,7 @@ class TestSetup(TestBase):
 
         # General defaults
         self.assertEqual("Unknown author", empty_textstory_setup.general.author)
+        self.assertEqual(False, empty_textstory_setup.general.draft)
         self.assertEqual("de", empty_textstory_setup.general.language)
         self.assertEqual("", empty_textstory_setup.general.subtitle)
         self.assertEqual("Unknown title", empty_textstory_setup.general.title)
@@ -67,10 +68,12 @@ class TestSetup(TestBase):
         self.assertEqual(False, empty_textstory_setup.latex.table_of_contents)
         # TODO table of contents contents_title
         self.assertEqual(False, empty_textstory_setup.latex.table_of_contents_pagebreak)
+        self.assertTrue(empty_textstory_setup.latex.todonotes_config.__contains__("disable"))
         self.assertEqual("blue", empty_textstory_setup.latex.url_color)
 
     def test_general(self):
         self.assertEqual("Josa Wode", self.textstory_setup.general.author)
+        self.assertEqual(True, self.textstory_setup.general.draft)
         self.assertEqual("cz", self.textstory_setup.general.language)  # Just because "de" is default
         self.assertEqual("Schatzsuche auf der Totenkopfinsel", self.textstory_setup.general.subtitle)
         self.assertEqual("Abenteuer in der blutigen See", self.textstory_setup.general.title)
@@ -105,6 +108,7 @@ class TestSetup(TestBase):
         self.assertEqual(True, self.textstory_setup.latex.table_of_contents)
         # TODO table of contents contents_title
         self.assertEqual(True, self.textstory_setup.latex.table_of_contents_pagebreak)
+        self.assertTrue(self.textstory_setup.latex.todonotes_config.__contains__('draft'))
         self.assertEqual("unicorn", self.textstory_setup.latex.url_color)
 
         # TODO page width page height --> geometry

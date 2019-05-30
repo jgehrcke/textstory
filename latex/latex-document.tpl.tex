@@ -25,6 +25,24 @@ $geometry
 \usepackage{scrlayer-scrpage}
 \usepackage{tabularx}
 
+%% comments
+
+\usepackage{ulem}
+
+%% todonotes_config: draft, disable
+\usepackage[$todonotes_config]{todonotes}
+
+% mark text in draft mode
+\makeatletter
+\if@todonotes@disabled%
+\newcommand{\wiggle}[1]{#1}
+\else% \if@todonotes@disabled
+\newcommand{\wiggle}[1]{%
+   \uwave{#1}%
+}
+\fi
+\makeatother
+
 %% some handy commands
 
 \newcommand{\storytitle}{$title}
