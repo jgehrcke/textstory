@@ -87,7 +87,20 @@ sitename = "Name der Seite, auf der der Text zu finden ist" #meta property og:si
 ```
 [general]
 subtitle = "Untertitel des Textes"
-draft = "Text als Entwurf ausgeben" #true, false #default: false
+outputMode = "Typ des auszugebenden Dokuments" #draft, final, manuscript #default: final 
+    #draft:
+        # Kommentare werden angezeigt
+        # Seitenformat: A4
+        # Schriftart: TeX Gyre Cursor (~Courier)
+        # Hinweis: Dieser Modus ist noch in Arbeit
+    #final:
+        # Keine Kommentare
+        # Dokument entsprechend der Konfiguration
+    #manuscript 
+        # Keine Kommentare
+        # Seitenformat: A4
+        # Schriftart: TeX Gyre Cursor (~Courier)
+        # Hinweis: Dieser Modus ist noch in Arbeit
 ```
 #### LaTeX Layout:
 ```
@@ -162,7 +175,7 @@ title = "Kommt und holt sie"
 #subtitle = ""
 author = "Josa Wode"
 language = "de" #de, en, ...
-draft = false
+outputMode = "final"
 
 [latex]
 bookPrint = true #true, false #Dokument wird für den Druck als Buch erstellt, es können Seiten zu Titelei und Anhang hinzugefügt werden (Verzeichnisse: latex/bookPreliminaries und latex/bookAppendix)
@@ -382,14 +395,14 @@ Beispiel: `Das ist das WortNachDemDieFußNoteKommt[Die Fußnote].`
 #### Unterstreichen
 Markup: Doppelte runde Klammern
 
-Derart markierter Text wird im Entwurfsmodus (Draft) mit geschlängelter Linie unterstrichen.
+Derart markierter Text wird im Entwurfsmodus (`outputMode = "draft"`) mit geschlängelter Linie unterstrichen.
 
 Beispiel: `((Dieser Text ist überarbeitungswürdig))`
 
 #### Randnotiz
 Markup: Doppelte eckige Klammern
 
-Derart markierter Text wird im Entwurfsmodus (Draft) als Randnotiz dargestellt und sonst ausgeblendet.
+Derart markierter Text wird im Entwurfsmodus (`outputMode = "draft"`) als Randnotiz dargestellt und sonst ausgeblendet.
 
 Beispiel: `Ihr Name war Thorsten[[Überlegen, ob Thorsten wirklich ein geeigneter Name ist.]]`
 
@@ -507,7 +520,20 @@ sitename = "Name of Site that hosts text" #meta property og:site_name
 ```
 [general]
 subtitle = "Subtitle of text"
-draft = "Output is draft" #true, false #default: false
+outputMode = "Type of generated document" #draft, final, manuscript #default: final 
+    #draft:
+        # comments are shown
+        # page format: A4
+        # font: TeX Gyre Cursor (~Courier)
+        # please note: this mode is still work in progress
+    #final:
+        # no comments
+        # output document as configured
+    #manuscript 
+        # no comments
+        # page format: A4
+        # font: TeX Gyre Cursor (~Courier)
+        # please note: this mode is still work in progress
 ```
 #### LaTeX Layout:
 ```
@@ -582,7 +608,7 @@ title = "Kommt und holt sie"
 #subtitle = ""
 author = "Josa Wode"
 language = "de" #de, en, ...
-draft = false
+outputMode = "final"
 
 [latex]
 bookPrint = true #true, false #create document for book printing, allow preliminaries and appendix (directories: latex/bookPreliminaries and latex/bookAppendix)

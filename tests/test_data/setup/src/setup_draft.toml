@@ -3,7 +3,7 @@ author = "Josa Wode"
 title = "Abenteuer in der blutigen See"
 subtitle = "Schatzsuche auf der Totenkopfinsel"
 language = "cz"
-outputMode = "final"
+outputMode = "draft"
 
 [html]
 title = "Digitale Abenteuer in der blutigen See"
@@ -26,7 +26,6 @@ contentsTitle = "Navigieren in der blutigen See"
 tableOfContentsPagebreak = true
 bookPrint = "True"
 pageFormat = "a4"
-font = "bonum"
 fontSize = "10"
 hascolorlinks = "true"
 linkcolor = "pink"

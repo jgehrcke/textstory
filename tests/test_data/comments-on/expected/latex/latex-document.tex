@@ -1,4 +1,4 @@
-\documentclass[fontsize=10pt,]{scrreprt}
+\documentclass[fontsize=12pt,]{scrreprt}
 
 \usepackage{calc}
 \usepackage[a4paper, heightrounded, hmarginratio=1:1, vmarginratio=1:1]{geometry}
@@ -6,10 +6,6 @@
 
 \usepackage{fontspec}
 
-\usepackage{cabin}
-\usepackage{gentium}
-\usepackage{fontenc}
-\setmainfont{GentiumPlus}
 \usepackage{microtype}
 \usepackage[ngerman]{babel}
 \usepackage[german=guillemets]{csquotes}
@@ -19,11 +15,19 @@
 \usepackage[export]{adjustbox} % loads also graphicx
 \usepackage{caption}
 
-\newfontfamily\licensefont{Cabin}
-\newfontfamily\boldfont{GentiumBasic}
-
 \usepackage{scrlayer-scrpage}
 \usepackage{tabularx}
+
+%% font setup
+
+%% main font
+\usepackage{tgcursor}
+\setmainfont{TeX Gyre Cursor}
+\newfontfamily\boldfont{TeX Gyre Cursor}
+
+%% license font
+\usepackage{cabin}
+\newfontfamily\licensefont{Cabin}
 
 %% comments
 

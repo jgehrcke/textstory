@@ -28,7 +28,7 @@ def get_filters(setup):
         FilterSectionsParagraphs(),  # introduces HTML-minuses, must run after FilterHyphens
         FilterHeadlines(setup.latex.chapter_pagebreak, setup.latex.hide_chapter_header),
         FilterImages(),  # has to be done before FilterFootnotes
-        FilterComments(setup.general.draft),  # has to be done before FilterFootnotes and after FilterImages
+        FilterComments(setup.general.output_mode == "draft"),  # has to be done before FilterFootnotes and after FilterImages
         FilterFootnotes(),
         FilterQuotes(),
         FilterBold(),  # has to be done before FilterItalics

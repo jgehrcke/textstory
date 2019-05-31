@@ -1,8 +1,8 @@
-\documentclass[fontsize=10pt,]{scrreprt}
-
+\documentclass[fontsize=12pt,]{scrreprt}
+%%\usepackage{stdpage}
 \usepackage{calc}
-\usepackage[a5paper, heightrounded, hmarginratio=1:1, vmarginratio=1:1]{geometry}
-\geometry{textheight=0.82\paperheight}
+\usepackage[a4paper, heightrounded, hmarginratio=1:1, vmarginratio=1:1]{geometry}
+%%\geometry{textheight=0.82\paperheight}
 
 \usepackage{fontspec}
 
@@ -21,20 +21,23 @@
 %% font setup
 
 %% main font
-\usepackage{gentium}
-\setmainfont{GentiumPlus}
-\newfontfamily\boldfont{GentiumBasic}
+\usepackage{beramono}
+\setmainfont{Bera Mono}
+\newfontfamily\boldfont{Bera Mono}
 
 %% license font
 \usepackage{cabin}
 \newfontfamily\licensefont{Cabin}
+
+%% draft
+\raggedright
 
 %% comments
 
 \usepackage{ulem}
 
 %% todonotes_config: draft, disable
-\usepackage[disable, backgroundcolor=white, linecolor=black]{todonotes}
+\usepackage[draft, backgroundcolor=white, linecolor=black]{todonotes}
 
 % mark text in draft mode
 \makeatletter

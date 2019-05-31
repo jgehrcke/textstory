@@ -39,29 +39,32 @@ def main():
 def run(setup_file_path, input_file_path, output_folder_path=None):
     log.info("++++++++++ textstory-to-beautiful-latex-html ++++++++++")
 
-    input_markup = DocumentReader(input_file_path).get_string()
-    
     # Setup
     log.info("***************** Running setup *****************")
-    setup = Setup(setup_file_path, output_folder_path)
+    setup = Setup(setup_file_path, input_file_path, output_folder_path)
     log.info("Done with setup.")
-    
+
+    run_with_setup(setup)
+
+def run_with_setup(setup):
+    input_markup = DocumentReader(setup.input_file_path).get_string()
+
     filters = get_filters(setup)
     
     outfile_latex_doc = os.path.normpath(os.path.join(dir_path, OUTFILE_LATEX_DOC))
     outfile_latex_body = os.path.normpath(os.path.join(dir_path, OUTFILE_LATEX_BODY))
     outfile_html = os.path.normpath(os.path.join(dir_path, OUTFILE_HTML))
     
-    if output_folder_path is not None:
+    if setup.output_folder_path is not None:
         # prepare output folder
-        output_folder_path = os.path.normpath(output_folder_path)
+        setup.output_folder_path = os.path.normpath(setup.output_folder_path)
         # tests/create output folder path
-        if not os.path.isdir(output_folder_path):
+        if not os.path.isdir(setup.output_folder_path):
             # create if not existent
-            if not os.path.exists(output_folder_path):
+            if not os.path.exists(setup.output_folder_path):
                 try:
-                    os.makedirs(output_folder_path)
-                    log.info("Created output directory: " + str(output_folder_path))
+                    os.makedirs(setup.output_folder_path)
+                    log.info("Created output directory: " + str(setup.output_folder_path))
                 except Exception as e:
                     log.info("Failed creating output directory: " + type(e).__name__ + str(e.args))
                     log.info("Abort.")
@@ -72,8 +75,8 @@ def run(setup_file_path, input_file_path, output_folder_path=None):
                 log.info("Abort.")
                 return
         # create directory structure
-        latex_output_path = os.path.join(output_folder_path, 'latex')
-        html_output_path = os.path.join(output_folder_path, 'html')
+        latex_output_path = os.path.join(setup.output_folder_path, 'latex')
+        html_output_path = os.path.join(setup.output_folder_path, 'html')
         try:
             if not os.path.exists(latex_output_path):
                 os.makedirs(latex_output_path)
@@ -128,9 +131,9 @@ def run(setup_file_path, input_file_path, output_folder_path=None):
             copy_file(file_name, 'html', html_output_path)
                 
         # set outfile paths
-        outfile_latex_doc = os.path.normpath(os.path.join(output_folder_path, OUTFILE_LATEX_DOC))
-        outfile_latex_body = os.path.normpath(os.path.join(output_folder_path, OUTFILE_LATEX_BODY))
-        outfile_html = os.path.normpath(os.path.join(output_folder_path, OUTFILE_HTML))
+        outfile_latex_doc = os.path.normpath(os.path.join(setup.output_folder_path, OUTFILE_LATEX_DOC))
+        outfile_latex_body = os.path.normpath(os.path.join(setup.output_folder_path, OUTFILE_LATEX_BODY))
+        outfile_html = os.path.normpath(os.path.join(setup.output_folder_path, OUTFILE_HTML))
     
     # Create LaTeX
     log.info("***************** Creating LaTeX *****************")
@@ -267,6 +270,7 @@ class LatexGenerator(Generator):
         self.latex_doc = latex_template.substitute(isbn=setup.latex.isbn, 
                                                    document_type=setup.latex.latex_document_type,
                                                    geometry=setup.latex.latex_geometry,
+                                                   font=setup.latex.font,
                                                    font_size=setup.latex.latex_font_size,
                                                    title=setup.latex.latex_title,
                                                    subtitle=setup.latex.latex_subtitle,

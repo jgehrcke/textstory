@@ -4,18 +4,20 @@
 from __future__ import unicode_literals
 import os
 import sys
-
 import toml
 
 from logger import log
 from documentreader import DocumentReader
+from fonts import FontManager
 from paths import dir_path, PRELIMINARIES_PATH, APPENDIX_PATH
 
 PY2 = sys.version_info.major == 2
 
 
 class Setup(object):
-    def __init__(self, setup_file_path, output_folder_path=None):
+    def __init__(self, setup_file_path, input_file_path, output_folder_path=None):
+        self.input_file_path = input_file_path
+        self.output_folder_path = output_folder_path
         setup_file_string = DocumentReader(setup_file_path).get_string()
         self.setup_toml = toml.loads(setup_file_string)
         self.general = GeneralSetupData(self.setup_toml)
@@ -58,7 +60,7 @@ class SetupData(object):
 
     def get_string(self, category, item, default=""):
         if not self.is_entry_in_setup_toml(category, item):
-            log.info("[" + category + "][" + item + "] not in setup TOML.")
+            log.info("[" + category + "][" + item + "] not in setup TOML. Using: " + default)
             return default
 
         value = self.setup_toml[category][item]
@@ -79,7 +81,7 @@ class GeneralSetupData(SetupData):
         self.subtitle = self.get_string(category, 'subtitle')
         self.author = self.get_string(category, 'author', default="Unknown author")
         self.language = self.get_string(category, 'language', default="de")
-        self.draft = self.get_bool(category, 'draft', default=False)
+        self.output_mode = self.get_string(category, 'outputMode', default="final")
 
 
 class HtmlSetupData(SetupData):
@@ -159,7 +161,7 @@ class LatexSetupData(SetupData):
         # geometry
         self.latex_geometry = "\\usepackage["
         page_format = self.get_string(category, 'pageFormat', default="")
-        if general.draft:
+        if general.output_mode == "draft" or general.output_mode == "manuscript":
             self.latex_geometry += "a4paper"
         elif page_format:
             self.latex_geometry += "%spaper" % page_format
@@ -175,9 +177,18 @@ class LatexSetupData(SetupData):
             self.latex_geometry += ", bindingoffset=%s" % binding_offset
         self.latex_geometry += ", heightrounded, hmarginratio=1:1, vmarginratio=1:1]{geometry}"
 
-        # font size
-        font_size = self.get_string(category, 'fontSize', default="11")
-        self.latex_font_size = "fontsize=%spt," % font_size
+        # font
+        font_manager = FontManager()
+        if general.output_mode == "draft" or general.output_mode == "manuscript":
+            log.info(general.output_mode + " mode. Using courier as main font.")
+            self.font = font_manager.get_latex_font_setup("courier")
+            self.latex_font_size = "fontsize=12pt,"
+        else:
+            font_name = self.get_string(category, 'font', default="gentium")
+            log.info("Main font: " + font_name)
+            self.font = font_manager.get_latex_font_setup(font_name)
+            font_size = self.get_string(category, 'fontSize', default="11")
+            self.latex_font_size = "fontsize=%spt," % font_size
 
         # title setup
         self.latex_title = self.get_string(category, 'title', general.title)
@@ -201,6 +212,6 @@ class LatexSetupData(SetupData):
 
         # comments
         self.todonotes_config = 'disable'
-        if general.draft:
+        if general.output_mode == "draft":
             self.todonotes_config = 'draft'
         self.todonotes_config += ', backgroundcolor=white, linecolor=black'

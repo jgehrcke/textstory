@@ -3,7 +3,7 @@ author = "Josa Wode"
 title = "Abenteuer in der blutigen See"
 subtitle = "Schatzsuche auf der Totenkopfinsel"
 language = "cz"
-outputMode = "final"
+outputMode = "manuscript"
 
 [html]
 title = "Digitale Abenteuer in der blutigen See"
