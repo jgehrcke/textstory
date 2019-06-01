@@ -67,7 +67,7 @@ class TestSetup(TestBase):
         self.assertEqual("\\begin{center}\n{\\huge \\storytitle}\n\\end{center}\n",
                          empty_textstory_setup.latex.print_title, )
         self.assertEqual(False, empty_textstory_setup.latex.table_of_contents)
-        # TODO table of contents contents_title
+        self.assertFalse(hasattr(empty_textstory_setup.latex, 'latex_contents_title'))
         self.assertEqual(False, empty_textstory_setup.latex.table_of_contents_pagebreak)
         self.assertTrue(empty_textstory_setup.latex.todonotes_config.__contains__("disable"))
         self.assertEqual("blue", empty_textstory_setup.latex.url_color)
@@ -108,7 +108,7 @@ class TestSetup(TestBase):
                          "\\end{center}\n",
                          self.textstory_setup.latex.print_title)
         self.assertEqual(True, self.textstory_setup.latex.table_of_contents)
-        # TODO table of contents contents_title
+        self.assertEqual("Navigieren in der blutigen See", self.textstory_setup.latex.latex_contents_title)
         self.assertEqual(True, self.textstory_setup.latex.table_of_contents_pagebreak)
         self.assertTrue(self.textstory_setup.latex.todonotes_config.__contains__('disable'))
         self.assertEqual("unicorn", self.textstory_setup.latex.url_color)

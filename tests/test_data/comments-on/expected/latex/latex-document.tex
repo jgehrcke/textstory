@@ -16,7 +16,7 @@
 \usepackage{caption}
 
 \usepackage{scrlayer-scrpage}
-\usepackage{tabularx}
+\usepackage{supertabular}
 
 %% font setup
 
@@ -107,11 +107,15 @@
 
 {\vspace{0.5cm}\noindent\LARGE Navigieren in der blutigen See}
 
-\vspace{0.5cm}\noindent\begin{tabular}{lr}
-Kapitel 1: Irgendwo im Nirgendwo & \pageref{0Kapitel 1: Irgendwo im Nirgendwo} \\
-Kapitel 2: Das Ziel der Reise & \pageref{1Kapitel 2: Das Ziel der Reise} \\
-Kapitel 3: Landung & \pageref{2Kapitel 3: Landung} \\
-\end{tabular}
+%% Calculate width for table of contents
+\newlength{\toctextwidth}
+\setlength{\toctextwidth}{\minof{0.8\linewidth}{\widthof{Kapitel 1: Irgendwo im Nirgendwo}}}
+
+\vspace{0.5cm}\noindent\begin{supertabular}{p{\toctextwidth}p{0.1\toctextwidth}}
+Kapitel 1: Irgendwo im Nirgendwo & \hfill\pageref{0Kapitel 1: Irgendwo im Nirgendwo} \\
+Kapitel 2: Das Ziel der Reise & \hfill\pageref{1Kapitel 2: Das Ziel der Reise} \\
+Kapitel 3: Landung & \hfill\pageref{2Kapitel 3: Landung} \\
+\end{supertabular}
 }
 
 \vspace{0.5cm}

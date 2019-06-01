@@ -46,6 +46,7 @@ def run(setup_file_path, input_file_path, output_folder_path=None):
 
     run_with_setup(setup)
 
+
 def run_with_setup(setup):
     input_markup = DocumentReader(setup.input_file_path).get_string()
 
@@ -241,10 +242,19 @@ class LatexGenerator(Generator):
             if setup.latex.latex_contents_title:
                 latex_first_page_setup += "\n{\\vspace{0.5cm}\\noindent\\LARGE %s}\n\n" \
                                           % setup.latex.latex_contents_title
-            latex_first_page_setup += "\\vspace{0.5cm}\\noindent\\begin{tabular}{lr}\n"
+            longest_chapter_title = ""
             for chapter in get_latex_chapters():
-                latex_first_page_setup += chapter['name'] + " & \\pageref{" + chapter['id'] + "} \\\\\n"
-            latex_first_page_setup += "\\end{tabular}\n"
+                if len(chapter['name']) > len(longest_chapter_title):
+                    longest_chapter_title = chapter['name']
+            latex_first_page_setup += "%%%% Calculate width for table of contents\n" \
+                                      "\\newlength{\\toctextwidth}\n" \
+                                      "\\setlength{\\toctextwidth}{\\minof{0.8\\linewidth}{\\widthof{%s}}}\n\n" \
+                                      % longest_chapter_title
+            latex_first_page_setup += "\\vspace{0.5cm}\\noindent" \
+                                      "\\begin{supertabular}{p{\\toctextwidth}p{0.1\\toctextwidth}}\n"
+            for chapter in get_latex_chapters():
+                latex_first_page_setup += chapter['name'] + " & \\hfill\\pageref{" + chapter['id'] + "} \\\\\n"
+            latex_first_page_setup += "\\end{supertabular}\n"
             latex_first_page_setup += "}\n\n"
             if setup.latex.chapter_pagebreak or setup.latex.table_of_contents_pagebreak:
                 latex_first_page_setup += "\\clearpage\n\n"

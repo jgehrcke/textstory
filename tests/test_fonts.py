@@ -39,7 +39,7 @@ class TestFonts(TestBase):
         self.assertTrue(font_name.lower().replace(" ", "") in setup.latex.font.lower().replace(" ", ""),
                         "Font " + font_name + " should be used, but is " + setup.latex.font)
 
-        # Execute LaTeX and Html creation for "pirates in the sea of blood"
+        # Execute LaTeX and Html creation
         filt0r.run_with_setup(setup)
 
         # generate pdf

@@ -377,9 +377,9 @@ class FilterComments(Filter):
     def __init__(self, show_comments):
         self.show_comments = show_comments
 
-    def _convert(self, input, pattern, replacement_pattern):
+    def _convert(self, input, pattern, replacement_pattern, log_string="commentary"):
         output, n = re.subn(pattern, replacement_pattern, input, flags=re.DOTALL)
-        log.info("Made %s commentary replacements.", n)  # TODO 2 convert functions
+        log.info("Made %s %s replacements.", n, log_string)
         return output
 
     @classmethod
@@ -387,13 +387,14 @@ class FilterComments(Filter):
         return cls.add_running_index_to_pattern(string, 'sn-tufte-comment')
 
     def to_html(self, input_text):
-        # inline comment
-        inline_pattern = r'\(\((.*?)\)\)'
+        # text highlighting
+        highlighting_pattern = r'\(\((.*?)\)\)'
         if self.show_comments:
-            inline_replacement_pattern = self.mask_double_quotes('<span class="inline-comment">\\1</span>')
+            highlighting_replacement_pattern = self.mask_double_quotes('<span class="inline-comment">\\1</span>')
         else:
-            inline_replacement_pattern = '\\1'
-        inline_commented = self._convert(input_text, inline_pattern, inline_replacement_pattern)
+            highlighting_replacement_pattern = '\\1'
+        highlighted_text = self._convert(input_text, highlighting_pattern, highlighting_replacement_pattern,
+                                         "text highlighting")
 
         # sidenote comment
         comment_pattern = r'\[\[(.*?)\]\]'
@@ -404,15 +405,16 @@ class FilterComments(Filter):
                 '<span class="sidenote-comment">\\1</span>')
         else:
             comment_replacement_pattern = ''
-        return self.add_comment_indices(self._convert(inline_commented, comment_pattern, comment_replacement_pattern))
+        return self.add_comment_indices(self._convert(highlighted_text, comment_pattern, comment_replacement_pattern))
 
     def to_latex(self, input_text):
-        # inline comment
-        inline_pattern = r'\(\((.*?)\)\)'
-        inline_replacement_pattern = r'\\wiggle{\1}'
-        inline_commented = self._convert(input_text, inline_pattern, inline_replacement_pattern)
+        # text highlighting
+        highlighting_pattern = r'\(\((.*?)\)\)'
+        highlighting_replacement_pattern = r'\\wiggle{\1}'
+        highlighted_text = self._convert(input_text, highlighting_pattern, highlighting_replacement_pattern,
+                                         "text highlighting")
 
         # sidenote comment
         comment_pattern = r'\[\[(.*?)\]\]'
         comment_replacement_pattern = r'{\\todo{\1}}'
-        return self._convert(inline_commented, comment_pattern, comment_replacement_pattern)
+        return self._convert(highlighted_text, comment_pattern, comment_replacement_pattern)
