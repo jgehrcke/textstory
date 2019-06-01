@@ -189,8 +189,8 @@ class TestFonts(TestBase):
     def test_baskerville(self):
         self.font_check('baskerville')
 
-    def test_bodoni(self):
-        self.font_check('Bodoni')
+    def test_libre_bodoni(self):
+        self.font_check('Libre Bodoni')
 
     def test_librecaslon(self):  # fail
         self.font_check('librecaslon')

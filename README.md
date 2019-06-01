@@ -109,6 +109,7 @@ pageFormat = "Seitenformat" #a0 - a6, b0 - b6 #default: a5 #Falls angegeben, wer
 pageWidth = "Seitenbreite" #z.B. "210mm", "21.5cm"
 pageHeight = "Seitenhöhe" #z.B. "210mm", "21.5cm"
 bindingOffset = "Bundzugabe"
+font = "Name der Schrift (siehe Abschnitt zu Schriften)"
 fontSize = "Schriftgröße in pt" #z.B. 12.5 #default: 11
 ```
 
@@ -191,6 +192,7 @@ pageFormat = "a5" # a0 - a6, b0 - b6 # Seitenformat festlegen
 #pageWidth = "210" # in mm # Seitenbreite, nur wenn nicht durch 'pageFormat' festgelegt
 #pageHeight = "297" # in mm # Seitenhöhe, nur wenn nicht durch 'pageFormat' festgelegt
 bindingOffset = "15mm" #Seitenanteil der in der Bindung verschwindet
+font = "gentium"
 fontSize = "11" # e.g. 11 12.5 # Schriftgröße in pt
 printAuthorOnTitle = false #true, false #Legt fest, ob die Titelseite mit dem Namen des Autors bzw. der Autorin beginnt
 #title = "" #Auskommentieren, falls identisch mit 'general.title'
@@ -226,6 +228,149 @@ Für die Verwendung in (zusätzlichen) LaTeX-Dokumenten (s.u.) und bestimmten Se
 * `\printtitle`     gibt formatiert Titel, ggf. Untertitel und bei Setup-Option `printAuthorOnTitle` zusätzlich den Autor aus
 
 Für die Verwendung in der Setup-TOML ist `\` als Escape-Charakter voranzustellen (z.B. `\\storytitle`).
+
+## LaTeX Schriften
+
+Es wird eine ganze Reihe von LaTeX-Schriften unterstützt. Das heißt nicht, dass diese Schriften eine gute Wahl für 
+deine Textstory sind.
+
+Es ist sehr zu empfehlen, für Fließtext eine Schrift mit Serifen zu wählen, da diese die Lesbarkeit verbessern.
+Standardmäßig ist als Textstory-Schrift Gentium ausgewählt -- sie sieht gut aus, ist typografisch hochwertig 
+und im Zusammenhang mit Textstorys gründlich erprobt.
+
+Bisher kann nur diese Hauptschrift konfiguriert werden.
+
+Für Draft und Manuskript ist TeX Gyre Cursor, eine Art Courier, eingestellt, um dem Standard zu entsprechen.
+
+Die Schrift für den Lizenztext ist Cabin.  
+
+### Schriften mit Serifen
+
+* [Alegreya](http://www.tug.dk/FontCatalogue/alegreya/)
+* Artemisia: siehe GFS Artemisia
+* Baskerville: siehe Libre Baskerville
+* Bonum, Bookman: siehe TeX Gyre Bonum
+* [Caladea](http://www.tug.dk/FontCatalogue/caladea/)
+* [Cochineal](http://www.tug.dk/FontCatalogue/cochineal/)
+* Computer Modern: siehe Latin Modern Roman
+* [DejaVu Serif](http://www.tug.dk/FontCatalogue/dejavuserif/)
+* [DejaVu Serif Condensed](http://www.tug.dk/FontCatalogue/dejavuserifcondensed/)
+* [Droid Serif](http://www.tug.dk/FontCatalogue/droidserif/)
+* [fbb](http://www.tug.dk/FontCatalogue/fbb/)
+* Free Serif, Freefont Serif: siehe GNU Freefont Serif
+* Gentium: siehe Gentium Plus
+* [Gentium Plus](https://software.sil.org/gentium/support/character-set-support/) (als Fettschrift wird [Gentium Basic](http://www.tug.dk/FontCatalogue/gentium/) verwendet, da Gentium Plus hier nicht vollständig ist)
+* [GFS Artemisia](http://www.tug.dk/FontCatalogue/gfsartemisia/)
+* [GFS Bodoni](http://www.tug.dk/FontCatalogue/gfsbodoni/)
+* [GNU Freefont Serif](http://www.tug.dk/FontCatalogue/gnufreefontserif/)
+* Gyre Bonum: siehe TeX Gyre Bonum
+* Gyre Pagella: siehe TeX Gyre Pagella
+* Gyre Schola: siehe TeX Gyre Schola
+* Gyre Termes: siehe TeX Gyre Termes
+* [Heuristica](http://www.tug.dk/FontCatalogue/heuristica/)
+* [IM Fell English](http://www.tug.dk/FontCatalogue/imfellenglish/)
+* [Junicode](http://www.tug.dk/FontCatalogue/junicode/)
+* Kerkis: siehe TeX Gyre Bonum
+* [Latin Modern Roman](http://www.tug.dk/FontCatalogue/latinmodernroman/)
+* [Libre Baskerville](http://www.tug.dk/FontCatalogue/librebaskerville/)
+* [Libre Bodoni](http://www.tug.dk/FontCatalogue/librebodoni/)
+* [Merriweather](http://www.tug.dk/FontCatalogue/merriweather/)
+* [Merriweather Light](http://www.tug.dk/FontCatalogue/merriweatherlight/)
+* New PX: siehe TeX Gyre Pagella
+* New TX, Nimbus Roman: siehe TeX Gyre Termes
+* [Old Standard](http://www.tug.dk/FontCatalogue/oldstandard/)
+* Pagella, Palladio: siehe TeX Gyre Pagella
+* [Playfair Display](http://www.tug.dk/FontCatalogue/playfairdisplay/)
+* PX Fonts: siehe TeX Gyre Pagella
+* [Quattrocento](http://www.tug.dk/FontCatalogue/quattrocento/)
+* [Roboto Slab](http://www.tug.dk/FontCatalogue/robotoslab/)
+* [Roboto Slab Light](http://www.tug.dk/FontCatalogue/robotoslablight/)
+* [Source Serif Pro Extra Light](http://www.tug.dk/FontCatalogue/sourceserifproextralight/)
+* [Source Serif Pro Light](http://www.tug.dk/FontCatalogue/sourceserifprolight/)
+* Source Serif Pro: siehe Source Serif Pro Regular
+* [Source Serif Pro Regular](http://www.tug.dk/FontCatalogue/sourceserifproregular/)
+* [TeX Gyre Bonum](http://www.tug.dk/FontCatalogue/tegyrebonum/)
+* [TeX Gyre Pagella](http://www.tug.dk/FontCatalogue/texgyrepagella/)
+* [TeX Gyre Schola](http://www.tug.dk/FontCatalogue/texgyreschola/)
+* Termes: siehe TeX Gyre Termes
+* [TeX Gyre Termes](http://www.tug.dk/FontCatalogue/texgyretermes/)
+* TX Fonts: siehe TeX Gyre Termes
+* Schola, Schoolbook, Schoolbook L: siehe TeX Gyre Schola
+* URW Bookman, URW Bookman L: siehe TeX Gyre Bonum
+* URW Nimbus Roman: siehe TeX Gyre Termes
+* URW Palladio: siehe TeX Gyre Pagella
+* URW Schoolbook, URW Schoolbook L: siehe TeX Gyre Schola
+* [XCharter](http://www.tug.dk/FontCatalogue/xcharter/)
+* [XITS](http://www.tug.dk/FontCatalogue/xits/)
+
+### Schreibmaschinenschriften
+
+* Courier: siehe TeX Gyre Cursor
+* [Deja Vu Sans Mono](http://www.tug.dk/FontCatalogue/dejavumono/)
+* [Fira Mono](http://www.tug.dk/FontCatalogue/firamono/)
+* [Latin Modern Mono](http://www.tug.dk/FontCatalogue/latinmodernmono/)
+* [Latin Modern Mono Light](http://www.tug.dk/FontCatalogue/latinmodernmonolight/)
+* [Source Code Pro](http://www.tug.dk/FontCatalogue/sourcecodepro/)
+* [TeX Gyre Cursor](http://www.tug.dk/FontCatalogue/texgyrecursor/)
+
+### Schriften ohne Serifen
+
+* Adventor: siehe TeX Gyre Adventor
+* [Cabin](http://www.tug.dk/FontCatalogue/cabin/)
+* [Cabin Condensed](http://www.tug.dk/FontCatalogue/cabincondensed/)
+* [Carlito](http://www.tug.dk/FontCatalogue/carlito/)
+* [Clear Sans](http://www.tug.dk/FontCatalogue/clearsans/)
+* Computer Modern Sans Serif: siehe Latin Modern Sans
+* [Cyklop](http://www.tug.dk/FontCatalogue/cyklop/)
+* [DejaVu Sans](http://www.tug.dk/FontCatalogue/dejavusans/)
+* [DejaVu Sans Condensed](http://www.tug.dk/FontCatalogue/dejavusanscondensed/)
+* [Droid Sans](http://www.tug.dk/FontCatalogue/droidsans/)
+* [Fira Sans Book](http://www.tug.dk/FontCatalogue/firasansbook/)
+* [Fira Sans Extra Light](http://www.tug.dk/FontCatalogue/firasansextralight/)
+* [Fira Sans Light](http://www.tug.dk/FontCatalogue/firasanslight/)
+* Fira Sans: siehe Fira Sans Regular
+* [Fira Sans Regular](http://www.tug.dk/FontCatalogue/firasansregular/)
+* [Fira Sans Thin](http://www.tug.dk/FontCatalogue/firasansthin/)
+* [Fira Sans Ultra Light](http://www.tug.dk/FontCatalogue/firasansultralight/)
+* Freefont Sans, Free Sans: siehe GNU Freefont Sans
+* [GFS Neohellenic](http://www.tug.dk/FontCatalogue/gfsneohellenic/)
+* [GNU Freefont Sans](http://www.tug.dk/FontCatalogue/gnufreefontsans/)
+* Gyre Adventor: siehe TeX Gyre Adventor
+* Gyre Heros: siehe TeX Gyre Heros
+* Heros: siehe TeX Gyre Heros
+* [Iwona](http://www.tug.dk/FontCatalogue/iwona/)
+* [Iwona Light](http://www.tug.dk/FontCatalogue/iwonalight/)
+* [Kurier](http://www.tug.dk/FontCatalogue/kurier/)
+* [Kurier Light](http://www.tug.dk/FontCatalogue/kurierlight/)
+* [Latin Modern Sans](http://www.tug.dk/FontCatalogue/latinmodernsans/)
+* [Lato](http://www.tug.dk/FontCatalogue/lato/)
+* [Merriweather Sans](http://www.tug.dk/FontCatalogue/merriweathersans/)
+* [Merriweather Sans Light](http://www.tug.dk/FontCatalogue/merriweathersanslight/)
+* [Mintspirit](http://www.tug.dk/FontCatalogue/mintspirit/)
+* Neohellenic: siehe GFS Neohellenic
+* [Open Sans](http://www.tug.dk/FontCatalogue/opensans/)
+* [Overlock](http://www.tug.dk/FontCatalogue/overlock/)
+* [Quattrocento Sans](http://www.tug.dk/FontCatalogue/quattrocentosans/)
+* [Raleway](http://www.tug.dk/FontCatalogue/raleway/)
+* [Roboto](http://www.tug.dk/FontCatalogue/roboto/)
+* [Roboto Condensed](http://www.tug.dk/FontCatalogue/robotocondensed/)
+* [Roboto Light](http://www.tug.dk/FontCatalogue/robotolight/)
+* [Source Sans Pro](http://www.tug.dk/FontCatalogue/sourcesanspro/)
+* [TeX Gyre Adventor](http://www.tug.dk/FontCatalogue/texgyreadventor/)
+* [TeX Gyre Heros](http://www.tug.dk/FontCatalogue/texgyreheros/)
+* URW Nimbus Sans: siehe TeX Gyre Heros
+* URW Gothic: siehe TeX Gyre Adventor
+
+### Calligraphical and Handwritten
+
+* [Lobster Two](http://www.tug.dk/FontCatalogue/lobstertwo/)
+* [Miama Nueva](http://www.tug.dk/FontCatalogue/miamanueva/)
+* [TeX Gyre Chorus](http://www.tug.dk/FontCatalogue/texgyrechorus/)
+
+### Special
+
+* [Cinzel](http://www.tug.dk/FontCatalogue/cinzel/)
+* [Punk Nova](http://www.tug.dk/FontCatalogue/punknova/)
 
 ## LaTeX Lizenz
 
@@ -542,6 +687,7 @@ pageFormat = "Page format" #a0 - a6, b0 - b6 #default: a5 #if set, pageWidth and
 pageWidth = "Page width" #e.g. "210mm", "21.5cm"
 pageHeight = "Page height" #e.g. "210mm", "21.5cm"
 bindingOffset = "Binding offset"
+font = "Name of the font (see section about fonts)"
 fontSize = "Font size in pt" #e.g. 12.5 #default: 11
 ```
 
@@ -624,6 +770,7 @@ pageFormat = "a5" # a0 - a6, b0 - b6 # define page size
 #pageWidth = "210" # in mm # only when not using pageFormat
 #pageHeight = "297" # in mm # only when not using pageFormat
 bindingOffset = "15mm" #part of the page that is lost in binding
+font = "gentium"
 fontSize = "11" # e.g. 11 12.5 # in pt
 printAuthorOnTitle = false #true, false #determines if title page begins with author name
 #title = "" #comment out if same as general.title
@@ -659,6 +806,148 @@ For usage in (aditional) LaTeX documents (see below) and some setup entries (see
 * `\printtitle`     print formated title, with subtitle (if any) and when setup option `printAuthorOnTitle` is set also the author
 
 For usage in setup TOML `\` has to be prepended to the command as escape character (e.g. `\\storytitle`).
+
+## LaTeX Schriften
+
+A whole lot of LaTeX fonts is supported. That doesn't mean they are a good choice for your textstory.
+
+For running text you should choose a font with serifs to improve readability.
+By default Gentium is selected as textstory font -- it looks good, is typographically high-end and thorougly
+tested in the field of textstories.
+
+Up to now only the main font can be configured.
+
+For draft and manuscript mode TeX Gyre Cursor, kind of Courier, is set to conform to the standard.
+
+The font for license text is Cabin.  
+
+### Serif fonts
+
+* [Alegreya](http://www.tug.dk/FontCatalogue/alegreya/)
+* Artemisia: see GFS Artemisia
+* Baskerville: see Libre Baskerville
+* Bonum, Bookman: see TeX Gyre Bonum
+* [Caladea](http://www.tug.dk/FontCatalogue/caladea/)
+* [Cochineal](http://www.tug.dk/FontCatalogue/cochineal/)
+* Computer Modern: see Latin Modern Roman
+* [DejaVu Serif](http://www.tug.dk/FontCatalogue/dejavuserif/)
+* [DejaVu Serif Condensed](http://www.tug.dk/FontCatalogue/dejavuserifcondensed/)
+* [Droid Serif](http://www.tug.dk/FontCatalogue/droidserif/)
+* [fbb](http://www.tug.dk/FontCatalogue/fbb/)
+* Free Serif, Freefont Serif: see GNU Freefont Serif
+* Gentium: see Gentium Plus
+* [Gentium Plus](https://software.sil.org/gentium/support/character-set-support/) (as bold font [Gentium Basic](http://www.tug.dk/FontCatalogue/gentium/) is used, because Gentium Plus bold is not complete)
+* [GFS Artemisia](http://www.tug.dk/FontCatalogue/gfsartemisia/)
+* [GFS Bodoni](http://www.tug.dk/FontCatalogue/gfsbodoni/)
+* [GNU Freefont Serif](http://www.tug.dk/FontCatalogue/gnufreefontserif/)
+* Gyre Bonum: see TeX Gyre Bonum
+* Gyre Pagella: see TeX Gyre Pagella
+* Gyre Schola: see TeX Gyre Schola
+* Gyre Termes: see TeX Gyre Termes
+* [Heuristica](http://www.tug.dk/FontCatalogue/heuristica/)
+* [IM Fell English](http://www.tug.dk/FontCatalogue/imfellenglish/)
+* [Junicode](http://www.tug.dk/FontCatalogue/junicode/)
+* Kerkis: see TeX Gyre Bonum
+* [Latin Modern Roman](http://www.tug.dk/FontCatalogue/latinmodernroman/)
+* [Libre Baskerville](http://www.tug.dk/FontCatalogue/librebaskerville/)
+* [Libre Bodoni](http://www.tug.dk/FontCatalogue/librebodoni/)
+* [Merriweather](http://www.tug.dk/FontCatalogue/merriweather/)
+* [Merriweather Light](http://www.tug.dk/FontCatalogue/merriweatherlight/)
+* New PX: see TeX Gyre Pagella
+* New TX, Nimbus Roman: see TeX Gyre Termes
+* [Old Standard](http://www.tug.dk/FontCatalogue/oldstandard/)
+* Pagella, Palladio: see TeX Gyre Pagella
+* [Playfair Display](http://www.tug.dk/FontCatalogue/playfairdisplay/)
+* PX Fonts: see TeX Gyre Pagella
+* [Quattrocento](http://www.tug.dk/FontCatalogue/quattrocento/)
+* [Roboto Slab](http://www.tug.dk/FontCatalogue/robotoslab/)
+* [Roboto Slab Light](http://www.tug.dk/FontCatalogue/robotoslablight/)
+* [Source Serif Pro Extra Light](http://www.tug.dk/FontCatalogue/sourceserifproextralight/)
+* [Source Serif Pro Light](http://www.tug.dk/FontCatalogue/sourceserifprolight/)
+* Source Serif Pro: see Source Serif Pro Regular
+* [Source Serif Pro Regular](http://www.tug.dk/FontCatalogue/sourceserifproregular/)
+* [TeX Gyre Bonum](http://www.tug.dk/FontCatalogue/tegyrebonum/)
+* [TeX Gyre Pagella](http://www.tug.dk/FontCatalogue/texgyrepagella/)
+* [TeX Gyre Schola](http://www.tug.dk/FontCatalogue/texgyreschola/)
+* Termes: see TeX Gyre Termes
+* [TeX Gyre Termes](http://www.tug.dk/FontCatalogue/texgyretermes/)
+* TX Fonts: see TeX Gyre Termes
+* Schola, Schoolbook, Schoolbook L: see TeX Gyre Schola
+* URW Bookman, URW Bookman L: see TeX Gyre Bonum
+* URW Nimbus Roman: see TeX Gyre Termes
+* URW Palladio: see TeX Gyre Pagella
+* URW Schoolbook, URW Schoolbook L: see TeX Gyre Schola
+* [XCharter](http://www.tug.dk/FontCatalogue/xcharter/)
+* [XITS](http://www.tug.dk/FontCatalogue/xits/)
+
+### Typewriter fonts
+
+* Courier: see TeX Gyre Cursor
+* [Deja Vu Sans Mono](http://www.tug.dk/FontCatalogue/dejavumono/)
+* [Fira Mono](http://www.tug.dk/FontCatalogue/firamono/)
+* [Latin Modern Mono](http://www.tug.dk/FontCatalogue/latinmodernmono/)
+* [Latin Modern Mono Light](http://www.tug.dk/FontCatalogue/latinmodernmonolight/)
+* [Source Code Pro](http://www.tug.dk/FontCatalogue/sourcecodepro/)
+* [TeX Gyre Cursor](http://www.tug.dk/FontCatalogue/texgyrecursor/)
+
+### Sans Serif fonts
+
+* Adventor: see TeX Gyre Adventor
+* [Cabin](http://www.tug.dk/FontCatalogue/cabin/)
+* [Cabin Condensed](http://www.tug.dk/FontCatalogue/cabincondensed/)
+* [Carlito](http://www.tug.dk/FontCatalogue/carlito/)
+* [Clear Sans](http://www.tug.dk/FontCatalogue/clearsans/)
+* Computer Modern Sans Serif: see Latin Modern Sans
+* [Cyklop](http://www.tug.dk/FontCatalogue/cyklop/)
+* [DejaVu Sans](http://www.tug.dk/FontCatalogue/dejavusans/)
+* [DejaVu Sans Condensed](http://www.tug.dk/FontCatalogue/dejavusanscondensed/)
+* [Droid Sans](http://www.tug.dk/FontCatalogue/droidsans/)
+* [Fira Sans Book](http://www.tug.dk/FontCatalogue/firasansbook/)
+* [Fira Sans Extra Light](http://www.tug.dk/FontCatalogue/firasansextralight/)
+* [Fira Sans Light](http://www.tug.dk/FontCatalogue/firasanslight/)
+* Fira Sans: see Fira Sans Regular
+* [Fira Sans Regular](http://www.tug.dk/FontCatalogue/firasansregular/)
+* [Fira Sans Thin](http://www.tug.dk/FontCatalogue/firasansthin/)
+* [Fira Sans Ultra Light](http://www.tug.dk/FontCatalogue/firasansultralight/)
+* Freefont Sans, Free Sans: see GNU Freefont Sans
+* [GFS Neohellenic](http://www.tug.dk/FontCatalogue/gfsneohellenic/)
+* [GNU Freefont Sans](http://www.tug.dk/FontCatalogue/gnufreefontsans/)
+* Gyre Adventor: see TeX Gyre Adventor
+* Gyre Heros: see TeX Gyre Heros
+* Heros: see TeX Gyre Heros
+* [Iwona](http://www.tug.dk/FontCatalogue/iwona/)
+* [Iwona Light](http://www.tug.dk/FontCatalogue/iwonalight/)
+* [Kurier](http://www.tug.dk/FontCatalogue/kurier/)
+* [Kurier Light](http://www.tug.dk/FontCatalogue/kurierlight/)
+* [Latin Modern Sans](http://www.tug.dk/FontCatalogue/latinmodernsans/)
+* [Lato](http://www.tug.dk/FontCatalogue/lato/)
+* [Merriweather Sans](http://www.tug.dk/FontCatalogue/merriweathersans/)
+* [Merriweather Sans Light](http://www.tug.dk/FontCatalogue/merriweathersanslight/)
+* [Mintspirit](http://www.tug.dk/FontCatalogue/mintspirit/)
+* Neohellenic: see GFS Neohellenic
+* [Open Sans](http://www.tug.dk/FontCatalogue/opensans/)
+* [Overlock](http://www.tug.dk/FontCatalogue/overlock/)
+* [Quattrocento Sans](http://www.tug.dk/FontCatalogue/quattrocentosans/)
+* [Raleway](http://www.tug.dk/FontCatalogue/raleway/)
+* [Roboto](http://www.tug.dk/FontCatalogue/roboto/)
+* [Roboto Condensed](http://www.tug.dk/FontCatalogue/robotocondensed/)
+* [Roboto Light](http://www.tug.dk/FontCatalogue/robotolight/)
+* [Source Sans Pro](http://www.tug.dk/FontCatalogue/sourcesanspro/)
+* [TeX Gyre Adventor](http://www.tug.dk/FontCatalogue/texgyreadventor/)
+* [TeX Gyre Heros](http://www.tug.dk/FontCatalogue/texgyreheros/)
+* URW Nimbus Sans: see TeX Gyre Heros
+* URW Gothic: see TeX Gyre Adventor
+
+### Calligraphical and Handwritten
+
+* [Lobster Two](http://www.tug.dk/FontCatalogue/lobstertwo/)
+* [Miama Nueva](http://www.tug.dk/FontCatalogue/miamanueva/)
+* [TeX Gyre Chorus](http://www.tug.dk/FontCatalogue/texgyrechorus/)
+
+### Special
+
+* [Cinzel](http://www.tug.dk/FontCatalogue/cinzel/)
+* [Punk Nova](http://www.tug.dk/FontCatalogue/punknova/)
 
 ## LaTeX License
 

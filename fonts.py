@@ -54,7 +54,7 @@ class FontManager(object):
         # GentiumPlus currently does not support all characters in bold -> use GentiumBasic
         self.add_font(['gentium', 'gentiumplus'], 'gentium', 'GentiumPlus', 'GentiumBasic')
         self.add_font(['Artemisia'], 'gfsartemisia', 'GFS Artemisia')
-        self.add_font(['Bodoni'], '[default]{gfsbodoni}', 'GFS Bodoni')
+        self.add_font([], '[default]{gfsbodoni}', 'GFS Bodoni')
         self.add_font(['GNU Freefont Serif', 'Freefont Serif'], None, 'FreeSerif')
         self.add_font([], 'heuristica', 'Heuristica')
         # self.add_font(['Plex Serif Extra Light'], 'plex-otf', 'IBM Plex Serif Extra Light')  # TODO fails
@@ -70,7 +70,7 @@ class FontManager(object):
         self.add_font(['Computer Modern'], 'lmodern', 'Latin Modern Roman')
         # self.add_font(['Libertinus'], 'libertinus', 'Libertinus Serif')  # TODO fails
         self.add_font(['baskerville'], 'librebaskerville', 'Libre Baskerville')
-        self.add_font(['Bodoni'], 'LibreBodoni', 'Libre Bodoni')
+        self.add_font([], 'LibreBodoni', 'Libre Bodoni')
         # self.add_font(['Caslon'], 'librecaslon', 'Libre Caslon')  # TODO fails
         # self.add_font(['Libertine'], 'libertine', 'Linux Libertine')  # TODO fails
         self.add_font([], 'merriweather', 'Merriweather')
