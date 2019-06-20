@@ -4,7 +4,7 @@
 from __future__ import unicode_literals
 import re
 
-from escaperoutes import escape_routes
+from escaperoutes import escape_all, escape_to_html, escape_to_latex, get_escape
 from logger import log
 
 latex_chapters = None
@@ -22,19 +22,19 @@ def get_filters(setup):
     latex_chapters = ChapterCollector()
 
     filters = [
-        FilterConvertLineEndings(),  # needs to be done first
-        FilterMaskEscapedCharacters(),  # needs to be done second
+        FilterConvertLineEndings(),  # do first
+        FilterMaskEscapedCharacters(),  # do second
         FilterHyphens(),
-        FilterSectionsParagraphs(),  # introduces HTML-minuses, must run after FilterHyphens
+        FilterSectionsParagraphs(),  # introduces HTML-minuses, do after FilterHyphens
         FilterHeadlines(setup.latex.chapter_pagebreak, setup.latex.hide_chapter_header),
-        FilterImages(),  # has to be done before FilterFootnotes
-        FilterComments(setup.general.output_mode == "draft"),  # has to be done before FilterFootnotes and after FilterImages
+        FilterImages(),  # do before FilterFootnotes
+        FilterComments(setup.general.output_mode == "draft"),  # do before FilterFootnotes and after FilterImages
         FilterFootnotes(),
         FilterQuotes(),
-        FilterBold(),  # has to be done before FilterItalics
+        FilterBold(),  # do before FilterItalics
         FilterItalics(),
         FilterDots(),
-        FilterRestoreEscapedCharacters(),  # needs to be done last
+        FilterRestoreEscapedCharacters(),  # do last
     ]
     return filters
 
@@ -68,7 +68,7 @@ class Filter(object):
     def add_running_index_to_pattern(cls, string, pattern, start_index=1):
         index = start_index
         while True:
-            string, n = re.subn(pattern + '(?!\d)', (pattern + str(index)), string, 2)
+            string, n = re.subn(pattern + r'(?!\d)', (pattern + str(index)), string, 2)
             index += 1
             if n < 2:
                 break
@@ -91,7 +91,7 @@ class FilterHeadlines(Filter):
             result = "<h2>%s</h2>" % (text,)
             return result
 
-        pattern = '^<p.*>##\s*(.*?)</p>$'
+        pattern = r'^<p.*>##\s*(.*?)</p>$'
         new, n = re.subn(pattern, replace_func, s, flags=re.MULTILINE)
         log.info("Made %s headline replacements.", n)
         return new
@@ -109,7 +109,7 @@ class FilterHeadlines(Filter):
                 result += "\n\\thispagestyle{empty}"
             return result
 
-        pattern = '^##\s*(.*?)$'
+        pattern = r'^##\s*(.*?)$'
         new, n = re.subn(pattern, replace_func, s, flags=re.MULTILINE)
         log.info("Made %s headline replacements.", n)
         return new
@@ -117,10 +117,10 @@ class FilterHeadlines(Filter):
 
 class FilterDots(Filter):
     def to_html(self, s):
-        return s.replace("...", "&hellip; ")
+        return s.replace("...", "&hellip;")
 
     def to_latex(self, s):
-        return s.replace("...", r"\dots ")
+        return s.replace("...", r"{\dots}")
 
 
 class FilterQuotes(Filter):
@@ -175,7 +175,7 @@ class FilterBold(Filter):
 
         pattern = '__(.*?)__'
         new, n = re.subn(pattern, replace_func, s, flags=re.DOTALL)
-        pattern = '\*\*(.*?)\*\*'
+        pattern = r'\*\*(.*?)\*\*'
         new, m = re.subn(pattern, replace_func, new, flags=re.DOTALL)
         log.info("Made %s bold replacements.", n + m)
         return new
@@ -188,7 +188,7 @@ class FilterBold(Filter):
 
         pattern = '__(.*?)__'
         new, n = re.subn(pattern, replace_func, s, flags=re.DOTALL)
-        pattern = '\*\*(.*?)\*\*'
+        pattern = r'\*\*(.*?)\*\*'
         new, m = re.subn(pattern, replace_func, new, flags=re.DOTALL)
         log.info("Made %s bold replacements.", n + m)
         return new
@@ -204,7 +204,7 @@ class FilterItalics(Filter):
 
         pattern = '_(.*?)_'
         new, n = re.subn(pattern, replace_func, s, flags=re.DOTALL)
-        pattern = '\*(.*?)\*'
+        pattern = r'\*(.*?)\*'
         new, m = re.subn(pattern, replace_func, new, flags=re.DOTALL)
         log.info("Made %s italic replacements.", n + m)
         return new
@@ -218,9 +218,9 @@ class FilterItalics(Filter):
                 result = "\\textit{%s}" % text
             return result
 
-        pattern = '_(.*?)_'
+        pattern = r'_(.*?)_'
         new, n = re.subn(pattern, replace_func, s, flags=re.DOTALL)
-        pattern = '\*(.*?)\*'
+        pattern = r'\*(.*?)\*'
         new, m = re.subn(pattern, replace_func, new, flags=re.DOTALL)
         log.info("Made %s italic replacements.", n + m)
         return new
@@ -228,7 +228,7 @@ class FilterItalics(Filter):
 
 class FilterImages(Filter):
     # ![Alt text](/path/to/img.jpg "optional title")
-    pattern = '!\[(.*)\]\(([^")]*)(\s"(.*)")?\)'
+    pattern = r'!\[(.*)\]\(([^")]*)(\s"(.*)")?\)'
 
     def to_html(self, s):
         def replace_func(match_obj):
@@ -254,15 +254,15 @@ class FilterImages(Filter):
             # alt_text = match_obj.group(1)
             path = match_obj.group(2)
             title = match_obj.group(4)
-            result = '\\begin{figure}$squareBracketOpen$!ht$squareBracketClose$\n'
+            result = '\\begin{figure}' + get_escape('[') + '!ht' + get_escape(']') + '\n'
             result += '\\centering\n'
             max_height = '1.0\\textheight'
             caption = ''
             if title is not None:
                 max_height = '0.9\\textheight'
                 caption = '\\caption$asterisk${%s}\n' % (title,)
-            result += '\\includegraphics$squareBracketOpen$max height=' + max_height \
-                      + ',max width=1.0\\textwidth$squareBracketClose${%s}\n' % (path,)
+            result += '\\includegraphics' + get_escape('[') + 'max height=' + max_height \
+                      + ',max width=1.0\\textwidth' + get_escape(']') + '{%s}\n' % (path,)
             result += caption
             result += '\\end{figure}'
             return result
@@ -314,10 +314,7 @@ class FilterSectionsParagraphs(Filter):
 
 class FilterMaskEscapedCharacters(Filter):
     def _convert(self, s):
-        new = s
-        for i in escape_routes:
-            new = new.replace(i.original, i.temporary)
-        return new
+        return escape_all(s)
 
     def to_html(self, s):
         return self._convert(s)
@@ -328,16 +325,10 @@ class FilterMaskEscapedCharacters(Filter):
 
 class FilterRestoreEscapedCharacters(Filter):
     def to_html(self, s):
-        new = s
-        for i in escape_routes:
-            new = new.replace(i.temporary, i.html)
-        return new
+        return escape_to_html(s)
 
     def to_latex(self, s):
-        new = s
-        for i in escape_routes:
-            new = new.replace(i.temporary, i.latex)
-        return new
+        return escape_to_latex(s)
 
 
 class FilterHyphens(Filter):
@@ -353,7 +344,7 @@ class FilterHyphens(Filter):
 
 class FilterFootnotes(Filter):
     def _convert(self, s, replacement):
-        pattern = "\[(.*?)\]"
+        pattern = r"\[(.*?)\]"
         new, n = re.subn(pattern, replacement, s, flags=re.DOTALL)
         log.info("Made %s footnote replacements.", n)
         return new
@@ -375,10 +366,11 @@ class FilterFootnotes(Filter):
 
 class FilterComments(Filter):
     def __init__(self, show_comments):
+        super(FilterComments, self).__init__()
         self.show_comments = show_comments
 
-    def _convert(self, input, pattern, replacement_pattern, log_string="commentary"):
-        output, n = re.subn(pattern, replacement_pattern, input, flags=re.DOTALL)
+    def _convert(self, input_text, pattern, replacement_pattern, log_string="commentary"):
+        output, n = re.subn(pattern, replacement_pattern, input_text, flags=re.DOTALL)
         log.info("Made %s %s replacements.", n, log_string)
         return output
 
@@ -390,11 +382,18 @@ class FilterComments(Filter):
         # text highlighting
         highlighting_pattern = r'\(\((.*?)\)\)'
         if self.show_comments:
-            highlighting_replacement_pattern = self.mask_double_quotes('<span class="inline-comment">\\1</span>')
+            highlighting_replacement_pattern = self.mask_double_quotes('<span class="highlighted">\\1</span>')
         else:
             highlighting_replacement_pattern = '\\1'
-        highlighted_text = self._convert(input_text, highlighting_pattern, highlighting_replacement_pattern,
+        output_text = self._convert(input_text, highlighting_pattern, highlighting_replacement_pattern,
                                          "text highlighting")
+        # inline comment
+        inline_pattern = r'\{\{(.*?)\}\}'
+        if self.show_comments:
+            inline_replacement_pattern = self.mask_double_quotes('<span class="inline-comment">\\1</span>')
+        else:  # TODO may create empty <p>-tags and so mess with text indent
+            inline_replacement_pattern = ''
+        output_text = self._convert(output_text, inline_pattern, inline_replacement_pattern, "inline commentary")
 
         # sidenote comment
         comment_pattern = r'\[\[(.*?)\]\]'
@@ -405,16 +404,20 @@ class FilterComments(Filter):
                 '<span class="sidenote-comment">\\1</span>')
         else:
             comment_replacement_pattern = ''
-        return self.add_comment_indices(self._convert(highlighted_text, comment_pattern, comment_replacement_pattern))
+        return self.add_comment_indices(self._convert(output_text, comment_pattern, comment_replacement_pattern))
 
     def to_latex(self, input_text):
         # text highlighting
-        highlighting_pattern = r'\(\((.*?)\)\)'
-        highlighting_replacement_pattern = r'\\wiggle{\1}'
-        highlighted_text = self._convert(input_text, highlighting_pattern, highlighting_replacement_pattern,
-                                         "text highlighting")
+        input_pattern = r'\(\((.*?)\)\)'
+        replacement_pattern = r'\\wiggle{\1}'
+        processed_text = self._convert(input_text, input_pattern, replacement_pattern, "text highlighting")
+
+        # inline comment  # TODO when not in draft mode there are cases where inline comments create empty lines
+        input_pattern = r'\{\{(.*?)\}\}'
+        replacement_pattern = r'{\\todo$squareBracketOpen$inline$squareBracketClose${\1}}'
+        processed_text = self._convert(processed_text, input_pattern, replacement_pattern, "inline commentary")
 
         # sidenote comment
-        comment_pattern = r'\[\[(.*?)\]\]'
-        comment_replacement_pattern = r'{\\todo{\1}}'
-        return self._convert(highlighted_text, comment_pattern, comment_replacement_pattern)
+        input_pattern = r'\[\[(.*?)\]\]'
+        replacement_pattern = r'{\\todo{\1}}'
+        return self._convert(processed_text, input_pattern, replacement_pattern)

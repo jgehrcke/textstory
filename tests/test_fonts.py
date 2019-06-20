@@ -15,7 +15,7 @@ from logger import log
 from textstory_setup import Setup
 
 
-@unittest.skip("disabled slow tests, also some will fail (fonts are disabled)")
+@unittest.skip("disabled slow tests, also some will fail (correlating fonts are disabled)")
 class TestFonts(TestBase):
 
     def check_pdf_generation_output(self, stdout):

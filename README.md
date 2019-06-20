@@ -544,6 +544,13 @@ Derart markierter Text wird im Entwurfsmodus (`outputMode = "draft"`) mit geschl
 
 Beispiel: `((Dieser Text ist überarbeitungswürdig))`
 
+#### Kommentarzeile
+Markup: Doppelte geschweifte Klammern
+
+Derart markierter Text wird im Entwurfsmodus (`outputMode = "draft"`) als Kommentarzeile eingefügt.
+
+Beispiel: `{{Hier könnte ihre Werbung stehen.}}`
+
 #### Randnotiz
 Markup: Doppelte eckige Klammern
 
@@ -553,7 +560,7 @@ Beispiel: `Ihr Name war Thorsten[[Überlegen, ob Thorsten wirklich ein geeignete
 
 #### In Kombination
 
-Es kann nützlich sein, die beiden Kommentarfunktionen zu kombinieren.
+Es kann nützlich sein, die verschiedene Kommentare zu kombinieren.
 
 Beispiel: `((Dieser Text ist sehr sehr ultra mega schlecht))[[Leicht übertrieben? Überflüssige Adverben streichen.]].`  
 
@@ -1120,6 +1127,14 @@ Markup: Double round brackets.
 Text marked like this will be underlined with a wiggly line in draft.
 
 Example: `((This text may need rework))`
+
+
+#### Inline comment
+Markup: Double curly brackets.
+
+Text marked like this will be shown as inline comment in draft and is hidden otherwise.
+
+Example: `{{Has anyone left an umbrella here?}}`
 
 #### Sidenote
 Markup: Double square bracktes.

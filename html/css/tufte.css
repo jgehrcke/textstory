@@ -1,3 +1,9 @@
+:root {
+  /* color defines */
+  --sidenote-color: #0F52BA;
+  --comment-color: #f00000;
+}
+
 @font-face { font-family: ETBembo;
              src: url("ETBembo-RomanLF.ttf"); }
 @font-face { font-family: ETBembo;
@@ -151,8 +157,16 @@ a { color: #111;
 
 img { max-width: 100%; }
 
+.highlighted {
+    color: var(--comment-color);
+    font-style: italic;
+}
+
 .inline-comment {
-    color: #0F52BA;
+    display: inline-block;
+    text-indent: 0;
+    border: 1px solid var(--comment-color);
+    padding: 5px;
     font-style: italic;
 }
 
@@ -186,14 +200,14 @@ img { max-width: 100%; }
     content: counter(sidenote-counter) " ";
     position: relative;
     vertical-align: baseline;
-    color: #f00000; 
+    color: var(--sidenote-color); 
 }
                                            
 .sidenote-comment-number:after, .sidenote-comment:before { 
     content: counter(sidenote-comment-counter) " ";
     position: relative;
     vertical-align: baseline;
-    color: #0F52BA; 
+    color: var(--comment-color); 
 }
 
 .sidenote-number:after {
