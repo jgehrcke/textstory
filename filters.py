@@ -4,7 +4,7 @@
 from __future__ import unicode_literals
 import re
 
-from escaperoutes import escape_all, escape_to_html, escape_to_latex, get_escape
+from escaperoutes import escape_all, escape_to_html, escape_to_latex, escape_to_restructured_text, get_escape
 from logger import log
 
 latex_chapters = None
@@ -114,6 +114,20 @@ class FilterHeadlines(Filter):
         log.info("Made %s headline replacements.", n)
         return new
 
+    def to_restructured_text(self, s):
+        def replace_func(match_obj):
+            text = match_obj.group(1)
+            text += "\n"
+            for x in range(0, len(text)):
+                text += "^"  # TODO best character for this?
+            result = "%s" % (text, )
+            return result
+
+        pattern = r'^##\s*(.*?)$'
+        new, n = re.subn(pattern, replace_func, s, flags=re.MULTILINE)
+        log.info("Made %s headline replacements.", n)
+        return new
+
 
 class FilterDots(Filter):
     def to_html(self, s):
@@ -121,6 +135,10 @@ class FilterDots(Filter):
 
     def to_latex(self, s):
         return s.replace("...", r"{\dots}")
+
+    def to_restructured_text(self, s):
+        # Do nothing, there does not seem to be a sensible replacement
+        return s
 
 
 class FilterQuotes(Filter):
@@ -164,6 +182,17 @@ class FilterQuotes(Filter):
         log.info("Made %s quotation replacements.", n)
         return new
 
+    def to_restructured_text(self, s):
+        def replace_func(match_obj):
+            quote = match_obj.group(1)
+            result = "»%s«" % (quote,)
+            return result
+
+        pattern = '"(.*?)"'
+        new, n = re.subn(pattern, replace_func, s, flags=re.DOTALL)
+        log.info("Made %s quotation replacements.", n)
+        return new
+
 
 # Text surrounded by double underscores or double asterisks will be shown bold
 class FilterBold(Filter):
@@ -184,6 +213,23 @@ class FilterBold(Filter):
         def replace_func(match_obj):
             text = match_obj.group(1)
             result = "{\\boldfont\\textbf{%s}}" % text
+            return result
+
+        pattern = '__(.*?)__'
+        new, n = re.subn(pattern, replace_func, s, flags=re.DOTALL)
+        pattern = r'\*\*(.*?)\*\*'
+        new, m = re.subn(pattern, replace_func, new, flags=re.DOTALL)
+        log.info("Made %s bold replacements.", n + m)
+        return new
+
+    def to_restructured_text(self, s):
+        def replace_func(match_obj):
+            text = match_obj.group(1)
+
+            # Make bold text work across sections
+            text = re.sub("\n(\n+)", r"**\n\1**", text)
+
+            result = "**%s**" % (text,)
             return result
 
         pattern = '__(.*?)__'
@@ -216,6 +262,23 @@ class FilterItalics(Filter):
                 result = "\\begin{itshape}%s\\end{itshape}" % text
             else:  # \textit can be combined with \textbf etc. but does not work over multiple lines
                 result = "\\textit{%s}" % text
+            return result
+
+        pattern = r'_(.*?)_'
+        new, n = re.subn(pattern, replace_func, s, flags=re.DOTALL)
+        pattern = r'\*(.*?)\*'
+        new, m = re.subn(pattern, replace_func, new, flags=re.DOTALL)
+        log.info("Made %s italic replacements.", n + m)
+        return new
+
+    def to_restructured_text(self, s):
+        def replace_func(match_obj):
+            text = match_obj.group(1)
+
+            # Make italics work across sections
+            text = re.sub("\n(\n+)", r"*\n\1*", text)
+
+            result = "*%s*" % (text,)
             return result
 
         pattern = r'_(.*?)_'
@@ -271,6 +334,20 @@ class FilterImages(Filter):
         log.info("Made %s image replacements.", n)
         return new
 
+    def to_restructured_text(self, s):
+        def replace_func(match_obj):
+            alt_text = match_obj.group(1)
+            path = match_obj.group(2)
+            title = match_obj.group(4)
+            result = '\n.. figure:: %s\n  :alt: %s\n  :align: center\n\n' % (path, alt_text,)
+            if title is not None:
+                result += '  %s\n\n' % (title,)
+            return result
+
+        new, n = re.subn('^<p.*>' + self.pattern + '</p>$', replace_func, s, flags=re.MULTILINE)
+        log.info("Made %s image replacements.", n)
+        return new
+
 
 class FilterConvertLineEndings(Filter):
     @staticmethod
@@ -283,6 +360,9 @@ class FilterConvertLineEndings(Filter):
         return self._convert(s)
 
     def to_latex(self, s):
+        return self._convert(s)
+
+    def to_restructured_text(self, s):
         return self._convert(s)
 
 
@@ -311,6 +391,10 @@ class FilterSectionsParagraphs(Filter):
         paragraph_sep = "\n\n"
         return self._convert(s, section_sep, paragraph_sep)
 
+    def to_restructured_text(self, s):
+        # Nothing to do
+        return s
+
 
 class FilterMaskEscapedCharacters(Filter):
     def _convert(self, s):
@@ -322,6 +406,9 @@ class FilterMaskEscapedCharacters(Filter):
     def to_latex(self, s):
         return self._convert(s)
 
+    def to_restructured_text(self, s):
+        return self._convert(s)
+
 
 class FilterRestoreEscapedCharacters(Filter):
     def to_html(self, s):
@@ -329,6 +416,9 @@ class FilterRestoreEscapedCharacters(Filter):
 
     def to_latex(self, s):
         return escape_to_latex(s)
+
+    def to_restructured_text(self, s):
+        return escape_to_restructured_text(s)
 
 
 class FilterHyphens(Filter):
@@ -341,11 +431,17 @@ class FilterHyphens(Filter):
         # actually nothing to do:
         return s
 
+    def to_restructured_text(self, s):
+        new = s.replace("---", u"\u2014")
+        new = new.replace("--", u"\u2013")
+        return new
+
 
 class FilterFootnotes(Filter):
+    pattern = r"\[(.*?)\]"
+
     def _convert(self, s, replacement):
-        pattern = r"\[(.*?)\]"
-        new, n = re.subn(pattern, replacement, s, flags=re.DOTALL)
+        new, n = re.subn(self.pattern, replacement, s, flags=re.DOTALL)
         log.info("Made %s footnote replacements.", n)
         return new
 
@@ -362,6 +458,12 @@ class FilterFootnotes(Filter):
 
     def to_latex(self, s):
         return self._convert(s, r"\\footnote{\1}")
+
+    def to_restructured_text(self, s):
+        footnotes = ''
+        for match in re.finditer(self.pattern, s, flags=re.DOTALL):
+            footnotes += '.. [#] %s\n' % (match.group(1),)
+        return self._convert(s, r"[#]" + get_escape('_')) + '\n\n' + footnotes
 
 
 class FilterComments(Filter):
@@ -386,7 +488,7 @@ class FilterComments(Filter):
         else:
             highlighting_replacement_pattern = '\\1'
         output_text = self._convert(input_text, highlighting_pattern, highlighting_replacement_pattern,
-                                         "text highlighting")
+                                    "text highlighting")
         # inline comment
         inline_pattern = r'\{\{(.*?)\}\}'
         if self.show_comments:
@@ -395,7 +497,7 @@ class FilterComments(Filter):
             inline_replacement_pattern = ''
         output_text = self._convert(output_text, inline_pattern, inline_replacement_pattern, "inline commentary")
 
-        # sidenote comment
+        # side note comment
         comment_pattern = r'\[\[(.*?)\]\]'
         if self.show_comments:
             comment_replacement_pattern = self.mask_double_quotes(
@@ -417,7 +519,35 @@ class FilterComments(Filter):
         replacement_pattern = r'{\\todo$squareBracketOpen$inline$squareBracketClose${\1}}'
         processed_text = self._convert(processed_text, input_pattern, replacement_pattern, "inline commentary")
 
-        # sidenote comment
+        # side note comment
         input_pattern = r'\[\[(.*?)\]\]'
         replacement_pattern = r'{\\todo{\1}}'
         return self._convert(processed_text, input_pattern, replacement_pattern)
+
+    def to_restructured_text(self, input_text):
+        # Do not show any comments (for now)
+
+        # text highlighting
+        highlighting_pattern = r'\(\((.*?)\)\)'
+        # if self.show_comments:
+        #     highlighting_replacement_pattern = ''  # TODO
+        # else:
+        #     highlighting_replacement_pattern = '\\1'
+        highlighting_replacement_pattern = '\\1'
+        output_text = self._convert(input_text, highlighting_pattern, highlighting_replacement_pattern,
+                                    "text highlighting")
+        # inline comment
+        inline_pattern = r'\{\{(.*?)\}\}'
+        if self.show_comments:
+            inline_replacement_pattern = ''  # TODO
+        else:
+            inline_replacement_pattern = ''
+        output_text = self._convert(output_text, inline_pattern, inline_replacement_pattern, "inline commentary")
+
+        # side note comment
+        comment_pattern = r'\[\[(.*?)\]\]'
+        if self.show_comments:
+            comment_replacement_pattern = ''  # TODO
+        else:
+            comment_replacement_pattern = ''
+        return self.add_comment_indices(self._convert(output_text, comment_pattern, comment_replacement_pattern))

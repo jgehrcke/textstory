@@ -22,3 +22,6 @@ HTML_LICENSE = os.path.normpath(os.path.join(dir_path, "html/license.tpl.html"))
 OUTFILE_HTML = os.path.normpath("html/index.html")
 PRELIMINARIES_PATH = "bookPreliminaries/"
 APPENDIX_PATH = "bookAppendix/"
+
+# reStructuredText
+OUTFILE_RESTRUCTURED_TEXT = os.path.normpath("reStructuredText/restructured.txt")

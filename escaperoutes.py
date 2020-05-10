@@ -34,6 +34,14 @@ def escape_to_latex(string):
     return escaped_string
 
 
+#  returns the string with temporary escapes replaced by reStructuredText escapes
+def escape_to_restructured_text(string):
+    escaped_string = string
+    for name, escape_route in escape_routes.items():
+        escaped_string = escaped_string.replace(escape_route.temporary, escape_route.restructured_text)
+    return escaped_string
+
+
 # returns the temporary escape with the given name
 def get_escape(name):
     return escape_routes[name].temporary
@@ -41,11 +49,12 @@ def get_escape(name):
 
 # structure for defining how to escape and restore special characters
 class EscapeRoute(object):
-    def __init__(self, original, temporary, html, latex):
+    def __init__(self, original, temporary, html, latex, restructured_text):
         self.original = original
         self.temporary = temporary
         self.html = html
         self.latex = latex
+        self.restructured_text = restructured_text
 
 
 r"""
@@ -82,25 +91,26 @@ _   underscore
 
 """
 escape_routes = {
-    "\\": EscapeRoute('\\\\', '$escapeChar$', '\\', '\\textbackslash{}'),
-    "&": EscapeRoute('&', '$amp$', '&amp;', '\\&'),
-    "<": EscapeRoute('<', '$lt$', '&lt;', '<'),
-    ">": EscapeRoute('>', '$gt$', '&gt;', '>'),
-    "%": EscapeRoute('%', '$percent$', '%', '\\% '),
-    "$": EscapeRoute('\\$', '$dollar$', '$', '\\$ '),
-    "#": EscapeRoute('\\#', '$hash$', '#', '\\# '),
-    "_": EscapeRoute('\\_', '$underscore$', '_', '\\_ '),
-    "{": EscapeRoute('\\{', '$curlyBracketOpen$', '{', '\\{ '),
-    "}": EscapeRoute('\\}', '$curlyBracketClose$', '}', '\\} '),
-    "(": EscapeRoute('\\(', '$bracketOpen$', '(', '('),
-    ")": EscapeRoute('\\)', '$bracketClose$', ')', ')'),
-    "[": EscapeRoute('\\[', '$squareBracketOpen$', '[', '['),
-    "]": EscapeRoute('\\]', '$squareBracketClose$', ']', ']'),
-    "~": EscapeRoute('~', '$tilde$', '~', '\\textasciitilde{}'),
-    "^": EscapeRoute('^', '$circumflex$', '^', '\\textasciicircum{}'),
-    "*": EscapeRoute('\\*', '$asterisk$', '*', '*'),
-    "--": EscapeRoute('\\--', '$hyphen$', '--', '\\verb|--|'),
-    '"': EscapeRoute('\\"', '$doubleQuote$', '&quot;', '"{}'),
-    "!": EscapeRoute('\\!', '$exclamation$', '!', '!'),
+    "\\": EscapeRoute('\\\\', '$escapeChar$', '\\', '\\textbackslash{}', '\\\\'),
+    "&": EscapeRoute('&', '$amp$', '&amp;', '\\&', '&'),
+    "<": EscapeRoute('<', '$lt$', '&lt;', '<', '\\<'),
+    ">": EscapeRoute('>', '$gt$', '&gt;', '>', '\\>'),
+    "%": EscapeRoute('%', '$percent$', '%', '\\% ', '%'),
+    "$": EscapeRoute('\\$', '$dollar$', '$', '\\$ ', '$'),
+    "#": EscapeRoute('\\#', '$hash$', '#', '\\# ', '#'),
+    "_": EscapeRoute('\\_', '$underscore$', '_', '\\_ ', '_'),
+    "{": EscapeRoute('\\{', '$curlyBracketOpen$', '{', '\\{ ', '\\{'),
+    "}": EscapeRoute('\\}', '$curlyBracketClose$', '}', '\\} ', '\\}'),
+    "(": EscapeRoute('\\(', '$bracketOpen$', '(', '(', '\\('),
+    ")": EscapeRoute('\\)', '$bracketClose$', ')', ')', '\\)'),
+    "[": EscapeRoute('\\[', '$squareBracketOpen$', '[', '[', '\\['),
+    "]": EscapeRoute('\\]', '$squareBracketClose$', ']', ']', '\\]'),
+    "~": EscapeRoute('~', '$tilde$', '~', '\\textasciitilde{}', '~'),
+    "^": EscapeRoute('^', '$circumflex$', '^', '\\textasciicircum{}', '^'),
+    "*": EscapeRoute('\\*', '$asterisk$', '*', '*', '\\*'),
+    "--": EscapeRoute('\\--', '$hyphen$', '--', '\\verb|--|', '--'),
+    '"': EscapeRoute('\\"', '$doubleQuote$', '&quot;', '"{}', '\\"'),
+    "'": EscapeRoute("\\'", '$singleQuote$', "'", "'", "\\'"),
+    "!": EscapeRoute('\\!', '$exclamation$', '!', '!', '!'),
     # "": EscapeRoute('\\', '', '', ''),
 }

@@ -12,7 +12,7 @@ from documentreader import DocumentReader
 from filters import get_filters, get_latex_chapters
 from logger import log
 from paths import dir_path, SETUP_FILE, LATEX_TEMPLATE, HTML_TEMPLATE, HTML_LICENSE, OUTFILE_LATEX_BODY, \
-    OUTFILE_LATEX_DOC, OUTFILE_HTML, PRELIMINARIES_PATH, APPENDIX_PATH
+    OUTFILE_LATEX_DOC, OUTFILE_HTML, OUTFILE_RESTRUCTURED_TEXT, PRELIMINARIES_PATH, APPENDIX_PATH
 from textstory_setup import Setup
 
 
@@ -51,90 +51,72 @@ def run_with_setup(setup):
     input_markup = DocumentReader(setup.input_file_path).get_string()
 
     filters = get_filters(setup)
-    
-    outfile_latex_doc = os.path.normpath(os.path.join(dir_path, OUTFILE_LATEX_DOC))
-    outfile_latex_body = os.path.normpath(os.path.join(dir_path, OUTFILE_LATEX_BODY))
-    outfile_html = os.path.normpath(os.path.join(dir_path, OUTFILE_HTML))
-    
-    if setup.output_folder_path is not None:
-        # prepare output folder
-        setup.output_folder_path = os.path.normpath(setup.output_folder_path)
-        # tests/create output folder path
-        if not os.path.isdir(setup.output_folder_path):
-            # create if not existent
-            if not os.path.exists(setup.output_folder_path):
-                try:
-                    os.makedirs(setup.output_folder_path)
-                    log.info("Created output directory: " + str(setup.output_folder_path))
-                except Exception as e:
-                    log.info("Failed creating output directory: " + type(e).__name__ + str(e.args))
-                    log.info("Abort.")
-                    return
-            else:
-                # abort: existent but not a dir
-                log.info("Output folder path is invalid.")
-                log.info("Abort.")
-                return
-        # create directory structure
-        latex_output_path = os.path.join(setup.output_folder_path, 'latex')
-        html_output_path = os.path.join(setup.output_folder_path, 'html')
-        try:
-            if not os.path.exists(latex_output_path):
-                os.makedirs(latex_output_path)
-            # preliminariesPath = os.path.join(latex_output_path, 'bookPreliminaries')
-            # if not os.path.exists(preliminariesPath):
-            #     os.makedirs(preliminariesPath)
-            # appendixPath = os.path.join(latex_output_path, 'bookAppendix')
-            # if not os.path.exists(appendixPath):
-            #     os.makedirs(appendixPath)
-            if not os.path.exists(html_output_path):
-                os.makedirs(html_output_path)
-        except Exception as e:
-            log.info("Failed creating output subdirectories: " + type(e).__name__ + str(e.args))
-            log.info("Abort.")
-            return           
 
-        # copy required files from latex template folders
-        appendix_source_path = os.path.join(dir_path, 'latex', APPENDIX_PATH)
-        if not os.path.exists(appendix_source_path):
-            os.makedirs(appendix_source_path)
-        dir_util.copy_tree(appendix_source_path,
-                           os.path.join(latex_output_path, APPENDIX_PATH), update=1)
-        # TODO appendix files from config?
-        preliminaries_source_path = os.path.join(dir_path, 'latex', PRELIMINARIES_PATH)
-        if not os.path.exists(preliminaries_source_path):
-            os.makedirs(preliminaries_source_path)
-        dir_util.copy_tree(preliminaries_source_path,
-                           os.path.join(latex_output_path, PRELIMINARIES_PATH), update=1)
-        # TODO preliminary files from config?
-        dir_util.copy_tree(os.path.join(dir_path, 'latex', 'img'),
-                           os.path.join(latex_output_path, 'img'), update=1)
-        latex_files = [
-            'build.bash',
-            'build.bat',
-            'license.tex'  # TODO get license from config, allow not using license
-        ]
-        for file_name in latex_files:
-            copy_file(file_name, 'latex', latex_output_path)
-        
-        # copy required files from html template folders
-        dir_util.copy_tree(os.path.join(dir_path, 'html', 'css'), os.path.join(html_output_path, 'css'), update=1)
-        dir_util.copy_tree(os.path.join(dir_path, 'html', 'img'), os.path.join(html_output_path, 'img'), update=1)
-        html_files = [  # TODO get license from config, allow not using license
-            'apple-touch-icon.png',
-            'browserconfig.xml',
-            'favicon.ico',
-            'humans.txt',
-            'tile.png',
-            'tile-wide.png'
-        ]
-        for file_name in html_files:
-            copy_file(file_name, 'html', html_output_path)
-                
-        # set outfile paths
-        outfile_latex_doc = os.path.normpath(os.path.join(setup.output_folder_path, OUTFILE_LATEX_DOC))
-        outfile_latex_body = os.path.normpath(os.path.join(setup.output_folder_path, OUTFILE_LATEX_BODY))
-        outfile_html = os.path.normpath(os.path.join(setup.output_folder_path, OUTFILE_HTML))
+    out_folder = prepare_out_folder(setup)
+
+    if not prepare_out_folder(setup):
+        return
+
+    # create directory structure
+    latex_output_path = os.path.join(setup.output_folder_path, 'latex')
+    html_output_path = os.path.join(setup.output_folder_path, 'html')
+    try:
+        if not os.path.exists(latex_output_path):
+            os.makedirs(latex_output_path)
+        # preliminariesPath = os.path.join(latex_output_path, 'bookPreliminaries')
+        # if not os.path.exists(preliminariesPath):
+        #     os.makedirs(preliminariesPath)
+        # appendixPath = os.path.join(latex_output_path, 'bookAppendix')
+        # if not os.path.exists(appendixPath):
+        #     os.makedirs(appendixPath)
+        if not os.path.exists(html_output_path):
+            os.makedirs(html_output_path)
+    except Exception as e:
+        log.info("Failed creating output subdirectories: " + type(e).__name__ + str(e.args))
+        log.info("Abort.")
+        return
+
+    # copy required files from latex template folders
+    appendix_source_path = os.path.join(dir_path, 'latex', APPENDIX_PATH)
+    if not os.path.exists(appendix_source_path):
+        os.makedirs(appendix_source_path)
+    dir_util.copy_tree(appendix_source_path,
+                       os.path.join(latex_output_path, APPENDIX_PATH), update=1)
+    # TODO appendix files from config?
+    preliminaries_source_path = os.path.join(dir_path, 'latex', PRELIMINARIES_PATH)
+    if not os.path.exists(preliminaries_source_path):
+        os.makedirs(preliminaries_source_path)
+    dir_util.copy_tree(preliminaries_source_path,
+                       os.path.join(latex_output_path, PRELIMINARIES_PATH), update=1)
+    # TODO preliminary files from config?
+    dir_util.copy_tree(os.path.join(dir_path, 'latex', 'img'),
+                       os.path.join(latex_output_path, 'img'), update=1)
+    latex_files = [
+        'build.bash',
+        'build.bat',
+        'license.tex'  # TODO get license from config, allow not using license
+    ]
+    for file_name in latex_files:
+        copy_file(file_name, 'latex', latex_output_path)
+
+    # copy required files from html template folders
+    dir_util.copy_tree(os.path.join(dir_path, 'html', 'css'), os.path.join(html_output_path, 'css'), update=1)
+    dir_util.copy_tree(os.path.join(dir_path, 'html', 'img'), os.path.join(html_output_path, 'img'), update=1)
+    html_files = [  # TODO get license from config, allow not using license
+        'apple-touch-icon.png',
+        'browserconfig.xml',
+        'favicon.ico',
+        'humans.txt',
+        'tile.png',
+        'tile-wide.png'
+    ]
+    for file_name in html_files:
+        copy_file(file_name, 'html', html_output_path)
+
+    # set outfile paths
+    outfile_latex_doc = os.path.normpath(os.path.join(setup.output_folder_path, OUTFILE_LATEX_DOC))
+    outfile_latex_body = os.path.normpath(os.path.join(setup.output_folder_path, OUTFILE_LATEX_BODY))
+    outfile_html = os.path.normpath(os.path.join(setup.output_folder_path, OUTFILE_HTML))
     
     # Create LaTeX
     log.info("***************** Creating LaTeX *****************")
@@ -147,7 +129,60 @@ def run_with_setup(setup):
     log.info("***************** Creating HTML *****************")
     html_generator = HtmlGenerator(setup, input_markup, filters, HTML_TEMPLATE, HTML_LICENSE, outfile_html)
     html_generator.create_output()
-    log.info("Done creating HTML.")  
+    log.info("Done creating HTML.")
+
+
+def create_restructured_text(setup_file_path, input_file_path, output_folder_path=None):
+    log.info("++++++++++ textstory-to-beautiful-latex-html ++++++++++")
+
+    # Setup
+    log.info("***************** Running setup *****************")
+    setup = Setup(setup_file_path, input_file_path, output_folder_path)
+    log.info("Done with setup.")
+
+    # run_with_setup(setup)
+    input_markup = DocumentReader(input_file_path).get_string()
+
+    filters = get_filters(setup)
+
+#     if not prepare_out_folder(setup):
+#         return
+
+    # set outfile path
+    # outfile_restructured_text = os.path.normpath(os.path.join(setup.output_folder_path, OUTFILE_RESTRUCTURED_TEXT))
+
+    # Create reStructuredText
+    log.info("***************** Creating reStructuredText *****************")
+    restructured_text_generator = ReStructuredTextGenerator(setup, input_markup, filters, None)
+    # restructured_text_generator.create_output()
+    log.info("Done creating reStructuredText.")
+    return restructured_text_generator.output_markup
+
+
+def prepare_out_folder(setup):
+    if setup.output_folder_path is None:
+        setup.output_folder_path = dir_path
+        return True
+
+    # prepare output folder
+    setup.output_folder_path = os.path.normpath(setup.output_folder_path)
+    # tests/create output folder path
+    if not os.path.isdir(setup.output_folder_path):
+        # create if not existent
+        if not os.path.exists(setup.output_folder_path):
+            try:
+                os.makedirs(setup.output_folder_path)
+                log.info("Created output directory: " + str(setup.output_folder_path))
+            except Exception as e:
+                log.info("Failed creating output directory: " + type(e).__name__ + str(e.args))
+                log.info("Abort.")
+                return False
+        else:
+            # abort: existent but not a dir
+            log.info("Output folder path is invalid.")
+            log.info("Abort.")
+            return False
+    return True
 
 
 def copy_file(file_name, src_folder, dst_folder):
@@ -309,6 +344,30 @@ class LatexGenerator(Generator):
         with open(self.output_body_file_path, "wb") as f:
             f.write(self.output_latex.encode("utf-8"))
         log.info("Wrote UTF-8-encoded LaTeX document body: %s.", self.output_body_file_path)
+
+
+class ReStructuredTextGenerator(Generator):
+    def __init__(self, setup, input_markup, filters, output_file_path=None):
+        self.output_file_path = output_file_path
+        self.output_markup = ""
+        Generator.__init__(self, setup, input_markup, filters, None)
+
+    def apply_filters(self, filters, input_markup):
+        # Push original contents through reStructuredText filters (same order, order matters).
+        self.output_markup = input_markup
+        for f in filters:
+            log.info("Process with %s", f)
+            self.output_markup = f.to_restructured_text(self.output_markup)
+            log.info("Done.")
+
+    def substitute(self, setup):
+        pass
+
+    def create_output(self):
+        if self.output_file_path:
+            with open(self.output_file_path, "wb") as f:
+                f.write(self.output_markup.encode("utf-8"))
+            log.info("Wrote UTF-8-encoded reStructuredText document: %s.", self.output_file_path)
 
 
 if __name__ == "__main__":
